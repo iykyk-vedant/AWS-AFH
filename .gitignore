@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.venv/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Docker
+amaze_repo_*/
+amaze_patched_*/
+
+# Test
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Reports
+reports/output/
+
+Previous_PROJECT_DOCUMENTATION.md
+PROJECT_DOCUMENTATION.md
