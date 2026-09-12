@@ -1,0 +1,16 @@
+{
+  "incident_id": "INC-0007",
+  "title": "We have a critical production issue in our Python service reported by the Finance Team. Customers ar",
+  "root_cause": "The discount is being applied twice because the discount logic is being executed both in the cart summary endpoint and during the checkout flow, due to recent changes adding discount support in both places without coordination.",
+  "changes_made": [],
+  "diff": "",
+  "validation": {},
+  "risk": {},
+  "confidence_score": 0.34,
+  "reasoning_chain": [
+    "Incident INC-0007 parsed: 'We have a critical production issue in our Python service reported by the Finance Team. Customers ar' -- service: python-service, type: logical_error",
+    "Stack trace analysis -> suspect files: ['python-service/app/services/discount_service.py', 'python-service/app/routes/cart.py', 'python-service/app/routes/checkout.py']",
+    "Root cause: The discount is being applied twice because the discount logic is being executed both in the cart summary endpoint and during the checkout flow, due to recent changes adding discount support in both places without coordination."
+  ],
+  "resolution_time_seconds": 21.294336080551147
+}

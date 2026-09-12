@@ -1,0 +1,31 @@
+{
+  "incident_id": "INC-0008",
+  "title": "We have a critical production issue in our Python service reported by the Finance Team. Customers ar",
+  "root_cause": "Line 15 of python-service/app/services/discount_service.py applies the discount twice because the apply_discount function is invoked both during cart summary calculation and again during checkout processing without idempotency checks or state tracking.",
+  "changes_made": [
+    {
+      "file": "python-service/app/services/discount_service.py",
+      "change": "    def apply_discount(cart, discount_rate):\n        if not hasattr(cart, '_discount_applied') or no",
+      "rationale": "This change ensures the discount is applied only once by marking the cart with a flag after the first application, preventing subsequent invocations from altering the total again."
+    }
+  ],
+  "diff": "",
+  "validation": {
+    "verdict": "SKIPPED",
+    "before": {},
+    "after": {},
+    "regressions": [],
+    "fixes_confirmed": [],
+    "unrelated_failures": []
+  },
+  "risk": {},
+  "confidence_score": 0.34,
+  "reasoning_chain": [
+    "Incident INC-0008 parsed: 'We have a critical production issue in our Python service reported by the Finance Team. Customers ar' -- service: python-service, type: logical_error",
+    "Stack trace analysis -> suspect files: ['python-service/app/services/discount_service.py']",
+    "Root cause: Line 15 of python-service/app/services/discount_service.py applies the discount twice because the apply_discount function is invoked both during cart summary calculation and again during checkout processing without idempotency checks or state tracking.",
+    "Fix applied: The discount was being applied twice due to lack of idempotency; the fix adds a check to apply discount only if not already applied.",
+    "Validation: SKIPPED -- before: 0/0 passed, after: 0/0 passed"
+  ],
+  "resolution_time_seconds": 15.877677202224731
+}
