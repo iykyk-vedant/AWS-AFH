@@ -1222,10 +1222,10 @@
             </div>
 
             <div class="filter-pills">
-              <button class="filter-pill active" onclick="setFilter('all', this)">All</button>
-              <button class="filter-pill" onclick="setFilter('open', this)">Open</button>
-              <button class="filter-pill" onclick="setFilter('triaging', this)">Triaging</button>
-              <button class="filter-pill" onclick="setFilter('resolved', this)">Resolved</button>
+              <button class="filter-pill active" id="filterPillAll" onclick="setFilter('all', this)">All</button>
+              <button class="filter-pill" id="filterPillOpen" onclick="setFilter('open', this)">Open</button>
+              <button class="filter-pill" id="filterPillTriaging" onclick="setFilter('triaging', this)">Triaging</button>
+              <button class="filter-pill" id="filterPillResolved" onclick="setFilter('resolved', this)">Resolved</button>
             </div>
 
             <button class="btn-primary" onclick="openNewIssueModal()">
@@ -1420,6 +1420,19 @@
 
         if (res.ok) {
           incidentsData = await res.json();
+          const total = incidentsData.length;
+          const openCount = incidentsData.filter(i => (i.state || 'open') === 'open' && !i.pr_url).length;
+          const resolvedCount = incidentsData.filter(i => (i.state || '') === 'closed' || !!i.pr_url).length;
+          
+          const pillAll = document.getElementById('filterPillAll');
+          const pillOpen = document.getElementById('filterPillOpen');
+          const pillTri = document.getElementById('filterPillTriaging');
+          const pillRes = document.getElementById('filterPillResolved');
+          if (pillAll) pillAll.textContent = `All (${total})`;
+          if (pillOpen) pillOpen.textContent = `Open (${openCount})`;
+          if (pillTri) pillTri.textContent = `Triaging (${openCount})`;
+          if (pillRes) pillRes.textContent = `Resolved (${resolvedCount})`;
+
           renderGrid(applyFilter(incidentsData));
         } else {
           incidentsData = [];
