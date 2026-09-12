@@ -1,0 +1,385 @@
+{
+  "counter": 41,
+  "incidents": {
+    "INC-0001": {
+      "source": "test"
+    },
+    "INC-0002": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773733191.305659",
+      "text": "{\n  \"incident_id\": \"INC-001\",\n  \"title\": \"Server returns 500 error on POST /api/auth/login after latest deployment\",\n  \"severity\": \"P1 - Critical\",\n  \"service\": \"python-service\",\n  \"reported_by\": \"Frontend Team\",\n  \"environment\": \"staging\",\n  \"timestamp\": \"2026-02-28T14:23:00Z\",\n  \"description\": \"After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials. This was wo",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773733191.305659"
+    },
+    "INC-0003": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773733191.305659",
+      "text": "{\n  \"incident_id\": \"INC-001\",\n  \"title\": \"Server returns 500 error on POST /api/auth/login after latest deployment\",\n  \"severity\": \"P1 - Critical\",\n  \"service\": \"python-service\",\n  \"reported_by\": \"Frontend Team\",\n  \"environment\": \"staging\",\n  \"timestamp\": \"2026-02-28T14:23:00Z\",\n  \"description\": \"After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials. This was wo",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773733191.305659"
+    },
+    "INC-0004": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773733580.846539",
+      "text": "{\n  \"incident_id\": \"INC-001\",\n  \"title\": \"Server returns 500 error on POST /api/auth/login after latest deployment\",\n  \"severity\": \"P1 - Critical\",\n  \"service\": \"python-service\",\n  \"reported_by\": \"Frontend Team\",\n  \"environment\": \"staging\",\n  \"timestamp\": \"2026-02-28T14:23:00Z\",\n  \"description\": \"After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials. This was wo",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773733580.846539"
+    },
+    "INC-0005": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773740261.232739",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773740261.232739"
+    },
+    "INC-0006": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773742058.614129",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773742058.614129"
+    },
+    "INC-0007": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773742058.614129",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773742058.614129"
+    },
+    "INC-0008": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773743434.005309",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773743434.005309"
+    },
+    "INC-0009": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773744510.256859",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773744510.256859"
+    },
+    "INC-0010": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773744510.256859",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773744510.256859"
+    },
+    "INC-0011": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773744566.356009",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773744566.356009"
+    },
+    "INC-0012": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773753828.095049",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773753828.095049"
+    },
+    "INC-0013": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773753828.095049",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773753828.095049"
+    },
+    "INC-0014": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773756338.116509",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773756338.116509"
+    },
+    "INC-0015": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773758146.352169",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773758146.352169"
+    },
+    "INC-0016": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773758146.352169",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773758146.352169"
+    },
+    "INC-0017": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773758146.352169",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773758146.352169"
+    },
+    "INC-0018": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773759443.954649",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773759443.954649"
+    },
+    "INC-0019": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773759443.954649",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773759443.954649"
+    },
+    "INC-0020": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773761008.659749",
+      "text": "Our CI pipeline has been consistently failing since the last merge, and the QA Team flagged it as a P2 issue. The `test_payment_flow` test suite in our Python service is breaking on two specific tests \u2014 `test_calculate_total_with_tax` and `test_checkout_flow_complete`. The root symptom is that tax calculation is returning zero for any order subtotal under $100. For example, a $49.99 order should come out to $54.24 after applying 8.5% tax, but the test is getting $49.99 back \u2014 meaning no tax is b",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773761008.659749"
+    },
+    "INC-0021": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773761008.659749",
+      "text": "Our CI pipeline has been consistently failing since the last merge, and the QA Team flagged it as a P2 issue. The `test_payment_flow` test suite in our Python service is breaking on two specific tests \u2014 `test_calculate_total_with_tax` and `test_checkout_flow_complete`. The root symptom is that tax calculation is returning zero for any order subtotal under $100. For example, a $49.99 order should come out to $54.24 after applying 8.5% tax, but the test is getting $49.99 back \u2014 meaning no tax is b",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773761008.659749"
+    },
+    "INC-0022": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773762818.328769",
+      "text": "Our CI pipeline has been consistently failing since the last merge, and the QA Team flagged it as a P2 issue. The `test_payment_flow` test suite in our Python service is breaking on two specific tests \u2014 `test_calculate_total_with_tax` and `test_checkout_flow_complete`. The root symptom is that tax calculation is returning zero for any order subtotal under $100. For example, a $49.99 order should come out to $54.24 after applying 8.5% tax, but the test is getting $49.99 back \u2014 meaning no tax is b",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773762818.328769"
+    },
+    "INC-0023": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773765959.711719",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773765959.711719"
+    },
+    "INC-0024": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773809171.617909",
+      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
+      "user": "U0ALTPHFE3E",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773809171.617909"
+    },
+    "INC-0025": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773812366.243229",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773812366.243229"
+    },
+    "INC-0026": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773812563.014289",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773812563.014289"
+    },
+    "INC-0027": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773813173.170149",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773813173.170149"
+    },
+    "INC-0028": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773819874.744079",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773819874.744079"
+    },
+    "INC-0029": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773820691.582299",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773820691.582299"
+    },
+    "INC-0030": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773821054.346889",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773821054.346889"
+    },
+    "INC-0031": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773821809.708979",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773821809.708979"
+    },
+    "INC-0032": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773821798.167749",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773821798.167749"
+    },
+    "INC-0033": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773821926.312099",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773821926.312099"
+    },
+    "INC-0034": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773822349.067359",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773822349.067359"
+    },
+    "INC-0035": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773822742.852069",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773822742.852069"
+    },
+    "INC-0036": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773823369.971879",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773823369.971879"
+    },
+    "INC-0037": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773823654.201229",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773823654.201229"
+    },
+    "INC-0038": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773824694.500189",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773824694.500189"
+    },
+    "INC-0039": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773825306.103869",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773825306.103869"
+    },
+    "INC-0040": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773825592.484629",
+      "text": "Discount is being applied twice.",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773825592.484629"
+    },
+    "INC-0041": {
+      "source": "slack",
+      "channel": "C0ALKQVBN87",
+      "thread_ts": "1773825934.821419",
+      "text": "There is a problem with Discount is being applied twice. repo: <https://github.com/RonakAjwani/shopstack-platform.git>",
+      "user": "U0ALTPHFE3E",
+      "repo_url": "https://github.com/RonakAjwani/shopstack-platform.git",
+      "slack_channel": "C0ALKQVBN87",
+      "slack_thread_ts": "1773825934.821419"
+    }
+  }
+}
