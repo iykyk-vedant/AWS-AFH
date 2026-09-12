@@ -29,10 +29,7 @@ def _docker_available() -> bool:
 
 
 def _neo4j_available() -> bool:
-    """Check if Neo4j is reachable."""
-    if not _docker_available():
-        return False
-
+    """Check if Neo4j is reachable (locally, over SSH tunnel, or on AWS EC2)."""
     try:
         from src.config import settings
         backend = Neo4jBackend(

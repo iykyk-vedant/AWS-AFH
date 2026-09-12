@@ -98,6 +98,31 @@ if HAS_FASTAPI:
             return HTMLResponse(content=static_file.read_text(encoding="utf-8"))
         return HTMLResponse(content="<h1>Amaze on Work Mission Control</h1>")
 
+    @app.get("/graph", response_class=HTMLResponse)
+    async def knowledge_graph():
+        """Serves the Amaze on Work Code Property Graph (GraphRAG Neo4j Explorer)."""
+        graph_file = Path("src/api/static/graph.html")
+        if graph_file.exists():
+            return HTMLResponse(content=graph_file.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Graph visualization not found</h1>", status_code=404)
+
+    @app.get("/api/graph")
+    async def get_graph_data():
+        """Returns the indexed Code Property Graph nodes and edges JSON."""
+        data_file = Path("src/api/static/graph_data.json")
+        if data_file.exists():
+            return json.loads(data_file.read_text(encoding="utf-8"))
+        return {"nodes": [], "edges": []}
+
+    @app.get("/data/graph_export.cypher")
+    async def get_cypher_export():
+        """Returns the exported Neo4j Cypher statements script."""
+        cypher_file = Path("data/graph_export.cypher")
+        if cypher_file.exists():
+            return HTMLResponse(content=cypher_file.read_text(encoding="utf-8"), media_type="text/plain")
+        return HTMLResponse(content="// Cypher export not generated", status_code=404)
+
+
     @app.get("/api/incidents")
     async def list_github_issues():
         """Returns real issues dynamically fetched from the GitHub repository iykyk-vedant/AFH-DEMO."""

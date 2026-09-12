@@ -101,7 +101,7 @@ class SupervisorAgent:
         # Initialize knowledge graph backend
         # Shared singleton across all agents so they all query the same indexed graph
         try:
-            self.graph = graph or create_graph_backend(prefer="networkx")
+            self.graph = graph or create_graph_backend(prefer="auto")
             logger.info(f"Graph backend ready: {self.graph.stats()}")
         except Exception as e:
             logger.warning(f"Graph backend init failed: {e} — graph-first localization disabled")

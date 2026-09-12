@@ -1,0 +1,1497 @@
+{
+  "nodes": [
+    {
+      "id": "file:app/main.py",
+      "label": "main.py",
+      "group": "file",
+      "title": "file: main.py<br>ID: file:app/main.py",
+      "properties": {
+        "file": "app/main.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 391
+      }
+    },
+    {
+      "id": "func:app/main.py:health_check",
+      "label": "health_check",
+      "group": "function",
+      "title": "function: health_check<br>ID: func:app/main.py:health_check",
+      "properties": {
+        "file": "app/main.py",
+        "line": 18,
+        "end_line": 19,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:app/__init__.py",
+      "label": "__init__.py",
+      "group": "file",
+      "title": "file: __init__.py<br>ID: file:app/__init__.py",
+      "properties": {
+        "file": "app/__init__.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 36
+      }
+    },
+    {
+      "id": "file:app/routes/auth.py",
+      "label": "auth.py",
+      "group": "file",
+      "title": "file: auth.py<br>ID: file:app/routes/auth.py",
+      "properties": {
+        "file": "app/routes/auth.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 1701
+      }
+    },
+    {
+      "id": "class:app/routes/auth.py:LoginRequest",
+      "label": "LoginRequest",
+      "group": "class",
+      "title": "class: LoginRequest<br>ID: class:app/routes/auth.py:LoginRequest",
+      "properties": {
+        "file": "app/routes/auth.py",
+        "line": 12,
+        "bases": [
+          "BaseModel"
+        ]
+      }
+    },
+    {
+      "id": "class:app/routes/auth.py:MockUser",
+      "label": "MockUser",
+      "group": "class",
+      "title": "class: MockUser<br>ID: class:app/routes/auth.py:MockUser",
+      "properties": {
+        "file": "app/routes/auth.py",
+        "line": 17,
+        "bases": []
+      }
+    },
+    {
+      "id": "func:app/routes/auth.py:login",
+      "label": "login",
+      "group": "function",
+      "title": "function: login<br>ID: func:app/routes/auth.py:login",
+      "properties": {
+        "file": "app/routes/auth.py",
+        "line": 36,
+        "end_line": 65,
+        "is_async": false,
+        "args": [
+          "payload"
+        ]
+      }
+    },
+    {
+      "id": "func:app/routes/auth.py:__init__",
+      "label": "__init__",
+      "group": "function",
+      "title": "function: __init__<br>ID: func:app/routes/auth.py:__init__",
+      "properties": {
+        "file": "app/routes/auth.py",
+        "line": 18,
+        "end_line": 21,
+        "is_async": false,
+        "args": [
+          "self",
+          "user_id",
+          "email",
+          "password_hash"
+        ]
+      }
+    },
+    {
+      "id": "file:app/routes/__init__.py",
+      "label": "__init__.py",
+      "group": "file",
+      "title": "file: __init__.py<br>ID: file:app/routes/__init__.py",
+      "properties": {
+        "file": "app/routes/__init__.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 22
+      }
+    },
+    {
+      "id": "file:app/services/analytics_service.py",
+      "label": "analytics_service.py",
+      "group": "file",
+      "title": "file: analytics_service.py<br>ID: file:app/services/analytics_service.py",
+      "properties": {
+        "file": "app/services/analytics_service.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 435
+      }
+    },
+    {
+      "id": "func:app/services/analytics_service.py:parse_date_range_days",
+      "label": "parse_date_range_days",
+      "group": "function",
+      "title": "function: parse_date_range_days<br>ID: func:app/services/analytics_service.py:parse_date_range_days",
+      "properties": {
+        "file": "app/services/analytics_service.py",
+        "line": 8,
+        "end_line": 14,
+        "is_async": false,
+        "args": [
+          "raw_param",
+          "default_days"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/audit_service.py",
+      "label": "audit_service.py",
+      "group": "file",
+      "title": "file: audit_service.py<br>ID: file:app/services/audit_service.py",
+      "properties": {
+        "file": "app/services/audit_service.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 473
+      }
+    },
+    {
+      "id": "func:app/services/audit_service.py:format_audit_log",
+      "label": "format_audit_log",
+      "group": "function",
+      "title": "function: format_audit_log<br>ID: func:app/services/audit_service.py:format_audit_log",
+      "properties": {
+        "file": "app/services/audit_service.py",
+        "line": 10,
+        "end_line": 18,
+        "is_async": false,
+        "args": [
+          "event_id",
+          "action",
+          "actor"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/cart_service.py",
+      "label": "cart_service.py",
+      "group": "file",
+      "title": "file: cart_service.py<br>ID: file:app/services/cart_service.py",
+      "properties": {
+        "file": "app/services/cart_service.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 598
+      }
+    },
+    {
+      "id": "func:app/services/cart_service.py:validate_cart_totals",
+      "label": "validate_cart_totals",
+      "group": "function",
+      "title": "function: validate_cart_totals<br>ID: func:app/services/cart_service.py:validate_cart_totals",
+      "properties": {
+        "file": "app/services/cart_service.py",
+        "line": 8,
+        "end_line": 18,
+        "is_async": false,
+        "args": [
+          "item_prices",
+          "reported_subtotal"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/inventory_service.py",
+      "label": "inventory_service.py",
+      "group": "file",
+      "title": "file: inventory_service.py<br>ID: file:app/services/inventory_service.py",
+      "properties": {
+        "file": "app/services/inventory_service.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 1438
+      }
+    },
+    {
+      "id": "func:app/services/inventory_service.py:reserve_stock",
+      "label": "reserve_stock",
+      "group": "function",
+      "title": "function: reserve_stock<br>ID: func:app/services/inventory_service.py:reserve_stock",
+      "properties": {
+        "file": "app/services/inventory_service.py",
+        "line": 17,
+        "end_line": 29,
+        "is_async": false,
+        "args": [
+          "item_id",
+          "quantity"
+        ]
+      }
+    },
+    {
+      "id": "func:app/services/inventory_service.py:list_inventory_page",
+      "label": "list_inventory_page",
+      "group": "function",
+      "title": "function: list_inventory_page<br>ID: func:app/services/inventory_service.py:list_inventory_page",
+      "properties": {
+        "file": "app/services/inventory_service.py",
+        "line": 32,
+        "end_line": 43,
+        "is_async": false,
+        "args": [
+          "page",
+          "limit"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/payment_service.py",
+      "label": "payment_service.py",
+      "group": "file",
+      "title": "file: payment_service.py<br>ID: file:app/services/payment_service.py",
+      "properties": {
+        "file": "app/services/payment_service.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 1062
+      }
+    },
+    {
+      "id": "func:app/services/payment_service.py:calculate_discount",
+      "label": "calculate_discount",
+      "group": "function",
+      "title": "function: calculate_discount<br>ID: func:app/services/payment_service.py:calculate_discount",
+      "properties": {
+        "file": "app/services/payment_service.py",
+        "line": 14,
+        "end_line": 19,
+        "is_async": false,
+        "args": [
+          "subtotal",
+          "discount_code"
+        ]
+      }
+    },
+    {
+      "id": "func:app/services/payment_service.py:process_order_total",
+      "label": "process_order_total",
+      "group": "function",
+      "title": "function: process_order_total<br>ID: func:app/services/payment_service.py:process_order_total",
+      "properties": {
+        "file": "app/services/payment_service.py",
+        "line": 22,
+        "end_line": 34,
+        "is_async": false,
+        "args": [
+          "subtotal",
+          "discount_code",
+          "tax_rate"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/rate_limiter.py",
+      "label": "rate_limiter.py",
+      "group": "file",
+      "title": "file: rate_limiter.py<br>ID: file:app/services/rate_limiter.py",
+      "properties": {
+        "file": "app/services/rate_limiter.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 419
+      }
+    },
+    {
+      "id": "func:app/services/rate_limiter.py:extract_client_ip",
+      "label": "extract_client_ip",
+      "group": "function",
+      "title": "function: extract_client_ip<br>ID: func:app/services/rate_limiter.py:extract_client_ip",
+      "properties": {
+        "file": "app/services/rate_limiter.py",
+        "line": 8,
+        "end_line": 12,
+        "is_async": false,
+        "args": [
+          "headers"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/shipping_service.py",
+      "label": "shipping_service.py",
+      "group": "file",
+      "title": "file: shipping_service.py<br>ID: file:app/services/shipping_service.py",
+      "properties": {
+        "file": "app/services/shipping_service.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 831
+      }
+    },
+    {
+      "id": "func:app/services/shipping_service.py:calculate_shipping_rate",
+      "label": "calculate_shipping_rate",
+      "group": "function",
+      "title": "function: calculate_shipping_rate<br>ID: func:app/services/shipping_service.py:calculate_shipping_rate",
+      "properties": {
+        "file": "app/services/shipping_service.py",
+        "line": 8,
+        "end_line": 24,
+        "is_async": false,
+        "args": [
+          "weight_kg",
+          "distance_km",
+          "base_fee"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/user_service.py",
+      "label": "user_service.py",
+      "group": "file",
+      "title": "file: user_service.py<br>ID: file:app/services/user_service.py",
+      "properties": {
+        "file": "app/services/user_service.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 808
+      }
+    },
+    {
+      "id": "func:app/services/user_service.py:update_user_profile",
+      "label": "update_user_profile",
+      "group": "function",
+      "title": "function: update_user_profile<br>ID: func:app/services/user_service.py:update_user_profile",
+      "properties": {
+        "file": "app/services/user_service.py",
+        "line": 13,
+        "end_line": 26,
+        "is_async": false,
+        "args": [
+          "user_id",
+          "updates"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/webhook_service.py",
+      "label": "webhook_service.py",
+      "group": "file",
+      "title": "file: webhook_service.py<br>ID: file:app/services/webhook_service.py",
+      "properties": {
+        "file": "app/services/webhook_service.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 544
+      }
+    },
+    {
+      "id": "func:app/services/webhook_service.py:prepare_webhook_target",
+      "label": "prepare_webhook_target",
+      "group": "function",
+      "title": "function: prepare_webhook_target<br>ID: func:app/services/webhook_service.py:prepare_webhook_target",
+      "properties": {
+        "file": "app/services/webhook_service.py",
+        "line": 9,
+        "end_line": 16,
+        "is_async": false,
+        "args": [
+          "target_url"
+        ]
+      }
+    },
+    {
+      "id": "file:app/services/__init__.py",
+      "label": "__init__.py",
+      "group": "file",
+      "title": "file: __init__.py<br>ID: file:app/services/__init__.py",
+      "properties": {
+        "file": "app/services/__init__.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 24
+      }
+    },
+    {
+      "id": "file:incidents/INC-001.json",
+      "label": "INC-001.json",
+      "group": "file",
+      "title": "file: INC-001.json<br>ID: file:incidents/INC-001.json",
+      "properties": {
+        "file": "incidents/INC-001.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1200
+      }
+    },
+    {
+      "id": "file:incidents/INC-002.json",
+      "label": "INC-002.json",
+      "group": "file",
+      "title": "file: INC-002.json<br>ID: file:incidents/INC-002.json",
+      "properties": {
+        "file": "incidents/INC-002.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1264
+      }
+    },
+    {
+      "id": "file:incidents/INC-003.json",
+      "label": "INC-003.json",
+      "group": "file",
+      "title": "file: INC-003.json<br>ID: file:incidents/INC-003.json",
+      "properties": {
+        "file": "incidents/INC-003.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1094
+      }
+    },
+    {
+      "id": "file:incidents/INC-004.json",
+      "label": "INC-004.json",
+      "group": "file",
+      "title": "file: INC-004.json<br>ID: file:incidents/INC-004.json",
+      "properties": {
+        "file": "incidents/INC-004.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1054
+      }
+    },
+    {
+      "id": "file:incidents/INC-005.json",
+      "label": "INC-005.json",
+      "group": "file",
+      "title": "file: INC-005.json<br>ID: file:incidents/INC-005.json",
+      "properties": {
+        "file": "incidents/INC-005.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 941
+      }
+    },
+    {
+      "id": "file:incidents/INC-006.json",
+      "label": "INC-006.json",
+      "group": "file",
+      "title": "file: INC-006.json<br>ID: file:incidents/INC-006.json",
+      "properties": {
+        "file": "incidents/INC-006.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1028
+      }
+    },
+    {
+      "id": "file:incidents/INC-007.json",
+      "label": "INC-007.json",
+      "group": "file",
+      "title": "file: INC-007.json<br>ID: file:incidents/INC-007.json",
+      "properties": {
+        "file": "incidents/INC-007.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1088
+      }
+    },
+    {
+      "id": "file:incidents/INC-008.json",
+      "label": "INC-008.json",
+      "group": "file",
+      "title": "file: INC-008.json<br>ID: file:incidents/INC-008.json",
+      "properties": {
+        "file": "incidents/INC-008.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1125
+      }
+    },
+    {
+      "id": "file:incidents/INC-009.json",
+      "label": "INC-009.json",
+      "group": "file",
+      "title": "file: INC-009.json<br>ID: file:incidents/INC-009.json",
+      "properties": {
+        "file": "incidents/INC-009.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1015
+      }
+    },
+    {
+      "id": "file:incidents/INC-010.json",
+      "label": "INC-010.json",
+      "group": "file",
+      "title": "file: INC-010.json<br>ID: file:incidents/INC-010.json",
+      "properties": {
+        "file": "incidents/INC-010.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1052
+      }
+    },
+    {
+      "id": "file:incidents/INC-011.json",
+      "label": "INC-011.json",
+      "group": "file",
+      "title": "file: INC-011.json<br>ID: file:incidents/INC-011.json",
+      "properties": {
+        "file": "incidents/INC-011.json",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".json",
+        "size_bytes": 1264
+      }
+    },
+    {
+      "id": "file:tests/test_analytics.py",
+      "label": "test_analytics.py",
+      "group": "file",
+      "title": "file: test_analytics.py<br>ID: file:tests/test_analytics.py",
+      "properties": {
+        "file": "tests/test_analytics.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 446
+      }
+    },
+    {
+      "id": "func:tests/test_analytics.py:test_parse_valid_days",
+      "label": "test_parse_valid_days",
+      "group": "function",
+      "title": "function: test_parse_valid_days<br>ID: func:tests/test_analytics.py:test_parse_valid_days",
+      "properties": {
+        "file": "tests/test_analytics.py",
+        "line": 9,
+        "end_line": 11,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_analytics.py:test_parse_empty_string_fallback",
+      "label": "test_parse_empty_string_fallback",
+      "group": "function",
+      "title": "function: test_parse_empty_string_fallback<br>ID: func:tests/test_analytics.py:test_parse_empty_string_fallback",
+      "properties": {
+        "file": "tests/test_analytics.py",
+        "line": 14,
+        "end_line": 17,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_audit.py",
+      "label": "test_audit.py",
+      "group": "file",
+      "title": "file: test_audit.py<br>ID: file:tests/test_audit.py",
+      "properties": {
+        "file": "tests/test_audit.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 482
+      }
+    },
+    {
+      "id": "func:tests/test_audit.py:test_format_audit_log_serializable",
+      "label": "test_format_audit_log_serializable",
+      "group": "function",
+      "title": "function: test_format_audit_log_serializable<br>ID: func:tests/test_audit.py:test_format_audit_log_serializable",
+      "properties": {
+        "file": "tests/test_audit.py",
+        "line": 11,
+        "end_line": 17,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_auth.py",
+      "label": "test_auth.py",
+      "group": "file",
+      "title": "file: test_auth.py<br>ID: file:tests/test_auth.py",
+      "properties": {
+        "file": "tests/test_auth.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 759
+      }
+    },
+    {
+      "id": "func:tests/test_auth.py:test_health_check",
+      "label": "test_health_check",
+      "group": "function",
+      "title": "function: test_health_check<br>ID: func:tests/test_auth.py:test_health_check",
+      "properties": {
+        "file": "tests/test_auth.py",
+        "line": 12,
+        "end_line": 15,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_auth.py:test_login_success",
+      "label": "test_login_success",
+      "group": "function",
+      "title": "function: test_login_success<br>ID: func:tests/test_auth.py:test_login_success",
+      "properties": {
+        "file": "tests/test_auth.py",
+        "line": 18,
+        "end_line": 31,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_cart.py",
+      "label": "test_cart.py",
+      "group": "file",
+      "title": "file: test_cart.py<br>ID: file:tests/test_cart.py",
+      "properties": {
+        "file": "tests/test_cart.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 492
+      }
+    },
+    {
+      "id": "func:tests/test_cart.py:test_validate_simple_integers",
+      "label": "test_validate_simple_integers",
+      "group": "function",
+      "title": "function: test_validate_simple_integers<br>ID: func:tests/test_cart.py:test_validate_simple_integers",
+      "properties": {
+        "file": "tests/test_cart.py",
+        "line": 9,
+        "end_line": 10,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_cart.py:test_validate_floating_point_prices",
+      "label": "test_validate_floating_point_prices",
+      "group": "function",
+      "title": "function: test_validate_floating_point_prices<br>ID: func:tests/test_cart.py:test_validate_floating_point_prices",
+      "properties": {
+        "file": "tests/test_cart.py",
+        "line": 13,
+        "end_line": 16,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_inventory.py",
+      "label": "test_inventory.py",
+      "group": "file",
+      "title": "file: test_inventory.py<br>ID: file:tests/test_inventory.py",
+      "properties": {
+        "file": "tests/test_inventory.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 717
+      }
+    },
+    {
+      "id": "func:tests/test_inventory.py:test_reserve_stock_existing_item",
+      "label": "test_reserve_stock_existing_item",
+      "group": "function",
+      "title": "function: test_reserve_stock_existing_item<br>ID: func:tests/test_inventory.py:test_reserve_stock_existing_item",
+      "properties": {
+        "file": "tests/test_inventory.py",
+        "line": 9,
+        "end_line": 11,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_inventory.py:test_reserve_stock_missing_item",
+      "label": "test_reserve_stock_missing_item",
+      "group": "function",
+      "title": "function: test_reserve_stock_missing_item<br>ID: func:tests/test_inventory.py:test_reserve_stock_missing_item",
+      "properties": {
+        "file": "tests/test_inventory.py",
+        "line": 14,
+        "end_line": 18,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_inventory.py:test_list_inventory_out_of_bounds",
+      "label": "test_list_inventory_out_of_bounds",
+      "group": "function",
+      "title": "function: test_list_inventory_out_of_bounds<br>ID: func:tests/test_inventory.py:test_list_inventory_out_of_bounds",
+      "properties": {
+        "file": "tests/test_inventory.py",
+        "line": 21,
+        "end_line": 24,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_payment.py",
+      "label": "test_payment.py",
+      "group": "file",
+      "title": "file: test_payment.py<br>ID: file:tests/test_payment.py",
+      "properties": {
+        "file": "tests/test_payment.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 611
+      }
+    },
+    {
+      "id": "func:tests/test_payment.py:test_calculate_discount",
+      "label": "test_calculate_discount",
+      "group": "function",
+      "title": "function: test_calculate_discount<br>ID: func:tests/test_payment.py:test_calculate_discount",
+      "properties": {
+        "file": "tests/test_payment.py",
+        "line": 8,
+        "end_line": 12,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_payment.py:test_process_order_total",
+      "label": "test_process_order_total",
+      "group": "function",
+      "title": "function: test_process_order_total<br>ID: func:tests/test_payment.py:test_process_order_total",
+      "properties": {
+        "file": "tests/test_payment.py",
+        "line": 15,
+        "end_line": 20,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_rate_limiter.py",
+      "label": "test_rate_limiter.py",
+      "group": "file",
+      "title": "file: test_rate_limiter.py<br>ID: file:tests/test_rate_limiter.py",
+      "properties": {
+        "file": "tests/test_rate_limiter.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 511
+      }
+    },
+    {
+      "id": "func:tests/test_rate_limiter.py:test_extract_client_ip_with_header",
+      "label": "test_extract_client_ip_with_header",
+      "group": "function",
+      "title": "function: test_extract_client_ip_with_header<br>ID: func:tests/test_rate_limiter.py:test_extract_client_ip_with_header",
+      "properties": {
+        "file": "tests/test_rate_limiter.py",
+        "line": 9,
+        "end_line": 11,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_rate_limiter.py:test_extract_client_ip_without_header",
+      "label": "test_extract_client_ip_without_header",
+      "group": "function",
+      "title": "function: test_extract_client_ip_without_header<br>ID: func:tests/test_rate_limiter.py:test_extract_client_ip_without_header",
+      "properties": {
+        "file": "tests/test_rate_limiter.py",
+        "line": 14,
+        "end_line": 17,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_shipping.py",
+      "label": "test_shipping.py",
+      "group": "file",
+      "title": "file: test_shipping.py<br>ID: file:tests/test_shipping.py",
+      "properties": {
+        "file": "tests/test_shipping.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 543
+      }
+    },
+    {
+      "id": "func:tests/test_shipping.py:test_standard_shipping",
+      "label": "test_standard_shipping",
+      "group": "function",
+      "title": "function: test_standard_shipping<br>ID: func:tests/test_shipping.py:test_standard_shipping",
+      "properties": {
+        "file": "tests/test_shipping.py",
+        "line": 9,
+        "end_line": 11,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_shipping.py:test_digital_items_zero_weight_shipping",
+      "label": "test_digital_items_zero_weight_shipping",
+      "group": "function",
+      "title": "function: test_digital_items_zero_weight_shipping<br>ID: func:tests/test_shipping.py:test_digital_items_zero_weight_shipping",
+      "properties": {
+        "file": "tests/test_shipping.py",
+        "line": 14,
+        "end_line": 18,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_user.py",
+      "label": "test_user.py",
+      "group": "file",
+      "title": "file: test_user.py<br>ID: file:tests/test_user.py",
+      "properties": {
+        "file": "tests/test_user.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 528
+      }
+    },
+    {
+      "id": "func:tests/test_user.py:test_update_name",
+      "label": "test_update_name",
+      "group": "function",
+      "title": "function: test_update_name<br>ID: func:tests/test_user.py:test_update_name",
+      "properties": {
+        "file": "tests/test_user.py",
+        "line": 9,
+        "end_line": 11,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_user.py:test_update_with_none_phone",
+      "label": "test_update_with_none_phone",
+      "group": "function",
+      "title": "function: test_update_with_none_phone<br>ID: func:tests/test_user.py:test_update_with_none_phone",
+      "properties": {
+        "file": "tests/test_user.py",
+        "line": 14,
+        "end_line": 18,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/test_webhook.py",
+      "label": "test_webhook.py",
+      "group": "file",
+      "title": "file: test_webhook.py<br>ID: file:tests/test_webhook.py",
+      "properties": {
+        "file": "tests/test_webhook.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 511
+      }
+    },
+    {
+      "id": "func:tests/test_webhook.py:test_prepare_webhook_with_scheme",
+      "label": "test_prepare_webhook_with_scheme",
+      "group": "function",
+      "title": "function: test_prepare_webhook_with_scheme<br>ID: func:tests/test_webhook.py:test_prepare_webhook_with_scheme",
+      "properties": {
+        "file": "tests/test_webhook.py",
+        "line": 9,
+        "end_line": 11,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "func:tests/test_webhook.py:test_prepare_webhook_without_scheme",
+      "label": "test_prepare_webhook_without_scheme",
+      "group": "function",
+      "title": "function: test_prepare_webhook_without_scheme<br>ID: func:tests/test_webhook.py:test_prepare_webhook_without_scheme",
+      "properties": {
+        "file": "tests/test_webhook.py",
+        "line": 14,
+        "end_line": 17,
+        "is_async": false,
+        "args": []
+      }
+    },
+    {
+      "id": "file:tests/__init__.py",
+      "label": "__init__.py",
+      "group": "file",
+      "title": "file: __init__.py<br>ID: file:tests/__init__.py",
+      "properties": {
+        "file": "tests/__init__.py",
+        "repo": "https://github.com/iykyk-vedant/AFH-DEMO",
+        "extension": ".py",
+        "size_bytes": 21
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "file:app/main.py",
+      "to": "func:app/main.py:health_check",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/main.py:health_check",
+      "to": "func:app/main.py:get",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/routes/auth.py",
+      "to": "class:app/routes/auth.py:LoginRequest",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/routes/auth.py",
+      "to": "class:app/routes/auth.py:MockUser",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/routes/auth.py",
+      "to": "func:app/routes/auth.py:login",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/routes/auth.py",
+      "to": "func:app/routes/auth.py:__init__",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/routes/auth.py:login",
+      "to": "func:app/routes/auth.py:post",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/routes/auth.py:login",
+      "to": "func:app/routes/auth.py:get",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/routes/auth.py:login",
+      "to": "func:app/routes/auth.py:checkpw",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/routes/auth.py:login",
+      "to": "func:app/routes/auth.py:HTTPException",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/routes/auth.py:login",
+      "to": "func:app/routes/auth.py:encode",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/analytics_service.py",
+      "to": "func:app/services/analytics_service.py:parse_date_range_days",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/analytics_service.py:parse_date_range_days",
+      "to": "func:app/services/analytics_service.py:int",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/audit_service.py",
+      "to": "func:app/services/audit_service.py:format_audit_log",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/audit_service.py:format_audit_log",
+      "to": "func:app/services/audit_service.py:dumps",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/cart_service.py",
+      "to": "func:app/services/cart_service.py:validate_cart_totals",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/cart_service.py:validate_cart_totals",
+      "to": "func:app/services/cart_service.py:sum",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/cart_service.py:validate_cart_totals",
+      "to": "func:app/services/cart_service.py:ValueError",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/inventory_service.py",
+      "to": "func:app/services/inventory_service.py:reserve_stock",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/inventory_service.py",
+      "to": "func:app/services/inventory_service.py:list_inventory_page",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/inventory_service.py:reserve_stock",
+      "to": "func:app/services/inventory_service.py:ValueError",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/inventory_service.py:list_inventory_page",
+      "to": "func:app/services/inventory_service.py:min",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/inventory_service.py:list_inventory_page",
+      "to": "func:app/services/inventory_service.py:ValueError",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/inventory_service.py:list_inventory_page",
+      "to": "func:app/services/inventory_service.py:len",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/payment_service.py",
+      "to": "func:app/services/payment_service.py:calculate_discount",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/payment_service.py",
+      "to": "func:app/services/payment_service.py:process_order_total",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/payment_service.py:calculate_discount",
+      "to": "func:app/services/payment_service.py:get",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/payment_service.py:calculate_discount",
+      "to": "func:app/services/payment_service.py:round",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/payment_service.py:calculate_discount",
+      "to": "func:app/services/payment_service.py:upper",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/payment_service.py:process_order_total",
+      "to": "func:app/services/payment_service.py:calculate_discount",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/payment_service.py:process_order_total",
+      "to": "func:app/services/payment_service.py:max",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/payment_service.py:process_order_total",
+      "to": "func:app/services/payment_service.py:round",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/rate_limiter.py",
+      "to": "func:app/services/rate_limiter.py:extract_client_ip",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/rate_limiter.py:extract_client_ip",
+      "to": "func:app/services/rate_limiter.py:strip",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/rate_limiter.py:extract_client_ip",
+      "to": "func:app/services/rate_limiter.py:split",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/shipping_service.py",
+      "to": "func:app/services/shipping_service.py:calculate_shipping_rate",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/shipping_service.py:calculate_shipping_rate",
+      "to": "func:app/services/shipping_service.py:round",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/shipping_service.py:calculate_shipping_rate",
+      "to": "func:app/services/shipping_service.py:ValueError",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/user_service.py",
+      "to": "func:app/services/user_service.py:update_user_profile",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/user_service.py:update_user_profile",
+      "to": "func:app/services/user_service.py:KeyError",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/user_service.py:update_user_profile",
+      "to": "func:app/services/user_service.py:strip",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:app/services/webhook_service.py",
+      "to": "func:app/services/webhook_service.py:prepare_webhook_target",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/webhook_service.py:prepare_webhook_target",
+      "to": "func:app/services/webhook_service.py:urlparse",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/webhook_service.py:prepare_webhook_target",
+      "to": "func:app/services/webhook_service.py:strip",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:app/services/webhook_service.py:prepare_webhook_target",
+      "to": "func:app/services/webhook_service.py:ValueError",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_analytics.py",
+      "to": "func:tests/test_analytics.py:test_parse_valid_days",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_analytics.py",
+      "to": "func:tests/test_analytics.py:test_parse_empty_string_fallback",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_analytics.py:test_parse_valid_days",
+      "to": "func:tests/test_analytics.py:parse_date_range_days",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_analytics.py:test_parse_empty_string_fallback",
+      "to": "func:tests/test_analytics.py:parse_date_range_days",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_audit.py",
+      "to": "func:tests/test_audit.py:test_format_audit_log_serializable",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_audit.py:test_format_audit_log_serializable",
+      "to": "func:tests/test_audit.py:uuid4",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_audit.py:test_format_audit_log_serializable",
+      "to": "func:tests/test_audit.py:format_audit_log",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_audit.py:test_format_audit_log_serializable",
+      "to": "func:tests/test_audit.py:loads",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_audit.py:test_format_audit_log_serializable",
+      "to": "func:tests/test_audit.py:str",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_auth.py",
+      "to": "func:tests/test_auth.py:test_health_check",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_auth.py",
+      "to": "func:tests/test_auth.py:test_login_success",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_auth.py:test_health_check",
+      "to": "func:tests/test_auth.py:get",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_auth.py:test_health_check",
+      "to": "func:tests/test_auth.py:json",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_auth.py:test_login_success",
+      "to": "func:tests/test_auth.py:post",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_auth.py:test_login_success",
+      "to": "func:tests/test_auth.py:json",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_cart.py",
+      "to": "func:tests/test_cart.py:test_validate_simple_integers",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_cart.py",
+      "to": "func:tests/test_cart.py:test_validate_floating_point_prices",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_cart.py:test_validate_simple_integers",
+      "to": "func:tests/test_cart.py:validate_cart_totals",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_cart.py:test_validate_floating_point_prices",
+      "to": "func:tests/test_cart.py:validate_cart_totals",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_inventory.py",
+      "to": "func:tests/test_inventory.py:test_reserve_stock_existing_item",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_inventory.py",
+      "to": "func:tests/test_inventory.py:test_reserve_stock_missing_item",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_inventory.py",
+      "to": "func:tests/test_inventory.py:test_list_inventory_out_of_bounds",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_inventory.py:test_reserve_stock_existing_item",
+      "to": "func:tests/test_inventory.py:reserve_stock",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_inventory.py:test_reserve_stock_missing_item",
+      "to": "func:tests/test_inventory.py:reserve_stock",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_inventory.py:test_reserve_stock_missing_item",
+      "to": "func:tests/test_inventory.py:lower",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_inventory.py:test_reserve_stock_missing_item",
+      "to": "func:tests/test_inventory.py:get",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_inventory.py:test_list_inventory_out_of_bounds",
+      "to": "func:tests/test_inventory.py:list_inventory_page",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_payment.py",
+      "to": "func:tests/test_payment.py:test_calculate_discount",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_payment.py",
+      "to": "func:tests/test_payment.py:test_process_order_total",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_payment.py:test_calculate_discount",
+      "to": "func:tests/test_payment.py:calculate_discount",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_payment.py:test_process_order_total",
+      "to": "func:tests/test_payment.py:process_order_total",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_rate_limiter.py",
+      "to": "func:tests/test_rate_limiter.py:test_extract_client_ip_with_header",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_rate_limiter.py",
+      "to": "func:tests/test_rate_limiter.py:test_extract_client_ip_without_header",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_rate_limiter.py:test_extract_client_ip_with_header",
+      "to": "func:tests/test_rate_limiter.py:extract_client_ip",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_rate_limiter.py:test_extract_client_ip_without_header",
+      "to": "func:tests/test_rate_limiter.py:extract_client_ip",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_shipping.py",
+      "to": "func:tests/test_shipping.py:test_standard_shipping",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_shipping.py",
+      "to": "func:tests/test_shipping.py:test_digital_items_zero_weight_shipping",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_shipping.py:test_standard_shipping",
+      "to": "func:tests/test_shipping.py:calculate_shipping_rate",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_shipping.py:test_digital_items_zero_weight_shipping",
+      "to": "func:tests/test_shipping.py:calculate_shipping_rate",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_user.py",
+      "to": "func:tests/test_user.py:test_update_name",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_user.py",
+      "to": "func:tests/test_user.py:test_update_with_none_phone",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_user.py:test_update_name",
+      "to": "func:tests/test_user.py:update_user_profile",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_user.py:test_update_with_none_phone",
+      "to": "func:tests/test_user.py:update_user_profile",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_webhook.py",
+      "to": "func:tests/test_webhook.py:test_prepare_webhook_with_scheme",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "file:tests/test_webhook.py",
+      "to": "func:tests/test_webhook.py:test_prepare_webhook_without_scheme",
+      "label": "contains",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_webhook.py:test_prepare_webhook_with_scheme",
+      "to": "func:tests/test_webhook.py:prepare_webhook_target",
+      "label": "calls",
+      "arrows": "to"
+    },
+    {
+      "from": "func:tests/test_webhook.py:test_prepare_webhook_without_scheme",
+      "to": "func:tests/test_webhook.py:prepare_webhook_target",
+      "label": "calls",
+      "arrows": "to"
+    }
+  ]
+}

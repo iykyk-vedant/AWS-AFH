@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amaze on Work — Code Property Graph (GraphRAG Neo4j Explorer)</title>
+  <meta name="description" content="Amaze on Work interactive Code Property Graph explorer powered by Neo4j and GraphRAG for repository iykyk-vedant/AFH-DEMO.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #07090e;
+      --bg-surface: #0d1117;
+      --bg-card: #161b22;
+      --bg-card-hover: #1c2128;
+      --border-subtle: #30363d;
+      --border-focus: #58a6ff;
+      --text-primary: #f0f6fc;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      
+      --cyan: #38bdf8;
+      --cyan-glow: rgba(56, 189, 248, 0.15);
+      --emerald: #3fb950;
+      --emerald-glow: rgba(63, 185, 80, 0.15);
+      --purple: #a855f7;
+      --purple-glow: rgba(168, 85, 247, 0.15);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.15);
+      --rose: #f43f5e;
+      
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Bar */
+    header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      height: 60px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(168, 85, 247, 0.2));
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--cyan);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-tag {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      font-family: var(--font-sans);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--text-secondary);
+    }
+
+    .btn-primary {
+      background: #1f6feb;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .btn-primary:hover {
+      background: #388bfd;
+      box-shadow: 0 0 12px rgba(31, 111, 235, 0.4);
+    }
+
+    .btn-emerald {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(63, 185, 80, 0.4);
+    }
+
+    .btn-emerald:hover {
+      background: rgba(63, 185, 80, 0.25);
+    }
+
+    /* Main Layout */
+    .layout-container {
+      display: flex;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Left Floating Control Panel */
+    .floating-controls {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 320px;
+      pointer-events: none;
+    }
+
+    .floating-controls > * {
+      pointer-events: auto;
+    }
+
+    .control-card {
+      background: rgba(13, 17, 23, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 6px 10px;
+      transition: border-color 0.2s;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 1px var(--cyan);
+    }
+
+    .search-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      width: 100%;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .filter-pill {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-pill:hover, .filter-pill.active {
+      color: var(--text-primary);
+      border-color: var(--cyan);
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .filter-pill.emerald.active {
+      border-color: var(--emerald);
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--emerald);
+    }
+
+    .filter-pill.purple.active {
+      border-color: var(--purple);
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--purple);
+    }
+
+    /* Stats Ribbon */
+    .stats-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    .stat-item {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 4px;
+      padding: 4px 6px;
+    }
+
+    .stat-val {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .stat-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Graph Canvas */
+    #graphCanvas {
+      flex: 1;
+      height: 100%;
+      background: radial-gradient(circle at center, #0f141f 0%, #07090e 100%);
+    }
+
+    /* Right Inspector Sidebar */
+    .inspector-sidebar {
+      width: 380px;
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      z-index: 5;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .node-header-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .node-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .node-type-badge {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-file { background: rgba(56, 189, 248, 0.15); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-function { background: rgba(63, 185, 80, 0.15); color: var(--emerald); border: 1px solid rgba(63, 185, 80, 0.3); }
+    .badge-class { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    .node-title-display {
+      font-size: 16px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      word-break: break-all;
+      color: var(--text-primary);
+    }
+
+    .detail-table {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+      font-size: 11px;
+      font-family: var(--font-mono);
+    }
+
+    .detail-table td {
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .detail-table td:first-child {
+      color: var(--text-muted);
+      width: 32%;
+    }
+
+    .detail-table td:last-child {
+      color: var(--text-primary);
+      word-break: break-all;
+    }
+
+    /* Blast Radius Section */
+    .blast-radius-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .section-heading {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .blast-count {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+    }
+
+    .relation-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .relation-item {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 4px;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .relation-item:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--border-focus);
+    }
+
+    .rel-tag {
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .rel-calls { background: rgba(63, 185, 80, 0.15); color: var(--emerald); }
+    .rel-contains { background: rgba(56, 189, 248, 0.15); color: var(--cyan); }
+
+    /* Cypher Snippet Card */
+    .cypher-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .code-block {
+      background: #04060a;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #79c0ff;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-break: break-all;
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 10px;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--text-secondary);
+    }
+
+    /* Floating Legend */
+    .legend-floating {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(13, 17, 23, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 11px;
+      z-index: 5;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Empty state for inspector */
+    .empty-inspector {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .empty-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      border: 1px dashed var(--border-subtle);
+    }
+
+    /* Preset Queries */
+    .preset-query-btn {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preset-query-btn:hover {
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header>
+    <div class="brand-section">
+      <div class="brand-badge-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">
+          <span>Amaze on Work</span>
+          <span class="brand-tag">GraphRAG CPG</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btnStabilize" onclick="togglePhysics()">
+        <span id="physicsStatusText">Pause Physics</span>
+      </button>
+      <button class="btn btn-secondary" onclick="fitGraph()">Fit to Screen</button>
+      <a href="/data/graph_export.cypher" download="graph_export.cypher" class="btn btn-emerald">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Download Cypher</span>
+      </a>
+      <a href="/" class="btn btn-primary">
+        <span>← Mission Control</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <div class="layout-container">
+    
+    <!-- Floating Filter & Search Panel -->
+    <div class="floating-controls">
+      <div class="control-card">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="graphSearchInput" class="search-input" placeholder="Search functions, files, classes..." oninput="handleSearch(this.value)">
+        </div>
+
+        <div class="filter-pills">
+          <div class="filter-pill active" onclick="filterGraph('all', this)">All (72)</div>
+          <div class="filter-pill" onclick="filterGraph('file', this)">Files (36)</div>
+          <div class="filter-pill emerald" onclick="filterGraph('function', this)">Functions (31)</div>
+          <div class="filter-pill purple" onclick="filterGraph('class', this)">Classes (5)</div>
+        </div>
+
+        <div class="stats-ribbon">
+          <div class="stat-item">
+            <div class="stat-val" id="statTotalNodes">72</div>
+            <div class="stat-label">Nodes</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" id="statTotalEdges">92</div>
+            <div class="stat-label">Edges</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" style="color: var(--emerald);" id="statFunctions">31</div>
+            <div class="stat-label">Funcs</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" style="color: var(--cyan);" id="statFiles">36</div>
+            <div class="stat-label">Files</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Focus Queries for Incident Root Causes -->
+      <div class="control-card">
+        <div class="section-heading" style="margin-bottom: 6px;">
+          <span>Incident Focus Queries</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <button class="preset-query-btn" onclick="focusNode('func:app/services/shipping_service.py:calculate_shipping_rate')">
+            🎯 INC-003: calculate_shipping_rate
+          </button>
+          <button class="preset-query-btn" onclick="focusNode('func:app/services/inventory_service.py:reserve_stock')">
+            🎯 INC-004: reserve_stock (KeyError)
+          </button>
+          <button class="preset-query-btn" onclick="focusNode('func:app/services/inventory_service.py:list_inventory_page')">
+            🎯 INC-005: list_inventory_page (IndexError)
+          </button>
+          <button class="preset-query-btn" onclick="focusNode('func:app/routes/auth.py:login')">
+            🎯 INC-001: auth.py: login & MockUser
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vis.js Canvas -->
+    <div id="graphCanvas"></div>
+
+    <!-- Right Side Inspector Panel -->
+    <aside class="inspector-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span>Node Inspector</span>
+        </div>
+        <span style="font-size: 10px; font-family: var(--font-mono); color: var(--text-muted);" id="inspectorStatus">READY</span>
+      </div>
+
+      <div class="sidebar-content" id="sidebarContent">
+        <!-- Default Empty State -->
+        <div class="empty-inspector">
+          <div class="empty-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="18" cy="5" r="3"/>
+              <circle cx="6" cy="12" r="3"/>
+              <circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </div>
+          <div>
+            <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">No Node Selected</div>
+            <div>Click any node in the graph or select an incident preset on the left to inspect properties and blast radius.</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Floating Legend at Bottom Left -->
+    <div class="legend-floating">
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #38bdf8;"></div>
+        <span>File</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #3fb950;"></div>
+        <span>Function</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #a855f7;"></div>
+        <span>Class</span>
+      </div>
+      <div class="legend-item">
+        <span style="color: #6e7681; font-family: var(--font-mono);">──► calls / contains</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let network = null;
+    let allNodes = [];
+    let allEdges = [];
+    let visNodes = null;
+    let visEdges = null;
+    let physicsActive = true;
+
+    const groupStyles = {
+      file: {
+        color: { background: '#0c2d48', border: '#38bdf8', highlight: { background: '#145374', border: '#7dd3fc' } },
+        shape: 'box',
+        font: { color: '#f0f6fc', face: 'JetBrains Mono', size: 12 },
+        margin: 8,
+        borderWidth: 1.5,
+        shadow: { enabled: true, color: 'rgba(56, 189, 248, 0.2)', size: 10 }
+      },
+      function: {
+        color: { background: '#0a3622', border: '#3fb950', highlight: { background: '#135e38', border: '#4ade80' } },
+        shape: 'dot',
+        size: 16,
+        font: { color: '#e6edf3', face: 'JetBrains Mono', size: 11 },
+        borderWidth: 1.5,
+        shadow: { enabled: true, color: 'rgba(63, 185, 80, 0.25)', size: 8 }
+      },
+      class: {
+        color: { background: '#3b1754', border: '#a855f7', highlight: { background: '#58237d', border: '#c084fc' } },
+        shape: 'diamond',
+        size: 18,
+        font: { color: '#f0f6fc', face: 'JetBrains Mono', size: 11 },
+        borderWidth: 1.5,
+        shadow: { enabled: true, color: 'rgba(168, 85, 247, 0.25)', size: 8 }
+      },
+      module: {
+        color: { background: '#451a03', border: '#f59e0b', highlight: { background: '#78350f', border: '#fbbf24' } },
+        shape: 'ellipse',
+        font: { color: '#f0f6fc', face: 'JetBrains Mono', size: 11 },
+        borderWidth: 1.5
+      }
+    };
+
+    async function initGraph() {
+      try {
+        const res = await fetch('/api/graph');
+        const data = await res.json();
+        
+        allNodes = data.nodes || [];
+        allEdges = data.edges || [];
+
+        // Update statistics
+        document.getElementById('statTotalNodes').textContent = allNodes.length;
+        document.getElementById('statTotalEdges').textContent = allEdges.length;
+        document.getElementById('statFunctions').textContent = allNodes.filter(n => n.group === 'function').length;
+        document.getElementById('statFiles').textContent = allNodes.filter(n => n.group === 'file').length;
+
+        // Process Vis Nodes
+        const formattedNodes = allNodes.map(n => {
+          const style = groupStyles[n.group] || groupStyles['function'];
+          return {
+            ...n,
+            ...style,
+            title: undefined // we use our custom sidebar inspector
+          };
+        });
+
+        // Process Vis Edges
+        const formattedEdges = allEdges.map(e => ({
+          ...e,
+          color: { color: e.label === 'calls' ? 'rgba(63, 185, 80, 0.4)' : 'rgba(56, 189, 248, 0.3)', highlight: '#58a6ff' },
+          font: { color: '#8b949e', size: 9, face: 'JetBrains Mono', align: 'top' },
+          arrows: { to: { enabled: true, scaleFactor: 0.6 } },
+          smooth: { type: 'continuous', roundness: 0.2 }
+        }));
+
+        visNodes = new vis.DataSet(formattedNodes);
+        visEdges = new vis.DataSet(formattedEdges);
+
+        const container = document.getElementById('graphCanvas');
+        const graphData = { nodes: visNodes, edges: visEdges };
+        const options = {
+          physics: {
+            solver: 'forceAtlas2Based',
+            forceAtlas2Based: {
+              gravitationalConstant: -38,
+              centralGravity: 0.006,
+              springLength: 85,
+              springConstant: 0.08,
+              damping: 0.45
+            },
+            stabilization: { iterations: 120 }
+          },
+          interaction: {
+            hover: true,
+            tooltipDelay: 200,
+            navigationButtons: false,
+            zoomView: true
+          }
+        };
+
+        network = new vis.Network(container, graphData, options);
+
+        // Click Handler for Node Inspection
+        network.on('click', function (params) {
+          if (params.nodes.length > 0) {
+            const nodeId = params.nodes[0];
+            showNodeInspector(nodeId);
+          }
+        });
+
+      } catch (err) {
+        console.error('Failed to load graph data:', err);
+      }
+    }
+
+    function showNodeInspector(nodeId) {
+      const node = allNodes.find(n => n.id === nodeId);
+      if (!node) return;
+
+      const props = node.properties || {};
+      const badgeClass = node.group === 'file' ? 'badge-file' : (node.group === 'class' ? 'badge-class' : 'badge-function');
+
+      // Find Inbound & Outbound edges
+      const inbound = allEdges.filter(e => e.to === nodeId);
+      const outbound = allEdges.filter(e => e.from === nodeId);
+
+      // Neo4j Cypher equivalent query
+      const cypherQuery = `MATCH (n:${capitalize(node.group)} {id: '${node.id}'})\nOPTIONAL MATCH (n)-[r]->(target)\nRETURN n, r, target;`;
+
+      let inboundHtml = '';
+      if (inbound.length > 0) {
+        inboundHtml = inbound.map(e => `
+          <li class="relation-item" onclick="focusNode('${e.from}')">
+            <span class="rel-tag ${e.label === 'calls' ? 'rel-calls' : 'rel-contains'}">${e.label}</span>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${getNodeName(e.from)}</span>
+          </li>
+        `).join('');
+      } else {
+        inboundHtml = '<li style="font-size: 11px; color: var(--text-muted); font-style: italic;">No inbound callers or parent file</li>';
+      }
+
+      let outboundHtml = '';
+      if (outbound.length > 0) {
+        outboundHtml = outbound.map(e => `
+          <li class="relation-item" onclick="focusNode('${e.to}')">
+            <span class="rel-tag ${e.label === 'calls' ? 'rel-calls' : 'rel-contains'}">${e.label}</span>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${getNodeName(e.to)}</span>
+          </li>
+        `).join('');
+      } else {
+        outboundHtml = '<li style="font-size: 11px; color: var(--text-muted); font-style: italic;">Terminal node (makes no downstream calls)</li>';
+      }
+
+      const html = `
+        <div class="node-header-card">
+          <div class="node-badge-row">
+            <span class="node-type-badge ${badgeClass}">${node.group}</span>
+            <span style="font-size: 10px; font-family: var(--font-mono); color: var(--text-muted);">Line ${props.line || '—'}</span>
+          </div>
+          <div class="node-title-display">${node.label}</div>
+          
+          <table class="detail-table">
+            <tr>
+              <td>Node ID</td>
+              <td>${node.id}</td>
+            </tr>
+            <tr>
+              <td>File</td>
+              <td>${props.file || '—'}</td>
+            </tr>
+            <tr>
+              <td>Repository</td>
+              <td>iykyk-vedant/AFH-DEMO</td>
+            </tr>
+            ${props.bases ? `<tr><td>Bases</td><td>${props.bases.join(', ')}</td></tr>` : ''}
+            ${props.args ? `<tr><td>Args</td><td>(${props.args.join(', ')})</td></tr>` : ''}
+          </table>
+        </div>
+
+        <!-- Blast Radius -->
+        <div class="blast-radius-card">
+          <div class="section-heading">
+            <span>Inbound Blast Radius (Callers)</span>
+            <span class="blast-count">${inbound.length}</span>
+          </div>
+          <ul class="relation-list">
+            ${inboundHtml}
+          </ul>
+        </div>
+
+        <div class="blast-radius-card">
+          <div class="section-heading">
+            <span>Outbound Dependencies (Callees)</span>
+            <span class="blast-count">${outbound.length}</span>
+          </div>
+          <ul class="relation-list">
+            ${outboundHtml}
+          </ul>
+        </div>
+
+        <!-- Neo4j Cypher -->
+        <div class="cypher-card">
+          <div class="section-heading">
+            <span>Neo4j Cypher Query</span>
+          </div>
+          <div class="code-block" id="cypherSnippet">
+            <button class="copy-btn" onclick="copyCypher()">Copy</button>
+            <code>${escapeHtml(cypherQuery)}</code>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('sidebarContent').innerHTML = html;
+      document.getElementById('inspectorStatus').textContent = 'ACTIVE';
+    }
+
+    function getNodeName(id) {
+      const node = allNodes.find(n => n.id === id);
+      return node ? node.label : id;
+    }
+
+    function capitalize(s) {
+      if (!s) return 'Node';
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function copyCypher() {
+      const el = document.getElementById('cypherSnippet');
+      if (!el) return;
+      const code = el.querySelector('code').innerText;
+      navigator.clipboard.writeText(code);
+      const btn = el.querySelector('.copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 1500);
+    }
+
+    function focusNode(nodeId) {
+      if (!network) return;
+      const node = allNodes.find(n => n.id === nodeId);
+      if (!node) return;
+
+      network.focus(nodeId, {
+        scale: 1.4,
+        animation: { duration: 800, easingFunction: 'easeInOutQuad' }
+      });
+      network.selectNodes([nodeId]);
+      showNodeInspector(nodeId);
+    }
+
+    function handleSearch(query) {
+      if (!query || !network) return;
+      const q = query.toLowerCase().trim();
+      const match = allNodes.find(n => n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q));
+      if (match) {
+        network.focus(match.id, {
+          scale: 1.3,
+          animation: { duration: 400, easingFunction: 'easeInOutQuad' }
+        });
+        network.selectNodes([match.id]);
+        showNodeInspector(match.id);
+      }
+    }
+
+    function filterGraph(type, pillEl) {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      pillEl.classList.add('active');
+
+      if (!visNodes) return;
+      if (type === 'all') {
+        visNodes.update(allNodes.map(n => ({ id: n.id, hidden: false })));
+      } else {
+        visNodes.update(allNodes.map(n => ({ id: n.id, hidden: n.group !== type })));
+      }
+    }
+
+    function togglePhysics() {
+      if (!network) return;
+      physicsActive = !physicsActive;
+      network.setOptions({ physics: { enabled: physicsActive } });
+      document.getElementById('physicsStatusText').textContent = physicsActive ? 'Pause Physics' : 'Resume Physics';
+    }
+
+    function fitGraph() {
+      if (network) {
+        network.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', initGraph);
+  </script>
+</body>
+</html>
