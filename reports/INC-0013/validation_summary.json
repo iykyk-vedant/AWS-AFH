@@ -1,0 +1,74 @@
+{
+  "incident_id": "INC-0013",
+  "total_attempts": 3,
+  "total_candidates": 3,
+  "best_candidate": "c1_minimal",
+  "best_verdict": "NO_CHANGE",
+  "best_score": 49.41,
+  "attempts": [
+    {
+      "attempt": 1,
+      "candidate_id": "c1_minimal",
+      "verdict": "NO_CHANGE",
+      "error_signature": "1834dbecca913e3b",
+      "is_new_error": false,
+      "before": {
+        "passed": 0,
+        "failed": 0
+      },
+      "after": {
+        "passed": 0,
+        "failed": 0
+      },
+      "fixes_confirmed": [],
+      "regressions": [],
+      "score": 49.41,
+      "patch_summary": "python-service/app/services/checkout_service.py (117 chars)",
+      "timestamp": "2026-03-17T13:27:47Z",
+      "stdout_tail": "/usr/local/lib/python3.11/site-packages/_pytest/config/__init__.py:331: PluggyTeardownRaisedWarning: A plugin raised an exception during an old-style hookwrapper teardown.\nPlugin: helpconfig, Hook: pytest_cmdline_parse\nConftestImportFailure: ImportError: cannot import name 'JSONEncoder' from 'flask.json' (/usr/local/lib/python3.11/site-packages/flask/json/__init__.py) (from /app/python-service/tests/conftest.py)\nFor more information see https://pluggy.readthedocs.io/en/stable/api_reference.html#pluggy.PluggyTeardownRaisedWarning\n  config = pluginmanager.hook.pytest_cmdline_parse(\nImportError while loading conftest '/app/python-service/tests/conftest.py'.\ntests/conftest.py:2: in <module>\n    from app import create_app, db as _db\napp/__init__.py:6: in <module>\n    from flask.json import JSONEncoder\nE   ImportError: cannot import name 'JSONEncoder' from 'flask.json' (/usr/local/lib/python3.11/site-packages/flask/json/__init__.py)\n\n"
+    },
+    {
+      "attempt": 2,
+      "candidate_id": "c2_defensive",
+      "verdict": "NO_CHANGE",
+      "error_signature": "1834dbecca913e3b",
+      "is_new_error": false,
+      "before": {
+        "passed": 0,
+        "failed": 0
+      },
+      "after": {
+        "passed": 0,
+        "failed": 0
+      },
+      "fixes_confirmed": [],
+      "regressions": [],
+      "score": 49.2,
+      "patch_summary": "python-service/app/services/checkout_service.py (159 chars)",
+      "timestamp": "2026-03-17T13:27:58Z",
+      "stdout_tail": "/usr/local/lib/python3.11/site-packages/_pytest/config/__init__.py:331: PluggyTeardownRaisedWarning: A plugin raised an exception during an old-style hookwrapper teardown.\nPlugin: helpconfig, Hook: pytest_cmdline_parse\nConftestImportFailure: ImportError: cannot import name 'JSONEncoder' from 'flask.json' (/usr/local/lib/python3.11/site-packages/flask/json/__init__.py) (from /app/python-service/tests/conftest.py)\nFor more information see https://pluggy.readthedocs.io/en/stable/api_reference.html#pluggy.PluggyTeardownRaisedWarning\n  config = pluginmanager.hook.pytest_cmdline_parse(\nImportError while loading conftest '/app/python-service/tests/conftest.py'.\ntests/conftest.py:2: in <module>\n    from app import create_app, db as _db\napp/__init__.py:6: in <module>\n    from flask.json import JSONEncoder\nE   ImportError: cannot import name 'JSONEncoder' from 'flask.json' (/usr/local/lib/python3.11/site-packages/flask/json/__init__.py)\n\n"
+    },
+    {
+      "attempt": 3,
+      "candidate_id": "c3_restructured",
+      "verdict": "NO_CHANGE",
+      "error_signature": "1834dbecca913e3b",
+      "is_new_error": false,
+      "before": {
+        "passed": 0,
+        "failed": 0
+      },
+      "after": {
+        "passed": 0,
+        "failed": 0
+      },
+      "fixes_confirmed": [],
+      "regressions": [],
+      "score": 49.18,
+      "patch_summary": "python-service/app/services/checkout_service.py (164 chars)",
+      "timestamp": "2026-03-17T13:28:09Z",
+      "stdout_tail": "/usr/local/lib/python3.11/site-packages/_pytest/config/__init__.py:331: PluggyTeardownRaisedWarning: A plugin raised an exception during an old-style hookwrapper teardown.\nPlugin: helpconfig, Hook: pytest_cmdline_parse\nConftestImportFailure: ImportError: cannot import name 'JSONEncoder' from 'flask.json' (/usr/local/lib/python3.11/site-packages/flask/json/__init__.py) (from /app/python-service/tests/conftest.py)\nFor more information see https://pluggy.readthedocs.io/en/stable/api_reference.html#pluggy.PluggyTeardownRaisedWarning\n  config = pluginmanager.hook.pytest_cmdline_parse(\nImportError while loading conftest '/app/python-service/tests/conftest.py'.\ntests/conftest.py:2: in <module>\n    from app import create_app, db as _db\napp/__init__.py:6: in <module>\n    from flask.json import JSONEncoder\nE   ImportError: cannot import name 'JSONEncoder' from 'flask.json' (/usr/local/lib/python3.11/site-packages/flask/json/__init__.py)\n\n"
+    }
+  ],
+  "generated_at": "2026-03-17T13:28:09Z"
+}
