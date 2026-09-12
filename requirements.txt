@@ -1,0 +1,50 @@
+# AWS Strands Agents SDK & Amazon Bedrock AgentCore
+strands-agents
+bedrock-agentcore
+
+# Core LangGraph and LangChain
+langgraph
+langchain
+langchain-core
+langchain-community
+
+# LLM Clients
+httpx
+
+# Knowledge Graph
+neo4j
+networkx
+
+# Docker Sandbox
+docker
+
+# API Server
+fastapi
+uvicorn
+
+# MCP SDK
+mcp[cli]
+
+# Slack Integration
+slack-sdk
+
+# Jira Integration
+jira
+
+# Report Templating
+jinja2
+
+# Config and Validation
+python-dotenv
+pydantic
+
+# Async Support
+aiohttp
+aiofiles
+
+# CLI and Logging
+rich
+
+# Testing
+pytest
+pytest-asyncio
