@@ -1120,7 +1120,7 @@
             <svg class="icon"><use href="#icon-shield"/></svg>
           </div>
           <div class="metric-value-row">
-            <span class="metric-value">11</span>
+            <span class="metric-value" id="metricCatalogCount">11</span>
             <span class="metric-trend trend-up">+2 this week</span>
           </div>
           <div class="metric-desc">Production failure modes</div>
@@ -1150,16 +1150,19 @@
           <div class="metric-desc">No regressions detected</div>
         </div>
 
-        <div class="metric-card">
+        <div class="metric-card" onclick="openAgentCoreModal()" style="cursor: pointer; transition: transform 0.2s, border-color 0.2s;" title="Click to open Bedrock AgentCore Runtime Console">
           <div class="metric-header">
             <span>Orchestration</span>
-            <svg class="icon"><use href="#icon-cpu"/></svg>
+            <svg class="icon" style="color: #C084FC;"><use href="#icon-cpu"/></svg>
           </div>
           <div class="metric-value-row">
-            <span class="metric-value" style="font-size: 19px;">Strands + AgentCore</span>
-            <span class="status-pill-small">ACTIVE</span>
+            <span class="metric-value" style="font-size: 19px; color: #C084FC;">Strands + AgentCore</span>
+            <span class="status-pill-small" style="border-color: rgba(168, 85, 247, 0.4); color: #D8B4FE;">ACTIVE</span>
           </div>
-          <div class="metric-desc">AWS agent runtime & Bedrock</div>
+          <div class="metric-desc" style="display: flex; align-items: center; justify-content: space-between;">
+            <span>AWS agent runtime & Bedrock</span>
+            <span style="font-size: 10px; color: #A855F7; text-decoration: underline;">Open Console ↗</span>
+          </div>
         </div>
       </section>
 
@@ -1565,6 +1568,9 @@
           if (pillOpen) pillOpen.textContent = `Open (${openCount})`;
           if (pillTri) pillTri.textContent = `Triaging (${openCount})`;
           if (pillRes) pillRes.textContent = `Resolved (${resolvedCount})`;
+
+          const metricCat = document.getElementById('metricCatalogCount');
+          if (metricCat && total > 0) metricCat.textContent = total;
 
           renderGrid(applyFilter(incidentsData));
         } else {
