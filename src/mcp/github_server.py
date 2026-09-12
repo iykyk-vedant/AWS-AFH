@@ -77,7 +77,14 @@ def get_file_content(owner: str, repo: str, path: str, ref: str = "master") -> s
     Returns the decoded file content as a string.
     """
     url = f"{BASE_URL}/repos/{owner}/{repo}/contents/{path}"
-    data = _get(url, params={"ref": ref})
+    try:
+        data = _get(url, params={"ref": ref})
+    except Exception:
+        alt_ref = "main" if ref == "master" else ("master" if ref == "main" else None)
+        if alt_ref:
+            data = _get(url, params={"ref": alt_ref})
+        else:
+            raise
 
     if isinstance(data, list):
         # Directory listing
@@ -92,31 +99,38 @@ def get_file_content(owner: str, repo: str, path: str, ref: str = "master") -> s
 
 
 @mcp.tool()
-def get_repo_tree(owner: str, repo: str, ref: str = "master") -> str:
-    """Fetch the complete file tree for a GitHub repository.
-    Returns JSON array of all files with path, type, and size.
+def get_repo_tree(owner: str, repo: str, ref: str = "master", recursive: bool = True) -> str:
+    """Fetch the full file tree for a repository.
+    Returns list of file paths.
     """
     url = f"{BASE_URL}/repos/{owner}/{repo}/git/trees/{ref}"
-    data = _get(url, params={"recursive": "1"})
-    tree = data.get("tree", [])
-    # Filter to blobs only and simplify
-    files = [
-        {"path": f["path"], "type": f["type"], "size": f.get("size", 0)}
-        for f in tree if f["type"] == "blob"
+    params = {"recursive": "1"} if recursive else {}
+    try:
+        data = _get(url, params=params)
+    except Exception:
+        alt_ref = "main" if ref == "master" else ("master" if ref == "main" else None)
+        if alt_ref:
+            url = f"{BASE_URL}/repos/{owner}/{repo}/git/trees/{alt_ref}"
+            data = _get(url, params=params)
+        else:
+            raise
+    tree = [
+        {"path": item["path"], "type": item["type"], "size": item.get("size", 0)}
+        for item in data.get("tree", [])
     ]
-    return json.dumps(files, indent=2)
+    return json.dumps(tree, indent=2)
 
 
 @mcp.tool()
-def search_code(owner: str, repo: str, query: str, per_page: int = 10) -> str:
-    """Search for code in a GitHub repository.
-    Returns matching file paths and text snippets.
+def search_code(owner: str, repo: str, query: str) -> str:
+    """Search code in a repository.
+    Returns list of matching file paths and snippets.
     """
     url = f"{BASE_URL}/search/code"
-    params = {"q": f"{query} repo:{owner}/{repo}", "per_page": per_page}
+    params = {"q": f"{query} repo:{owner}/{repo}"}
     data = _get(url, params=params)
     results = [
-        {"path": item["path"], "name": item["name"]}
+        {"path": item["path"], "repository": item["repository"]["full_name"]}
         for item in data.get("items", [])
     ]
     return json.dumps(results, indent=2)
@@ -138,16 +152,24 @@ def list_incidents(owner: str, repo: str, ref: str = "master") -> str:
     Returns JSON array of incident file names.
     """
     url = f"{BASE_URL}/repos/{owner}/{repo}/contents/incidents"
+    data = None
     try:
         data = _get(url, params={"ref": ref})
-        if isinstance(data, list):
-            incidents = [
-                f["name"].replace(".json", "")
-                for f in data if f["name"].endswith(".json")
-            ]
-            return json.dumps(incidents, indent=2)
-    except Exception as e:
-        return json.dumps({"error": str(e)})
+    except Exception:
+        alt_ref = "main" if ref == "master" else ("master" if ref == "main" else None)
+        if alt_ref:
+            try:
+                data = _get(url, params={"ref": alt_ref})
+            except Exception as e:
+                return json.dumps({"error": str(e)})
+        else:
+            return json.dumps({"error": "Failed to list incidents"})
+    if isinstance(data, list):
+        incidents = [
+            f["name"].replace(".json", "")
+            for f in data if f["name"].endswith(".json")
+        ]
+        return json.dumps(incidents, indent=2)
     return json.dumps([])
 
 
