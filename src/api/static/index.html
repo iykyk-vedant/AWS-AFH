@@ -675,6 +675,33 @@
       font-weight: 600;
       font-family: var(--font-mono);
     }
+    .pr-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(139, 92, 246, 0.18);
+      color: #C084FC;
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .pr-chip:hover {
+      background: rgba(139, 92, 246, 0.35);
+      color: #FFFFFF;
+      border-color: #A855F7;
+      transform: translateY(-1px);
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+    }
+    .icon-xs {
+      width: 12px;
+      height: 12px;
+    }
     .card-footer {
       border-top: 1px solid var(--border);
       padding-top: 12px;
@@ -1506,10 +1533,23 @@
         card.className = 'issue-card';
         card.onclick = () => openDrawer(inc.id);
 
+        let prBadgeHtml = '';
+        if (inc.pr_url) {
+          const prMatch = inc.pr_url.match(/pull\/(\d+)/);
+          const prNum = prMatch ? `#${prMatch[1]}` : 'PR';
+          prBadgeHtml = `<a href="${inc.pr_url}" target="_blank" onclick="event.stopPropagation()" class="pr-chip" title="View Real-Time Pull Request on GitHub">
+            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
+            <span>${prNum} Live PR ↗</span>
+          </a>`;
+        }
+
         card.innerHTML = `
           <div>
             <div class="card-head">
-              <span class="issue-id">${inc.id}</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="issue-id">${inc.id}</span>
+                ${prBadgeHtml}
+              </div>
               <span class="${stateBadgeClass}">${stateText}</span>
             </div>
             <div class="issue-title">${escapeHtml(inc.title)}</div>
@@ -1517,8 +1557,8 @@
           </div>
           <div class="card-footer">
             <div class="agent-progress-row">
-              <span>Agent status: ${isResolved ? 'RESOLVED' : 'TRIAGING'}</span>
-              <span>${progressPct}%</span>
+              <span>Agent status: ${isResolved ? (inc.pr_url ? 'PR OPENED' : 'RESOLVED') : 'TRIAGING'}</span>
+              <span>${inc.pr_url ? '100%' : progressPct + '%'}</span>
             </div>
             <div class="progress-bar-bg">
               <div class="progress-bar-fill" style="width: ${progressPct}%;"></div>
@@ -1652,7 +1692,10 @@
 
       const prBtn = document.getElementById('drawerPrBtn');
       if (inc.pr_url) {
+        const prMatch = inc.pr_url.match(/pull\/(\d+)/);
+        const prNum = prMatch ? `#${prMatch[1]}` : '';
         prBtn.href = inc.pr_url;
+        prBtn.innerHTML = `<span>View Pull Request ${prNum}</span><svg class="icon icon-sm"><use href="#icon-pr"/></svg>`;
         prBtn.style.display = 'inline-flex';
       } else {
         prBtn.style.display = 'none';

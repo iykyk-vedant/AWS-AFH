@@ -125,8 +125,10 @@ if HAS_FASTAPI:
 
     @app.get("/api/incidents")
     async def list_github_issues():
-        """Returns real issues dynamically fetched from the GitHub repository iykyk-vedant/AFH-DEMO."""
+        """Returns real issues dynamically fetched from the GitHub repository iykyk-vedant/AFH-DEMO
+        with live cross-referenced Pull Requests raised by the autonomous agent system."""
         import httpx
+        import re
         owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
         repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
         token = os.getenv("GITHUB_TOKEN", "")
@@ -143,6 +145,45 @@ if HAS_FASTAPI:
                     params={"state": "all", "per_page": 30},
                     headers=headers,
                 )
+
+                # Fetch pull requests to match real GitHub PRs raised by our system
+                pr_map = {}
+                try:
+                    r_pulls = await client.get(
+                        f"https://api.github.com/repos/{owner}/{repo}/pulls",
+                        params={"state": "all", "per_page": 30},
+                        headers=headers,
+                    )
+                    if r_pulls.status_code == 200:
+                        for pr_item in r_pulls.json():
+                            pr_head_ref = (pr_item.get("head") or {}).get("ref") or ""
+                            pr_body_text = pr_item.get("body") or ""
+                            pr_title_text = pr_item.get("title") or ""
+                            pr_num = pr_item.get("number")
+                            pr_html = pr_item.get("html_url")
+                            pr_state_val = pr_item.get("state")
+                            
+                            # Match by branch (e.g. amaze-on-work/inc-003 -> 3), #close #3, Closes #3, or title
+                            matches = re.findall(
+                                r'(?:amaze-on-work/(?:inc-|issue-)?|#close\s*#?|closes\s*#?|fixes\s*#?|resolves\s*#?|inc-0*|issue-#?0*)(\d+)',
+                                f"{pr_head_ref} {pr_title_text} {pr_body_text}",
+                                re.IGNORECASE
+                            )
+                            for m in matches:
+                                try:
+                                    inum = int(m)
+                                    if inum not in pr_map:
+                                        pr_map[inum] = {
+                                            "pr_url": pr_html,
+                                            "pr_number": pr_num,
+                                            "pr_state": pr_state_val,
+                                            "pr_title": pr_title_text,
+                                        }
+                                except ValueError:
+                                    pass
+                except Exception as pe:
+                    logger.debug(f"Pull requests fetch: {pe}")
+
                 if r.status_code == 200:
                     raw_items = r.json()
                     for item in raw_items:
@@ -159,7 +200,11 @@ if HAS_FASTAPI:
                         fix_diff = None
                         explanation = None
 
-                        # Check if tracked in event_stream
+                        # Check if matched to a GitHub PR raised by our system
+                        if issue_num in pr_map:
+                            pr_url = pr_map[issue_num]["pr_url"]
+
+                        # Check if tracked in event_stream (real-time in-flight triage)
                         try:
                             from src.api.event_stream import get_current_event_state
                             es = get_current_event_state()

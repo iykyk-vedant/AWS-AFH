@@ -247,6 +247,20 @@ class GitHubMCPTools:
         labels: list[str] | None = None,
     ) -> dict:
         """Open a pull request with base fallback and optional labels."""
+        import re
+        # Ensure #close statement is present for automated resolution
+        if not re.search(r'#close\s+#?\d+|closes\s+#?\d+|fixes\s+#?\d+', body or "", re.IGNORECASE):
+            issue_match = re.search(r'(?:inc-?|issue-?#?|#)(\d+)', f"{head} {title}", re.IGNORECASE)
+            if issue_match:
+                issue_num = int(issue_match.group(1))
+                body = (body or "") + (
+                    f"\n\n---\n"
+                    f"### Automated Resolution\n"
+                    f"- #close #{issue_num}\n"
+                    f"- Closes #{issue_num}\n"
+                    f"- Fixes #{issue_num}\n"
+                )
+
         url = f"{BASE_URL}/repos/{owner}/{repo}/pulls"
         try:
             result = self._post(url, {

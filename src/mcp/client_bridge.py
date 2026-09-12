@@ -498,8 +498,23 @@ class MCPClientBridge:
                 logger.warning("No files committed -- fix_plan may have no files_to_modify")
 
             # 3. Create PR (or reuse existing PR if already open)
+            # Extract issue number from incident_id (e.g. INC-003 -> 3, ISSUE-#5 -> 5)
+            import re
+            issue_match = re.search(r'\b(?:inc-?|issue-?#?|#)?(\d+)\b', str(incident_id), re.IGNORECASE)
+            issue_num_str = f"#{int(issue_match.group(1))}" if issue_match else ""
+
+            close_block = ""
+            if issue_num_str:
+                close_block = (
+                    f"\n\n---\n"
+                    f"### Automated Resolution\n"
+                    f"- #close {issue_num_str}\n"
+                    f"- Closes {issue_num_str}\n"
+                    f"- Fixes {issue_num_str}\n"
+                )
+
             pr_title = title
-            pr_body = report_body[:65000]  # GitHub body limit
+            pr_body = (report_body + close_block)[:65000]  # GitHub body limit
             pr_url = ""
             pr_number = 0
             try:
