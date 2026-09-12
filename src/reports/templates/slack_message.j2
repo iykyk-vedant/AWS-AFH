@@ -1,0 +1,16 @@
+🔧 *Amaze on Work — Resolution Report*
+
+*Incident:* {{ incident_id }} — {{ title }}
+*Service:* {{ service }} | *Severity:* {{ severity }}
+
+*Root Cause:* {{ root_cause[:200] }}
+
+*Verdict:* {{ verdict_emoji }} {{ verdict }}
+*Confidence:* {{ confidence }}%
+*Risk:* {{ risk_emoji }} {{ risk_level }}
+
+{% if pr_url -%}
+*Pull Request:* <{{ pr_url }}|View PR>
+{% endif -%}
+
+_Resolved in {{ resolution_time }}s by Amaze on Work_
