@@ -1,0 +1,21 @@
+{
+  "attempt": 1,
+  "candidate_id": "c1_minimal",
+  "verdict": "FIX_APPLIED_NO_TESTS",
+  "error_signature": "1834dbecca913e3b",
+  "is_new_error": false,
+  "before": {
+    "passed": 0,
+    "failed": 0
+  },
+  "after": {
+    "passed": 0,
+    "failed": 0
+  },
+  "fixes_confirmed": [],
+  "regressions": [],
+  "score": 78.64,
+  "patch_summary": "python-service/app/services/payment_service.py (273 chars)",
+  "timestamp": "2026-03-18T09:20:47Z",
+  "stdout_tail": "============================= test session starts ==============================\ncollecting ... collected 0 items / 1 error\n\n==================================== ERRORS ====================================\n__________________ ERROR collecting test_amaze_generated.py __________________\nImportError while importing test module '/app/python-service/_amaze_tests/test_amaze_generated.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/local/lib/python3.11/importlib/__init__.py:126: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n_amaze_tests/test_amaze_generated.py:5: in <module>\n    from app.services.payment_service import apply_discount\napp/__init__.py:6: in <module>\n    from flask.json import JSONEncoder\nE   ImportError: cannot import name 'JSONEncoder' from 'flask.json' (/usr/local/lib/python3.11/site-packages/flask/json/__init__.py)\n=========================== short test summary info ============================\nERROR _amaze_tests/test_amaze_generated.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n=============================== 1 error in 0.74s ===============================\nPYTEST_EXIT_CODE=2\n\n"
+}
