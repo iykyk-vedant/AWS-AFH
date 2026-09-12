@@ -5,23 +5,23 @@
     {
       "candidate_id": "c1_primary",
       "fix_plan": {
-        "description": "Minimal surgical fix for Unhandled KeyError in inventory reservation when item ID is not in catalog",
+        "description": "Added a guard for missing item IDs to prevent an unhandled KeyError in reserve_stock.",
         "files_to_modify": [
           {
             "file_path": "app/services/inventory_service.py",
-            "original_code": "    available = STOCK_CATALOG[item_id]",
+            "original_code": "    # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n    available = STOCK_CATALOG[item_id]",
             "fixed_code": "    if item_id not in STOCK_CATALOG:\n        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n    available = STOCK_CATALOG[item_id]",
-            "rationale": "Direct dictionary access on STOCK_CATALOG without verifying item existence"
+            "rationale": "The added existence check returns a controlled error response when the item is absent, avoiding the KeyError that occurs from direct dictionary indexing."
           }
         ],
-        "patch": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -20,6 +20,8 @@\n     if quantity <= 0:\n         raise ValueError(\"Reservation quantity must be positive\")\n\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n     available = STOCK_CATALOG[item_id]\n     if available < quantity:\n         return {\"success\": False, \"reason\": \"Insufficient stock\", \"available\": available}",
-        "rationale": "Direct dictionary access on STOCK_CATALOG without verifying item existence",
+        "patch": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -19,7 +19,8 @@\n     if quantity <= 0:\n         raise ValueError(\"Reservation quantity must be positive\")\n \n-    # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n     available = STOCK_CATALOG[item_id]\n \n     if available < quantity:\n",
+        "rationale": "By verifying the presence of the requested item in STOCK_CATALOG before accessing it, the function now handles unknown item IDs gracefully, eliminating the crash and providing a clear error payload.",
         "characterization_test": null,
-        "change_size": 2
+        "change_size": 3
       },
-      "score": 95,
+      "score": 0,
       "rank": 1,
-      "verdict": "FIX_CONFIRMED"
+      "verdict": "UNKNOWN"
     }
   ]
 }

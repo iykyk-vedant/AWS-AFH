@@ -1,0 +1,32 @@
+{
+  "incident_id": "INC-002",
+  "title": "Double discount deduction applied during checkout calculation\n\nCustomers are being undercharged duri",
+  "root_cause": "The root cause of the double discount deduction is in the process_order_total function in app/services/payment_service.py, specifically at line 26.",
+  "changes_made": [
+    {
+      "file": "app/services/payment_service.py",
+      "change": "    # BUG (INC-002): Discount is mistakenly subtracted twice from subtotal\n    discounted_subtotal =",
+      "rationale": "Replacing the erroneous expression with a single subtraction ensures the discount is applied only once, correcting the total calculation."
+    }
+  ],
+  "diff": "--- a/app/services/payment_service.py\n+++ b/app/services/payment_service.py\n@@ -23,7 +23,7 @@\n     \"\"\"Calculate the final total including discount and tax.\"\"\"\n     discount = calculate_discount(subtotal, discount_code)\n     # BUG (INC-002): Discount is mistakenly subtracted twice from subtotal\n-    discounted_subtotal = max(0.0, (subtotal - discount) - discount)\n+    discounted_subtotal = max(0.0, subtotal - discount)\n     tax = round(discounted_subtotal * tax_rate, 2)\n     total = round(discounted_subtotal + tax, 2)\n     return {\n",
+  "validation": {
+    "verdict": "SKIPPED",
+    "before": {},
+    "after": {},
+    "regressions": [],
+    "fixes_confirmed": [],
+    "unrelated_failures": [],
+    "attempt_logs": []
+  },
+  "risk": {},
+  "confidence_score": 0.36,
+  "reasoning_chain": [
+    "Incident INC-002 parsed: 'Double discount deduction applied during checkout calculation\n\nCustomers are being undercharged duri' -- service: python-service, type: logical_error",
+    "Stack trace analysis -> suspect files: ['app/services/payment_service.py']",
+    "Root cause: The root cause of the double discount deduction is in the process_order_total function in app/services/payment_service.py, specifically at line 26.",
+    "Fix applied: Fixes double discount deduction by applying the discount only once to the subtotal.",
+    "Validation: SKIPPED -- before: 0/0 passed, after: 0/0 passed"
+  ],
+  "resolution_time_seconds": 169.39670419692993
+}
