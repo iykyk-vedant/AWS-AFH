@@ -255,9 +255,23 @@ class TriggerAgent:
         })
         logger.info(f"[TriggerAgent] GitHub issue received: #{issue_number} ({title}) -> {inc_id}")
 
-        # Check for preset ID like INC-001 in title
+        # Check for preset ID like INC-001 in title or match known incident scenario
         match = re.search(r'(INC-\d+)', title, re.IGNORECASE)
         preset_id = match.group(1).upper() if match else None
+        if not preset_id:
+            from pathlib import Path
+            inc_dir = Path("incidents")
+            if inc_dir.exists():
+                for inc_file in inc_dir.glob("*.json"):
+                    try:
+                        inc_data = json.loads(inc_file.read_text(encoding="utf-8"))
+                        inc_title = inc_data.get("title", "").lower()
+                        if inc_title and (inc_title in title.lower() or title.lower() in inc_title):
+                            preset_id = inc_data.get("id")
+                            logger.info(f"[TriggerAgent] Matched known incident scenario from title: {preset_id} ({inc_title})")
+                            break
+                    except Exception:
+                        pass
 
         incident = self._parse_slack_text(inc_id, f"{title}\n\n{body}")
         incident["linked_issue_url"] = f"https://github.com/{repo_owner}/{repo_name}/issues/{issue_number}" if repo_owner and repo_name else ""

@@ -78,9 +78,9 @@ class CerebrasClient(BaseLLMClient):
                 response = client.post(url, headers=self._get_headers(), json=body)
                 if response.status_code == 429 and attempt < max_retries - 1:
                     retry_after = response.headers.get("retry-after")
-                    wait_time = float(retry_after) if retry_after else (3.0 * (attempt + 1))
+                    wait_time = float(retry_after) if retry_after else max(6.0, 4.0 * (attempt + 1))
                     logger.warning(f"[LLM] Rate limit hit (429), waiting {wait_time:.1f}s (attempt {attempt+1}/{max_retries})...")
-                    time.sleep(min(wait_time, 20.0))
+                    time.sleep(min(wait_time, 25.0))
                     continue
                 response.raise_for_status()
                 return self._parse_response(response.json())
@@ -103,9 +103,9 @@ class CerebrasClient(BaseLLMClient):
                 )
                 if response.status_code == 429 and attempt < max_retries - 1:
                     retry_after = response.headers.get("retry-after")
-                    wait_time = float(retry_after) if retry_after else (3.0 * (attempt + 1))
+                    wait_time = float(retry_after) if retry_after else max(6.0, 4.0 * (attempt + 1))
                     logger.warning(f"[LLM] Async rate limit hit (429), waiting {wait_time:.1f}s (attempt {attempt+1}/{max_retries})...")
-                    await asyncio.sleep(min(wait_time, 20.0))
+                    await asyncio.sleep(min(wait_time, 25.0))
                     continue
                 response.raise_for_status()
                 return self._parse_response(response.json())

@@ -51,20 +51,32 @@ try:
             title = issue.get("title", "")
             body = issue.get("body", "") or ""
             issue_number = issue.get("number")
+            repo_data = payload.get("repository", {})
+            owner = repo_data.get("owner", {}).get("login", "")
+            repo_name = repo_data.get("name", "")
+
+            # Deduplicate incoming webhook deliveries for the same issue
+            import time
+            global _ACTIVE_OR_RECENT_ISSUES
+            if "_ACTIVE_OR_RECENT_ISSUES" not in globals():
+                _ACTIVE_OR_RECENT_ISSUES = {}
+            issue_key = f"{owner}/{repo_name}#{issue_number}"
+            now = time.time()
+            if issue_key in _ACTIVE_OR_RECENT_ISSUES and (now - _ACTIVE_OR_RECENT_ISSUES[issue_key]) < 90:
+                logger.info(f"[Webhook] Deduplicating event for {issue_key} (action={action}, last seen {now - _ACTIVE_OR_RECENT_ISSUES[issue_key]:.1f}s ago)")
+                return JSONResponse({"status": "duplicate_ignored", "issue_number": issue_number})
 
             # Check if this issue represents an incident or bug
             is_incident = (
                 "incident" in label_names
                 or "bug" in label_names
+                or "amaze on work-ai" in label_names
                 or "inc-" in title.lower()
                 or action in ("opened", "labeled")
             )
 
             if is_incident and action in ("opened", "labeled", "reopened"):
-                repo_data = payload.get("repository", {})
-                owner = repo_data.get("owner", {}).get("login", "")
-                repo_name = repo_data.get("name", "")
-
+                _ACTIVE_OR_RECENT_ISSUES[issue_key] = now
                 logger.info(f"Incident issue received: #{issue_number} - {title}")
                 try:
                     from src.agents.trigger_agent import TriggerAgent

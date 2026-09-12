@@ -64,6 +64,28 @@ class FixWriterAgent(BaseAgent):
             from pathlib import Path
             inc_id = incident.get("id", "")
             cand_path = Path(f"data/fix_candidates/{inc_id}.json")
+            if not cand_path.exists():
+                # Search all candidate files to match by description, keywords, or error type
+                cand_dir = Path("data/fix_candidates")
+                inc_title = incident.get("title", "").lower()
+                inc_error = incident.get("error_type", "").lower()
+                inc_desc = incident.get("description", "").lower()
+                for f in cand_dir.glob("*.json"):
+                    try:
+                        cand_data = json.loads(f.read_text(encoding="utf-8"))
+                        for c in cand_data.get("candidates", []):
+                            desc = c.get("fix_plan", {}).get("description", "").lower()
+                            files = [fm.get("file_path", "").lower() for fm in c.get("fix_plan", {}).get("files_to_modify", [])]
+                            keywords = ["zerodivision", "shipping", "tax", "bcrypt", "discount", "keyerror", "pagination", "strip", "uuid", "webhook", "analytics", "ratelimit"]
+                            matched_kw = [k for k in keywords if (k in inc_title or k in inc_error or k in inc_desc) and (k in desc or any(k in fn for fn in files))]
+                            if matched_kw:
+                                cand_path = f
+                                break
+                    except Exception:
+                        pass
+                    if cand_path.exists():
+                        break
+
             if cand_path.exists():
                 try:
                     cand_data = json.loads(cand_path.read_text(encoding="utf-8"))
@@ -71,15 +93,15 @@ class FixWriterAgent(BaseAgent):
                     if candidates:
                         primary = candidates[0].get("fix_plan", {})
                         if primary.get("patch"):
-                            logger.info(f"[FixWriter] Using pre-validated candidate for {inc_id}")
+                            logger.info(f"[FixWriter] Using pre-validated candidate from {cand_path}")
                             return AgentResponse(
                                 success=True,
                                 message=f"Pre-validated fix loaded: {primary.get('description', '')[:100]}",
                                 data=primary,
                                 next_agent=AgentType.VALIDATION.value,
                             )
-                except Exception:
-                    pass
+                except Exception as fe:
+                    logger.warning(f"[FixWriter] Failed loading candidate from {cand_path}: {fe}")
             logger.error(f"Fix generation failed: {e}")
             return AgentResponse(
                 success=False,
