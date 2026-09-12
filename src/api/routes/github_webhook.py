@@ -45,16 +45,47 @@ try:
 
         if event_type == "issues":
             action = payload.get("action", "")
-            if action == "labeled":
-                label = payload.get("label", {}).get("name", "")
-                if label.lower() == "incident":
-                    issue = payload.get("issue", {})
-                    logger.info(f"Incident issue labeled: #{issue.get('number')} - {issue.get('title')}")
+            issue = payload.get("issue", {})
+            labels = [l.get("name", "") for l in issue.get("labels", [])]
+            label_names = {l.lower() for l in labels}
+            title = issue.get("title", "")
+            body = issue.get("body", "") or ""
+            issue_number = issue.get("number")
+
+            # Check if this issue represents an incident or bug
+            is_incident = (
+                "incident" in label_names
+                or "bug" in label_names
+                or "inc-" in title.lower()
+                or action in ("opened", "labeled")
+            )
+
+            if is_incident and action in ("opened", "labeled", "reopened"):
+                repo_data = payload.get("repository", {})
+                owner = repo_data.get("owner", {}).get("login", "")
+                repo_name = repo_data.get("name", "")
+
+                logger.info(f"Incident issue received: #{issue_number} - {title}")
+                try:
+                    from src.agents.trigger_agent import TriggerAgent
+                    agent = TriggerAgent()
+                    result = agent.handle_github_issue(
+                        issue_number=issue_number,
+                        title=title,
+                        body=body,
+                        labels=labels,
+                        repo_owner=owner,
+                        repo_name=repo_name,
+                    )
                     return JSONResponse({
                         "status": "queued",
-                        "issue_number": issue.get("number"),
-                        "message": "Incident issue detected, Amaze on Work is analyzing...",
+                        "issue_number": issue_number,
+                        "incident_id": result.get("incident_id"),
+                        "message": f"Amaze on Work picked up issue #{issue_number} and is analyzing...",
                     })
+                except Exception as e:
+                    logger.error(f"Failed to handle GitHub issue #{issue_number}: {e}")
+                    return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
 
         elif event_type == "pull_request":
             action = payload.get("action", "")

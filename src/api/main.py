@@ -43,8 +43,9 @@ from src.config import settings
 try:
     from src.api.routes.slack_webhook import router as slack_router
     from src.api.routes.jira_webhook import router as jira_router
+    from src.api.routes.github_webhook import router as github_router
     from src.api.routes.fix_selection_webhook import router as fix_selection_router
-    _WEBHOOK_ROUTERS = [slack_router, jira_router, fix_selection_router]
+    _WEBHOOK_ROUTERS = [slack_router, jira_router, github_router, fix_selection_router]
 except ImportError as e:
     _WEBHOOK_ROUTERS = []
     logger.warning(f"Webhook routers not loaded: {e}")

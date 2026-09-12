@@ -229,6 +229,58 @@ class TriggerAgent:
 
         return {"incident_id": inc_id, "jira_ticket_id": ticket_id, "status": "queued"}
 
+    def handle_github_issue(
+        self,
+        issue_number: int,
+        title: str,
+        body: str,
+        labels: list | None = None,
+        repo_owner: str = "",
+        repo_name: str = "",
+    ) -> dict:
+        """
+        Handle a new GitHub Issue (from github_webhook.py).
+
+        Steps:
+        1. Assign INC-XXXX (or match INC-00X from title)
+        2. Parse issue title and body into IncidentContext
+        3. Launch pipeline in background thread
+        """
+        target_repo = f"https://github.com/{repo_owner}/{repo_name}" if repo_owner and repo_name else self.repo_url
+        inc_id = next_incident_id(metadata={
+            "source": "github_issue",
+            "issue_number": issue_number,
+            "title": title,
+            "repo": f"{repo_owner}/{repo_name}" if repo_owner and repo_name else self.repo_url,
+        })
+        logger.info(f"[TriggerAgent] GitHub issue received: #{issue_number} ({title}) -> {inc_id}")
+
+        # Check for preset ID like INC-001 in title
+        match = re.search(r'(INC-\d+)', title, re.IGNORECASE)
+        preset_id = match.group(1).upper() if match else None
+
+        incident = self._parse_slack_text(inc_id, f"{title}\n\n{body}")
+        incident["linked_issue_url"] = f"https://github.com/{repo_owner}/{repo_name}/issues/{issue_number}" if repo_owner and repo_name else ""
+        incident["github_issue_number"] = issue_number
+        if preset_id:
+            incident["id"] = preset_id
+
+        def _run():
+            try:
+                self.supervisor.resolve_incident(
+                    incident=incident,
+                    repo_url=target_repo,
+                    slack_channel=None,
+                    slack_thread_ts=None,
+                )
+            except Exception as e:
+                logger.error(f"[TriggerAgent] Pipeline failed for GitHub issue #{issue_number} ({inc_id}): {e}")
+
+        t = threading.Thread(target=_run, daemon=True, name=f"pipeline-{inc_id}")
+        t.start()
+
+        return {"incident_id": incident.get("id", inc_id), "issue_number": issue_number, "status": "queued"}
+
     # ── Repo URL Extraction ────────────────────────────────────
 
     def _extract_repo_from_text(self, text: str) -> tuple[str, str]:
