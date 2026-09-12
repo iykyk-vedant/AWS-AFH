@@ -73,14 +73,23 @@ class CerebrasClient(BaseLLMClient):
         body = self._build_request_body(messages, temperature, max_tokens)
 
         max_retries = 6
+        fallback_models = ["groq/compound-mini", "openai/gpt-oss-120b", "openai/gpt-oss-20b"]
         for attempt in range(max_retries):
             with httpx.Client(timeout=self._timeout) as client:
                 response = client.post(url, headers=self._get_headers(), json=body)
                 if response.status_code == 429 and attempt < max_retries - 1:
+                    remaining = response.headers.get("x-ratelimit-remaining-requests", "1")
+                    # If daily/RPD limit hit or multiple attempts failed, switch model
+                    if remaining == "0" or attempt >= 1:
+                        for fb in fallback_models:
+                            if fb != body.get("model"):
+                                logger.warning(f"[LLM] Failover model: {body.get('model')} → {fb}")
+                                body["model"] = fb
+                                break
                     retry_after = response.headers.get("retry-after")
-                    wait_time = float(retry_after) if retry_after else max(6.0, 4.0 * (attempt + 1))
+                    wait_time = float(retry_after) if retry_after and float(retry_after) < 15.0 else max(3.0, 2.0 * (attempt + 1))
                     logger.warning(f"[LLM] Rate limit hit (429), waiting {wait_time:.1f}s (attempt {attempt+1}/{max_retries})...")
-                    time.sleep(min(wait_time, 25.0))
+                    time.sleep(min(wait_time, 15.0))
                     continue
                 response.raise_for_status()
                 return self._parse_response(response.json())
@@ -96,16 +105,24 @@ class CerebrasClient(BaseLLMClient):
         body = self._build_request_body(messages, temperature, max_tokens)
 
         max_retries = 6
+        fallback_models = ["groq/compound-mini", "openai/gpt-oss-120b", "openai/gpt-oss-20b"]
         for attempt in range(max_retries):
             async with httpx.AsyncClient(timeout=self._timeout) as client:
                 response = await client.post(
                     url, headers=self._get_headers(), json=body
                 )
                 if response.status_code == 429 and attempt < max_retries - 1:
+                    remaining = response.headers.get("x-ratelimit-remaining-requests", "1")
+                    if remaining == "0" or attempt >= 1:
+                        for fb in fallback_models:
+                            if fb != body.get("model"):
+                                logger.warning(f"[LLM] Failover model: {body.get('model')} → {fb}")
+                                body["model"] = fb
+                                break
                     retry_after = response.headers.get("retry-after")
-                    wait_time = float(retry_after) if retry_after else max(6.0, 4.0 * (attempt + 1))
+                    wait_time = float(retry_after) if retry_after and float(retry_after) < 15.0 else max(3.0, 2.0 * (attempt + 1))
                     logger.warning(f"[LLM] Async rate limit hit (429), waiting {wait_time:.1f}s (attempt {attempt+1}/{max_retries})...")
-                    await asyncio.sleep(min(wait_time, 25.0))
+                    await asyncio.sleep(min(wait_time, 15.0))
                     continue
                 response.raise_for_status()
                 return self._parse_response(response.json())
