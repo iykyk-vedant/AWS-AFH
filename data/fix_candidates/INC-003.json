@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-003",
+  "repo_url": "https://github.com/iykyk-vedant/AFH-DEMO",
+  "candidates": [
+    {
+      "candidate_id": "c1_primary",
+      "fix_plan": {
+        "description": "Minimal surgical fix for ZeroDivisionError in shipping rate calculation for digital orders",
+        "files_to_modify": [
+          {
+            "file_path": "app/services/shipping_service.py",
+            "rationale": "Division by zero when order weight_kg is 0.0 for digital items"
+          }
+        ],
+        "patch": "--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -11,7 +11,7 @@\n     if distance_km < 0:\n         raise ValueError(\"Distance cannot be negative\")\n\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 0.0 if weight_kg <= 0.0 else 15.0 / weight_kg\n     weight_charge = round(cost_per_kg * weight_kg, 2)\n     distance_charge = round(distance_km * 0.5, 2)\n     total_shipping = round(base_fee + weight_charge + distance_charge, 2)",
+        "rationale": "Division by zero when order weight_kg is 0.0 for digital items",
+        "characterization_test": null,
+        "change_size": 2
+      },
+      "score": 95,
+      "rank": 1,
+      "verdict": "FIX_CONFIRMED"
+    }
+  ]
+}

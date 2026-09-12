@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-004",
+  "title": "Unhandled KeyError in inventory reservation when item ID is not in catalog",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P1 - Critical",
+  "root_cause": "Direct dictionary access on STOCK_CATALOG without verifying item existence",
+  "status": "RESOLVED",
+  "confidence": 0.98,
+  "risk_level": "LOW",
+  "files_changed": [
+    "app/services/inventory_service.py"
+  ],
+  "patch_applied": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -20,6 +20,8 @@\n     if quantity <= 0:\n         raise ValueError(\"Reservation quantity must be positive\")\n\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n     available = STOCK_CATALOG[item_id]\n     if available < quantity:\n         return {\"success\": False, \"reason\": \"Insufficient stock\", \"available\": available}",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-004)\n\n**Incident ID:** `INC-004`\n**Title:** Unhandled KeyError in inventory reservation when item ID is not in catalog\n**Service:** `python-service` | **Env:** production | **Severity:** P1 - Critical\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 98%\n\n---\n\n## Root Cause\nDirect dictionary access on STOCK_CATALOG without verifying item existence\n\n---\n\n## Changes Made\n- Target file: `app/services/inventory_service.py`\n\n```diff\n--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -20,6 +20,8 @@\n     if quantity <= 0:\n         raise ValueError(\"Reservation quantity must be positive\")\n\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n     available = STOCK_CATALOG[item_id]\n     if available < quantity:\n         return {\"success\": False, \"reason\": \"Insufficient stock\", \"available\": available}\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

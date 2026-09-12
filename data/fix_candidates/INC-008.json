@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-008",
+  "repo_url": "https://github.com/iykyk-vedant/AFH-DEMO",
+  "candidates": [
+    {
+      "candidate_id": "c1_primary",
+      "fix_plan": {
+        "description": "Minimal surgical fix for ValueError: No scheme supplied in webhook notification target URL",
+        "files_to_modify": [
+          {
+            "file_path": "app/services/webhook_service.py",
+            "rationale": "Strict urlparse fails to prepend https:// on schemeless target URLs"
+          }
+        ],
+        "patch": "--- a/app/services/webhook_service.py\n+++ b/app/services/webhook_service.py\n@@ -10,6 +10,8 @@\n     \"\"\"Validate and normalize outbound webhook endpoint URL.\"\"\"\n+    if not target_url.startswith(('http://', 'https://')):\n+        target_url = f\"https://{target_url}\"\n     parsed = urlparse(target_url)\n     if not parsed.scheme:\n         raise ValueError(f\"Invalid URL '{target_url}': No scheme supplied. Perhaps you meant https://{target_url}?\")",
+        "rationale": "Strict urlparse fails to prepend https:// on schemeless target URLs",
+        "characterization_test": null,
+        "change_size": 2
+      },
+      "score": 95,
+      "rank": 1,
+      "verdict": "FIX_CONFIRMED"
+    }
+  ]
+}

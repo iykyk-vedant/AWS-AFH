@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-011",
+  "title": "ValueError: Cart subtotal mismatch on floating-point precision sum",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P2 - High",
+  "root_cause": "Strict float equality check fails on IEEE-754 binary floating-point representation",
+  "status": "RESOLVED",
+  "confidence": 0.99,
+  "risk_level": "LOW",
+  "files_changed": [
+    "app/services/cart_service.py"
+  ],
+  "patch_applied": "--- a/app/services/cart_service.py\n+++ b/app/services/cart_service.py\n@@ -10,6 +10,6 @@\n     computed_sum = sum(item_prices)\n\n-    if computed_sum != reported_subtotal:\n+    if round(computed_sum, 2) != round(reported_subtotal, 2):\n         raise ValueError(\n             f\"Cart subtotal mismatch: computed sum {computed_sum} does not match reported subtotal {reported_subtotal}\"\n         )",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-011)\n\n**Incident ID:** `INC-011`\n**Title:** ValueError: Cart subtotal mismatch on floating-point precision sum\n**Service:** `python-service` | **Env:** production | **Severity:** P2 - High\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 99%\n\n---\n\n## Root Cause\nStrict float equality check fails on IEEE-754 binary floating-point representation\n\n---\n\n## Changes Made\n- Target file: `app/services/cart_service.py`\n\n```diff\n--- a/app/services/cart_service.py\n+++ b/app/services/cart_service.py\n@@ -10,6 +10,6 @@\n     computed_sum = sum(item_prices)\n\n-    if computed_sum != reported_subtotal:\n+    if round(computed_sum, 2) != round(reported_subtotal, 2):\n         raise ValueError(\n             f\"Cart subtotal mismatch: computed sum {computed_sum} does not match reported subtotal {reported_subtotal}\"\n         )\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

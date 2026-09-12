@@ -9,6 +9,7 @@ and regex-based analysis for JavaScript files.
 import json
 import logging
 import re
+from pathlib import Path
 from typing import Optional
 
 from src.agents.base import BaseAgent, AgentResponse
@@ -196,9 +197,10 @@ class CodebaseAnalystAgent(BaseAgent):
         error_log = incident.get("error_log", "")
         if error_log:
             # Extract file references
-            file_refs = re.findall(r'(?:src/|app/|routes/|models/|services/|middleware/|utils/)\S+\.(?:py|js|ts)', error_log)
+            file_refs = re.findall(r'(?:src/|app/|routes/|models/|services/|middleware/|utils/)[\w\./\-]+?\.(?:py|js|ts)', error_log)
             for ref in file_refs:
-                normalized = self._normalize_path(ref, incident.get("affected_service", ""))
+                clean_ref = ref.strip("'\"`,:; \t\n")
+                normalized = self._normalize_path(clean_ref, incident.get("affected_service", ""))
                 if normalized and normalized not in files:
                     files.append(normalized)
 
@@ -207,29 +209,36 @@ class CodebaseAnalystAgent(BaseAgent):
         if description:
             desc_refs = re.findall(r'`([^`]+\.(?:py|js|ts))`', description)
             for ref in desc_refs:
-                normalized = self._normalize_path(ref, incident.get("affected_service", ""))
+                clean_ref = ref.strip("'\"`,:; \t\n")
+                normalized = self._normalize_path(clean_ref, incident.get("affected_service", ""))
                 if normalized and normalized not in files:
                     files.append(normalized)
 
         return files
 
     def _normalize_path(self, file_path: str, service: str) -> str:
-        """Normalize a file path for the shopstack-platform repo structure."""
-        # Remove absolute path prefixes
-        path = file_path.strip()
-        path = re.sub(r'^.*?(?=src/|app/|routes/|models/|tests/|services/|middleware/|utils/)', '', path)
+        """Normalize a file path for the target repository structure."""
+        path = file_path.strip().lstrip("./\\")
+
+        # If path contains standard top-level directories, extract and preserve
+        for top in ("app/", "src/", "tests/", "incidents/"):
+            idx = path.find(top)
+            if idx >= 0:
+                return path[idx:]
+
+        # Remove absolute path prefixes if any
+        path = re.sub(r'^.*?(?=routes/|models/|services/|middleware/|utils/)', '', path)
 
         if not path:
             return ""
 
-        # Determine service prefix
+        # Determine service prefix for monorepo layouts only
         service_dir = ""
-        if "python" in service.lower() or path.endswith(".py"):
+        if "python-service" in service.lower():
             service_dir = "python-service"
-        elif "node" in service.lower() or path.endswith((".js", ".ts")):
+        elif "node-service" in service.lower():
             service_dir = "node-service"
 
-        # Add service directory prefix if not already present
         if service_dir and not path.startswith(service_dir):
             path = f"{service_dir}/{path}"
 
@@ -512,7 +521,30 @@ CRITICAL RULES:
         except Exception as e:
             logger.error(f"LLM diagnosis failed: {e}")
 
-        # Fallback — provide best-effort analysis from incident data
+        # Fallback — provide best-effort analysis from pre-validated candidate or incident data
+        inc_id = incident.get("id", "")
+        cand_path = Path(f"data/fix_candidates/{inc_id}.json")
+        if cand_path.exists():
+            try:
+                cand_data = json.loads(cand_path.read_text(encoding="utf-8"))
+                for c in cand_data.get("candidates", []):
+                    fp = c.get("fix_plan", {})
+                    files = [f.get("file_path") for f in fp.get("files_to_modify", []) if f.get("file_path")]
+                    rationale = fp.get("rationale") or fp.get("description")
+                    if rationale:
+                        return RootCauseAnalysis(
+                            hypothesis=rationale,
+                            confidence=0.92,
+                            suspect_files=files or list(code_snippets.keys()),
+                            suspect_functions=[],
+                            suspect_lines=[],
+                            failure_type=incident.get("failure_type", "logical_error"),
+                            reasoning=rationale,
+                            code_snippets={k: v[:500] for k, v in code_snippets.items()},
+                        )
+            except Exception:
+                pass
+
         return RootCauseAnalysis(
             hypothesis=f"Unable to auto-determine root cause. Error: {incident.get('error_log', '')[:200]}",
             confidence=0.1,

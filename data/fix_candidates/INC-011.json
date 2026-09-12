@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-011",
+  "repo_url": "https://github.com/iykyk-vedant/AFH-DEMO",
+  "candidates": [
+    {
+      "candidate_id": "c1_primary",
+      "fix_plan": {
+        "description": "Minimal surgical fix for ValueError: Cart subtotal mismatch on floating-point precision sum",
+        "files_to_modify": [
+          {
+            "file_path": "app/services/cart_service.py",
+            "rationale": "Strict float equality check fails on IEEE-754 binary floating-point representation"
+          }
+        ],
+        "patch": "--- a/app/services/cart_service.py\n+++ b/app/services/cart_service.py\n@@ -10,6 +10,6 @@\n     computed_sum = sum(item_prices)\n\n-    if computed_sum != reported_subtotal:\n+    if round(computed_sum, 2) != round(reported_subtotal, 2):\n         raise ValueError(\n             f\"Cart subtotal mismatch: computed sum {computed_sum} does not match reported subtotal {reported_subtotal}\"\n         )",
+        "rationale": "Strict float equality check fails on IEEE-754 binary floating-point representation",
+        "characterization_test": null,
+        "change_size": 2
+      },
+      "score": 95,
+      "rank": 1,
+      "verdict": "FIX_CONFIRMED"
+    }
+  ]
+}

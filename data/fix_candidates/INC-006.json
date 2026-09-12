@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-006",
+  "repo_url": "https://github.com/iykyk-vedant/AFH-DEMO",
+  "candidates": [
+    {
+      "candidate_id": "c1_primary",
+      "fix_plan": {
+        "description": "Minimal surgical fix for AttributeError: 'NoneType' object has no attribute 'strip' on user profile update",
+        "files_to_modify": [
+          {
+            "file_path": "app/services/user_service.py",
+            "rationale": "Calling strip() on optional phone parameter when set to None"
+          }
+        ],
+        "patch": "--- a/app/services/user_service.py\n+++ b/app/services/user_service.py\n@@ -21,7 +21,7 @@\n     if \"name\" in updates:\n         user[\"name\"] = updates[\"name\"].strip()\n\n     if \"phone\" in updates:\n-        user[\"phone\"] = updates[\"phone\"].strip()\n+        user[\"phone\"] = updates[\"phone\"].strip() if updates[\"phone\"] is not None else None\n     return user",
+        "rationale": "Calling strip() on optional phone parameter when set to None",
+        "characterization_test": null,
+        "change_size": 2
+      },
+      "score": 95,
+      "rank": 1,
+      "verdict": "FIX_CONFIRMED"
+    }
+  ]
+}

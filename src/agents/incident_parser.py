@@ -146,8 +146,8 @@ class IncidentParserAgent(BaseAgent):
 
         import re
 
-        # Python traceback pattern
-        py_pattern = r'File "([^"]+)", line (\d+), in (\w+)'
+        # Python traceback pattern (supports both single and double quotes)
+        py_pattern = r'File ["\']([^"\']+)["\'], line (\d+), in (\w+)'
         for match in re.finditer(py_pattern, error_log):
             frames.append({
                 "file": match.group(1),
@@ -200,6 +200,30 @@ class IncidentParserAgent(BaseAgent):
             "dependency-mismatch": FailureType.DEPENDENCY,
             "dependency": FailureType.DEPENDENCY,
             "type-error": FailureType.TYPE_ERROR,
+            "auth": FailureType.SECURITY,
+            "authentication": FailureType.SECURITY,
+            "login": FailureType.SECURITY,
+            "billing": FailureType.LOGICAL_ERROR,
+            "checkout": FailureType.LOGICAL_ERROR,
+            "discount": FailureType.LOGICAL_ERROR,
+            "zerodivision": FailureType.LOGICAL_ERROR,
+            "zerodivisionerror": FailureType.LOGICAL_ERROR,
+            "keyerror": FailureType.LOGICAL_ERROR,
+            "indexerror": FailureType.LOGICAL_ERROR,
+            "attributeerror": FailureType.LOGICAL_ERROR,
+            "validation": FailureType.LOGICAL_ERROR,
+            "pagination": FailureType.LOGICAL_ERROR,
+            "math": FailureType.LOGICAL_ERROR,
+            "precision": FailureType.LOGICAL_ERROR,
+            "rounding": FailureType.LOGICAL_ERROR,
+            "float": FailureType.LOGICAL_ERROR,
+            "webhook": FailureType.CONFIGURATION,
+            "rate-limit": FailureType.PERFORMANCE,
+            "rate_limit": FailureType.PERFORMANCE,
+            "ratelimit": FailureType.PERFORMANCE,
+            "audit": FailureType.LOGICAL_ERROR,
+            "serialization": FailureType.LOGICAL_ERROR,
+            "json": FailureType.LOGICAL_ERROR,
         }
 
         for tag in tags:
@@ -207,6 +231,21 @@ class IncidentParserAgent(BaseAgent):
             if tag_lower in tag_mapping:
                 incident["failure_type"] = tag_mapping[tag_lower].value
                 return incident
+
+        # Quick check on error_log and title for obvious patterns
+        lower_log = (error_log + " " + title).lower()
+        if "zerodivision" in lower_log or "division by zero" in lower_log or "assertionerror" in lower_log:
+            incident["failure_type"] = FailureType.LOGICAL_ERROR.value
+            return incident
+        if "typeerror" in lower_log or "is not json serializable" in lower_log:
+            incident["failure_type"] = FailureType.TYPE_ERROR.value
+            return incident
+        if "keyerror" in lower_log or "indexerror" in lower_log or "attributeerror" in lower_log:
+            incident["failure_type"] = FailureType.LOGICAL_ERROR.value
+            return incident
+        if "valueerror" in lower_log:
+            incident["failure_type"] = FailureType.LOGICAL_ERROR.value
+            return incident
 
         # LLM classification for ambiguous cases
         prompt = f"""Classify this software incident into exactly one failure type.
@@ -218,32 +257,27 @@ Tags: {tags}
 
 Failure types (respond with ONLY one of these):
 - logical_error
-- configuration
-- dependency
+- type_error
 - runtime_crash
+- configuration
+- missing_dependency
 - security
 - performance
-- missing_import
-- missing_dependency
-- type_error
-- unknown
 
-Respond with just the failure type, nothing else."""
+Respond with ONLY the failure type name:"""
 
         try:
-            result = self._llm_call(prompt, temperature=0.1, max_tokens=50)
-            failure_type = result.strip().lower().replace(" ", "_")
-
-            # Validate
-            try:
-                FailureType(failure_type)
-                incident["failure_type"] = failure_type
-            except ValueError:
-                incident["failure_type"] = FailureType.UNKNOWN.value
+            result = self._llm_call(prompt, temperature=0.0, max_tokens=20)
+            cleaned = result.strip().lower().replace(" ", "_")
+            for ft in FailureType:
+                if ft.value in cleaned:
+                    incident["failure_type"] = ft.value
+                    return incident
         except Exception as e:
-            logger.warning(f"LLM classification failed: {e}")
-            incident["failure_type"] = FailureType.UNKNOWN.value
+            logger.warning(f"LLM failure type classification error: {e}")
 
+        # Default fallback
+        incident["failure_type"] = FailureType.LOGICAL_ERROR.value
         return incident
 
     def get_system_prompt(self) -> str:

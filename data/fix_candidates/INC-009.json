@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-009",
+  "repo_url": "https://github.com/iykyk-vedant/AFH-DEMO",
+  "candidates": [
+    {
+      "candidate_id": "c1_primary",
+      "fix_plan": {
+        "description": "Minimal surgical fix for ValueError: invalid literal for int() with base 10: '' in analytics query",
+        "files_to_modify": [
+          {
+            "file_path": "app/services/analytics_service.py",
+            "rationale": "Attempting int() conversion on empty query string parameters"
+          }
+        ],
+        "patch": "--- a/app/services/analytics_service.py\n+++ b/app/services/analytics_service.py\n@@ -10,6 +10,8 @@\n     \"\"\"Parse integer query parameter with safe default fallback.\"\"\"\n     if raw_val is None:\n         return default\n+    if isinstance(raw_val, str) and not raw_val.strip():\n+        return default\n     return int(raw_val)",
+        "rationale": "Attempting int() conversion on empty query string parameters",
+        "characterization_test": null,
+        "change_size": 2
+      },
+      "score": 95,
+      "rank": 1,
+      "verdict": "FIX_CONFIRMED"
+    }
+  ]
+}

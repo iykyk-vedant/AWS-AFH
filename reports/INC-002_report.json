@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-002",
+  "title": "Double discount deduction applied during checkout calculation",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P1 - Critical",
+  "root_cause": "Discount was subtracted twice from subtotal in process_order_total",
+  "status": "RESOLVED",
+  "confidence": 0.96,
+  "risk_level": "MEDIUM",
+  "files_changed": [
+    "app/services/payment_service.py"
+  ],
+  "patch_applied": "--- a/app/services/payment_service.py\n+++ b/app/services/payment_service.py\n@@ -23,7 +23,7 @@\n     \"\"\"Calculate the final total including discount and tax.\"\"\"\n     discount = calculate_discount(subtotal, discount_code)\n     # BUG (INC-002): Discount is mistakenly subtracted twice from subtotal\n-    discounted_subtotal = max(0.0, (subtotal - discount) - discount)\n+    discounted_subtotal = max(0.0, subtotal - discount)\n     tax = round(discounted_subtotal * tax_rate, 2)\n     total = round(discounted_subtotal + tax, 2)\n     return {",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-002)\n\n**Incident ID:** `INC-002`\n**Title:** Double discount deduction applied during checkout calculation\n**Service:** `python-service` | **Env:** production | **Severity:** P1 - Critical\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 96%\n\n---\n\n## Root Cause\nDiscount was subtracted twice from subtotal in process_order_total\n\n---\n\n## Changes Made\n- Target file: `app/services/payment_service.py`\n\n```diff\n--- a/app/services/payment_service.py\n+++ b/app/services/payment_service.py\n@@ -23,7 +23,7 @@\n     \"\"\"Calculate the final total including discount and tax.\"\"\"\n     discount = calculate_discount(subtotal, discount_code)\n     # BUG (INC-002): Discount is mistakenly subtracted twice from subtotal\n-    discounted_subtotal = max(0.0, (subtotal - discount) - discount)\n+    discounted_subtotal = max(0.0, subtotal - discount)\n     tax = round(discounted_subtotal * tax_rate, 2)\n     total = round(discounted_subtotal + tax, 2)\n     return {\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

@@ -66,19 +66,76 @@ def step_header(num, title, subtitle=""):
     console.print()
 
 
+INCIDENTS_CATALOG = [
+    ("INC-001", "Auth bcrypt TypeError", "app/routes/auth.py", "P1 - Critical"),
+    ("INC-002", "Double Discount Deduction", "app/services/payment_service.py", "P1 - Critical"),
+    ("INC-003", "ZeroDivisionError Shipping Tariff", "app/services/shipping_service.py", "P2 - High"),
+    ("INC-004", "KeyError Missing Catalog Item", "app/services/inventory_service.py", "P1 - Critical"),
+    ("INC-005", "IndexError Catalog Pagination", "app/services/inventory_service.py", "P2 - High"),
+    ("INC-006", "AttributeError NoneType Phone Strip", "app/services/user_service.py", "P2 - High"),
+    ("INC-007", "UUID JSON Serialization in Audit", "app/services/audit_service.py", "P2 - High"),
+    ("INC-008", "Webhook URL Missing Scheme", "app/services/webhook_service.py", "P2 - High"),
+    ("INC-009", "ValueError int('') in Analytics", "app/services/analytics_service.py", "P2 - High"),
+    ("INC-010", "KeyError x-forwarded-for Rate Limiter", "app/services/rate_limiter.py", "P2 - High"),
+    ("INC-011", "Float IEEE-754 Cart Subtotal", "app/services/cart_service.py", "P2 - High"),
+]
+
+
+def prompt_incident_selection() -> str:
+    """Display interactive incident menu for live demos."""
+    table = Table(box=box.ROUNDED, title="11-Incident Live Demonstration Suite", title_style="bold cyan", padding=(0, 1))
+    table.add_column("#", style="bold yellow", width=4)
+    table.add_column("ID", style="bold", width=9)
+    table.add_column("Incident Title", width=34)
+    table.add_column("Suspect Subsystem", style="dim", width=32)
+    table.add_column("Severity", width=14)
+
+    for i, (inc_id, title, file_path, sev) in enumerate(INCIDENTS_CATALOG, 1):
+        sev_color = "red" if "P1" in sev else "yellow"
+        table.add_row(str(i), inc_id, title, file_path, f"[{sev_color}]{sev}[/{sev_color}]")
+
+    console.print(table)
+    console.print()
+
+    from rich.prompt import Prompt
+    try:
+        choice = Prompt.ask(
+            "[bold green]Select incident to resolve[/bold green] (1-11, or incident ID, or Enter for INC-001)",
+            default="1"
+        ).strip().upper()
+
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(INCIDENTS_CATALOG):
+                return INCIDENTS_CATALOG[idx][0]
+        for inc_id, _, _, _ in INCIDENTS_CATALOG:
+            if choice == inc_id:
+                return inc_id
+    except Exception:
+        pass
+    return "INC-001"
+
+
 def main():
     parser = argparse.ArgumentParser(description="Amaze on Work Demo")
     default_repo = os.getenv("GITHUB_REPO_FULL") or f"{os.getenv('GITHUB_OWNER', 'iykyk-vedant')}/{os.getenv('GITHUB_REPO', 'AFH-DEMO')}"
-    parser.add_argument("--incident", default="INC-001", help="Incident ID")
+    parser.add_argument("--incident", default=None, help="Incident ID (e.g. INC-001, INC-002... INC-011)")
     parser.add_argument("--repo", default=default_repo)
     parser.add_argument("--slack-channel", default="", help="Slack channel name or ID")
     args = parser.parse_args()
 
-    owner, repo = args.repo.split("/")
-    incident_id = args.incident
-    slack_channel = args.slack_channel
-
     banner()
+
+    owner, repo = args.repo.split("/")
+    if not args.incident:
+        if sys.stdin.isatty():
+            incident_id = prompt_incident_selection()
+        else:
+            incident_id = "INC-001"
+    else:
+        incident_id = args.incident.upper()
+
+    slack_channel = args.slack_channel
 
     # ─── System Health ─────────────────────────────────────────────
     step_header(0, "System Health Check", "Verifying all components are operational")

@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-010",
+  "title": "KeyError: 'x-forwarded-for' when extracting client IP in VPC rate limiter",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P2 - High",
+  "root_cause": "Direct header dictionary indexing throws KeyError when proxy header is absent",
+  "status": "RESOLVED",
+  "confidence": 0.98,
+  "risk_level": "LOW",
+  "files_changed": [
+    "app/services/rate_limiter.py"
+  ],
+  "patch_applied": "--- a/app/services/rate_limiter.py\n+++ b/app/services/rate_limiter.py\n@@ -8,6 +8,8 @@\n def extract_client_ip(headers: Dict[str, str]) -> str:\n     \"\"\"Extract client IP address from HTTP request headers.\"\"\"\n-    forwarded_for = headers[\"x-forwarded-for\"]\n+    forwarded_for = headers.get(\"x-forwarded-for\")\n+    if not forwarded_for:\n+        return \"127.0.0.1\"\n     client_ip = forwarded_for.split(\",\")[0].strip()\n     return client_ip",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-010)\n\n**Incident ID:** `INC-010`\n**Title:** KeyError: 'x-forwarded-for' when extracting client IP in VPC rate limiter\n**Service:** `python-service` | **Env:** production | **Severity:** P2 - High\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 98%\n\n---\n\n## Root Cause\nDirect header dictionary indexing throws KeyError when proxy header is absent\n\n---\n\n## Changes Made\n- Target file: `app/services/rate_limiter.py`\n\n```diff\n--- a/app/services/rate_limiter.py\n+++ b/app/services/rate_limiter.py\n@@ -8,6 +8,8 @@\n def extract_client_ip(headers: Dict[str, str]) -> str:\n     \"\"\"Extract client IP address from HTTP request headers.\"\"\"\n-    forwarded_for = headers[\"x-forwarded-for\"]\n+    forwarded_for = headers.get(\"x-forwarded-for\")\n+    if not forwarded_for:\n+        return \"127.0.0.1\"\n     client_ip = forwarded_for.split(\",\")[0].strip()\n     return client_ip\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

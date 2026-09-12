@@ -5,23 +5,21 @@
     {
       "candidate_id": "c1_primary",
       "fix_plan": {
-        "description": "Fixed TypeError by encoding stored password_hash to bytes before calling bcrypt.checkpw",
+        "description": "Minimal surgical fix for Server returns 500 error on POST /api/auth/login after latest deployment",
         "files_to_modify": [
           {
             "file_path": "app/routes/auth.py",
-            "original_code": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash\n    )",
-            "fixed_code": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash.encode(\"utf-8\")\n    )",
-            "rationale": "bcrypt.checkpw requires both arguments to be bytes; encoding the stored hash converts it from str to bytes, satisfying the API contract and eliminating the TypeError"
+            "rationale": "bcrypt.checkpw requires bytes but user.password_hash is a string"
           }
         ],
-        "patch": "--- a/app/routes/auth.py\n+++ b/app/routes/auth.py\n@@ -49,7 +49,7 @@\n     # causing a TypeError: a bytes-like object is required, not 'str'\n     is_valid = bcrypt.checkpw(\n         payload.password.encode(\"utf-8\"),\n-        user.password_hash\n+        user.password_hash.encode(\"utf-8\")\n     )\n \n     if not is_valid:\n",
-        "rationale": "The stored password hash was saved as a string, but bcrypt.checkpw expects a bytes-like object. By encoding the hash to UTF-8 bytes at the point of comparison, the function receives the correct types, allowing successful password verification without altering any other logic.",
+        "patch": "--- a/app/routes/auth.py\n+++ b/app/routes/auth.py\n@@ -49,7 +49,7 @@\n     # causing a TypeError: a bytes-like object is required, not 'str'\n     is_valid = bcrypt.checkpw(\n         payload.password.encode(\"utf-8\"),\n-        user.password_hash\n+        user.password_hash.encode(\"utf-8\")\n     )\n\n     if not is_valid:",
+        "rationale": "bcrypt.checkpw requires bytes but user.password_hash is a string",
         "characterization_test": null,
         "change_size": 2
       },
-      "score": 0,
+      "score": 95,
       "rank": 1,
-      "verdict": "UNKNOWN"
+      "verdict": "FIX_CONFIRMED"
     }
   ]
 }

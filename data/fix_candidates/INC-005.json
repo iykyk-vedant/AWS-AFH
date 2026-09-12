@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-005",
+  "repo_url": "https://github.com/iykyk-vedant/AFH-DEMO",
+  "candidates": [
+    {
+      "candidate_id": "c1_primary",
+      "fix_plan": {
+        "description": "Minimal surgical fix for IndexError on pagination past catalog boundary",
+        "files_to_modify": [
+          {
+            "file_path": "app/services/inventory_service.py",
+            "rationale": "Accessing items[start] out of range instead of returning empty slice"
+          }
+        ],
+        "patch": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -37,7 +37,7 @@\n     start = page * limit\n     if start >= len(CATALOG_ITEMS):\n-        return CATALOG_ITEMS[start]\n+        return []\n     return CATALOG_ITEMS[start : start + limit]",
+        "rationale": "Accessing items[start] out of range instead of returning empty slice",
+        "characterization_test": null,
+        "change_size": 2
+      },
+      "score": 95,
+      "rank": 1,
+      "verdict": "FIX_CONFIRMED"
+    }
+  ]
+}

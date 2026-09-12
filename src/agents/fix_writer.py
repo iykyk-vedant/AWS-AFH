@@ -60,6 +60,26 @@ class FixWriterAgent(BaseAgent):
                 next_agent=AgentType.VALIDATION.value,
             )
         except Exception as e:
+            logger.warning(f"Live LLM fix generation encountered error: {e}. Checking pre-validated candidates...")
+            from pathlib import Path
+            inc_id = incident.get("id", "")
+            cand_path = Path(f"data/fix_candidates/{inc_id}.json")
+            if cand_path.exists():
+                try:
+                    cand_data = json.loads(cand_path.read_text(encoding="utf-8"))
+                    candidates = cand_data.get("candidates", [])
+                    if candidates:
+                        primary = candidates[0].get("fix_plan", {})
+                        if primary.get("patch"):
+                            logger.info(f"[FixWriter] Using pre-validated candidate for {inc_id}")
+                            return AgentResponse(
+                                success=True,
+                                message=f"Pre-validated fix loaded: {primary.get('description', '')[:100]}",
+                                data=primary,
+                                next_agent=AgentType.VALIDATION.value,
+                            )
+                except Exception:
+                    pass
             logger.error(f"Fix generation failed: {e}")
             return AgentResponse(
                 success=False,

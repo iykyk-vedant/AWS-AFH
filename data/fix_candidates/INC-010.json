@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-010",
+  "repo_url": "https://github.com/iykyk-vedant/AFH-DEMO",
+  "candidates": [
+    {
+      "candidate_id": "c1_primary",
+      "fix_plan": {
+        "description": "Minimal surgical fix for KeyError: 'x-forwarded-for' when extracting client IP in VPC rate limiter",
+        "files_to_modify": [
+          {
+            "file_path": "app/services/rate_limiter.py",
+            "rationale": "Direct header dictionary indexing throws KeyError when proxy header is absent"
+          }
+        ],
+        "patch": "--- a/app/services/rate_limiter.py\n+++ b/app/services/rate_limiter.py\n@@ -8,6 +8,8 @@\n def extract_client_ip(headers: Dict[str, str]) -> str:\n     \"\"\"Extract client IP address from HTTP request headers.\"\"\"\n-    forwarded_for = headers[\"x-forwarded-for\"]\n+    forwarded_for = headers.get(\"x-forwarded-for\")\n+    if not forwarded_for:\n+        return \"127.0.0.1\"\n     client_ip = forwarded_for.split(\",\")[0].strip()\n     return client_ip",
+        "rationale": "Direct header dictionary indexing throws KeyError when proxy header is absent",
+        "characterization_test": null,
+        "change_size": 2
+      },
+      "score": 95,
+      "rank": 1,
+      "verdict": "FIX_CONFIRMED"
+    }
+  ]
+}

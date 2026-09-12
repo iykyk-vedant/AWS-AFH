@@ -1,0 +1,241 @@
+{
+  "incident": {
+    "id": "INC-003",
+    "title": "ZeroDivisionError in shipping rate calculation for digital orders",
+    "description": "When users purchase digital-only products (such as eBooks or virtual gift cards) with zero shipping weight, the checkout fails with HTTP 500. The stack trace shows a ZeroDivisionError in the shipping rate calculation function.",
+    "stack_traces": [
+      {
+        "file": "app/services/shipping_service.py",
+        "line": 14,
+        "function": "calculate_shipping_rate"
+      }
+    ],
+    "affected_service": "",
+    "environment": "production",
+    "severity": "P2 - High",
+    "failure_type": "logical_error",
+    "error_log": "Traceback (most recent call last):\n  File 'app/services/shipping_service.py', line 14, in calculate_shipping_rate\n    cost_per_kg = 15.0 / weight_kg\nZeroDivisionError: float division by zero",
+    "tags": [
+      "shipping",
+      "checkout",
+      "zerodivision",
+      "logistics"
+    ],
+    "steps_to_reproduce": [],
+    "expected_behavior": "Zero-weight digital items should incur $0 weight charge without throwing ZeroDivisionError",
+    "actual_behavior": "Unhandled ZeroDivisionError when weight_kg is 0.0",
+    "recent_changes": "Commit 4b92c1: Updated variable parcel shipping tariff calculations",
+    "linked_commits": [],
+    "linked_issue_url": "",
+    "reported_by": "Logistics & Fulfillment Team",
+    "timestamp": "2026-09-12T12:15:00Z"
+  },
+  "root_cause": {
+    "hypothesis": "Division by zero when order weight_kg is 0.0 for digital items",
+    "confidence": 0.92,
+    "suspect_files": [
+      "app/services/shipping_service.py"
+    ],
+    "suspect_functions": [],
+    "suspect_lines": [],
+    "failure_type": "logical_error",
+    "reasoning": "Division by zero when order weight_kg is 0.0 for digital items",
+    "code_snippets": {
+      "app/services/shipping_service.py": "\"\"\"\nShipping cost estimation service.\n\"\"\"\n\nfrom typing import Dict, Any\n\n\ndef calculate_shipping_rate(weight_kg: float, distance_km: float = 25.0, base_fee: float = 5.0) -> Dict[str, float]:\n    \"\"\"Calculate shipping cost based on weight and distance.\"\"\"\n    if distance_km < 0:\n        raise ValueError(\"Distance cannot be negative\")\n\n    # BUG (INC-003): Division by zero when order contains zero weight (e.g., gift cards / digital items)\n    cost_per_kg = 15.0 / weight_kg\n    distance_charge = ro",
+      "incidents/INC-003.json": "{\n  \"id\": \"INC-003\",\n  \"title\": \"ZeroDivisionError in shipping rate calculation for digital orders\",\n  \"severity\": \"P2 - High\",\n  \"affected_service\": \"python-service\",\n  \"environment\": \"production\",\n  \"reported_by\": \"Logistics & Fulfillment Team\",\n  \"timestamp\": \"2026-09-12T12:15:00Z\",\n  \"description\": \"When users purchase digital-only products (such as eBooks or virtual gift cards) with zero shipping weight, the checkout fails with HTTP 500. The stack trace shows a ZeroDivisionError in the ship",
+      "tests/test_shipping.py": "\"\"\"\nUnit tests for shipping rate calculation service.\n\"\"\"\n\nimport pytest\nfrom app.services.shipping_service import calculate_shipping_rate\n\n\ndef test_standard_shipping():\n    res = calculate_shipping_rate(weight_kg=2.0, distance_km=50.0)\n    assert res[\"total_shipping\"] > 0\n\n\ndef test_digital_items_zero_weight_shipping():\n    # Should not raise ZeroDivisionError for zero-weight digital orders\n    res = calculate_shipping_rate(weight_kg=0.0, distance_km=10.0)\n    assert res[\"weight_charge\"] == 0.",
+      "incidents/INC-011.json": "{\n  \"id\": \"INC-011\",\n  \"title\": \"ValueError: Cart subtotal mismatch on floating-point precision sum\",\n  \"severity\": \"P2 - High\",\n  \"affected_service\": \"python-service\",\n  \"environment\": \"production\",\n  \"reported_by\": \"Checkout Experience Team\",\n  \"timestamp\": \"2026-09-12T16:05:00Z\",\n  \"description\": \"Carts containing certain combinations of prices (e.g., $10.10 and $20.20) fail validation with ValueError because the sum of floats produces 30.299999999999997, causing a mismatch against the report",
+      "incidents/INC-008.json": "{\n  \"id\": \"INC-008\",\n  \"title\": \"ValueError: No scheme supplied in webhook notification target URL\",\n  \"severity\": \"P2 - High\",\n  \"affected_service\": \"python-service\",\n  \"environment\": \"production\",\n  \"reported_by\": \"Partner Integrations Team\",\n  \"timestamp\": \"2026-09-12T15:00:00Z\",\n  \"description\": \"Third-party merchant webhooks fail to dispatch when registered without an explicit protocol prefix (e.g. 'hooks.slack.com/...'). The system throws a ValueError instead of prepending https://.\",\n  \"e",
+      "incidents/INC-006.json": "{\n  \"id\": \"INC-006\",\n  \"title\": \"AttributeError: 'NoneType' object has no attribute 'strip' on user profile update\",\n  \"severity\": \"P2 - High\",\n  \"affected_service\": \"python-service\",\n  \"environment\": \"production\",\n  \"reported_by\": \"Mobile Client Team\",\n  \"timestamp\": \"2026-09-12T14:10:00Z\",\n  \"description\": \"Mobile users who leave the optional phone number blank encounter a 500 error when saving their profile settings. The backend fails when calling strip() on a None value.\",\n  \"error_log\": \"Tr"
+    }
+  },
+  "fix_plan": {
+    "description": "Minimal surgical fix for ZeroDivisionError in shipping rate calculation for digital orders",
+    "files_to_modify": [
+      {
+        "file_path": "app/services/shipping_service.py",
+        "rationale": "Division by zero when order weight_kg is 0.0 for digital items"
+      }
+    ],
+    "patch": "--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -11,7 +11,7 @@\n     if distance_km < 0:\n         raise ValueError(\"Distance cannot be negative\")\n\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 0.0 if weight_kg <= 0.0 else 15.0 / weight_kg\n     weight_charge = round(cost_per_kg * weight_kg, 2)\n     distance_charge = round(distance_km * 0.5, 2)\n     total_shipping = round(base_fee + weight_charge + distance_charge, 2)",
+    "rationale": "Division by zero when order weight_kg is 0.0 for digital items",
+    "characterization_test": null,
+    "change_size": 2
+  },
+  "validation": {
+    "verdict": "SKIPPED",
+    "before": {},
+    "after": {},
+    "regressions": [],
+    "fixes_confirmed": [],
+    "unrelated_failures": [],
+    "attempt_logs": []
+  },
+  "risk": {
+    "level": "MEDIUM",
+    "composite_score": 30,
+    "blast_radius": 0,
+    "coupling_score": 0,
+    "cyclomatic_delta": 0,
+    "file_churn": 0,
+    "has_tests": false,
+    "change_size": 2,
+    "environment": "production",
+    "severity": "P2 - High",
+    "policy": "MEDIUM RISK \u2014 Auto-PR created with optimal fix. Slack notification shows all alternatives. User can select a different fix to replace the PR.",
+    "deployment_action": "pr_with_options",
+    "all_candidates": [
+      {
+        "candidate_id": "c1_primary",
+        "fix_plan": {
+          "description": "Minimal surgical fix for ZeroDivisionError in shipping rate calculation for digital orders",
+          "files_to_modify": [
+            {
+              "file_path": "app/services/shipping_service.py",
+              "rationale": "Division by zero when order weight_kg is 0.0 for digital items"
+            }
+          ],
+          "patch": "--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -11,7 +11,7 @@\n     if distance_km < 0:\n         raise ValueError(\"Distance cannot be negative\")\n\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 0.0 if weight_kg <= 0.0 else 15.0 / weight_kg\n     weight_charge = round(cost_per_kg * weight_kg, 2)\n     distance_charge = round(distance_km * 0.5, 2)\n     total_shipping = round(base_fee + weight_charge + distance_charge, 2)",
+          "rationale": "Division by zero when order weight_kg is 0.0 for digital items",
+          "characterization_test": null,
+          "change_size": 2
+        },
+        "score": 0,
+        "rank": 1,
+        "verdict": "UNKNOWN"
+      }
+    ],
+    "best_candidate_id": "c1_primary",
+    "breakdown": {
+      "blast_radius": {
+        "value": 0,
+        "score": 0,
+        "max": 30
+      },
+      "test_coverage": {
+        "has_tests": false,
+        "score": 20,
+        "max": 20
+      },
+      "coupling": {
+        "value": 0,
+        "score": 0,
+        "max": 15
+      },
+      "change_size": {
+        "value": 2,
+        "score": 0,
+        "max": 15
+      },
+      "environment": {
+        "value": "production",
+        "score": 10,
+        "max": 10
+      },
+      "cyclomatic_delta": {
+        "value": 0,
+        "score": 0,
+        "max": 10
+      }
+    }
+  },
+  "report": {
+    "incident_id": "INC-003",
+    "title": "ZeroDivisionError in shipping rate calculation for digital orders",
+    "root_cause": "Division by zero when order weight_kg is 0.0 for digital items",
+    "changes_made": [
+      {
+        "file": "app/services/shipping_service.py",
+        "change": "",
+        "rationale": "Division by zero when order weight_kg is 0.0 for digital items"
+      }
+    ],
+    "diff": "--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -11,7 +11,7 @@\n     if distance_km < 0:\n         raise ValueError(\"Distance cannot be negative\")\n\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 0.0 if weight_kg <= 0.0 else 15.0 / weight_kg\n     weight_charge = round(cost_per_kg * weight_kg, 2)\n     distance_charge = round(distance_km * 0.5, 2)\n     total_shipping = round(base_fee + weight_charge + distance_charge, 2)",
+    "validation": {
+      "verdict": "SKIPPED",
+      "before": {},
+      "after": {},
+      "regressions": [],
+      "fixes_confirmed": [],
+      "unrelated_failures": [],
+      "attempt_logs": []
+    },
+    "risk": {
+      "level": "MEDIUM",
+      "composite_score": 30,
+      "blast_radius": 0,
+      "coupling_score": 0,
+      "cyclomatic_delta": 0,
+      "file_churn": 0,
+      "has_tests": false,
+      "change_size": 2,
+      "environment": "production",
+      "severity": "P2 - High",
+      "policy": "MEDIUM RISK \u2014 Auto-PR created with optimal fix. Slack notification shows all alternatives. User can select a different fix to replace the PR.",
+      "deployment_action": "pr_with_options",
+      "all_candidates": [
+        {
+          "candidate_id": "c1_primary",
+          "fix_plan": {
+            "description": "Minimal surgical fix for ZeroDivisionError in shipping rate calculation for digital orders",
+            "files_to_modify": [
+              {
+                "file_path": "app/services/shipping_service.py",
+                "rationale": "Division by zero when order weight_kg is 0.0 for digital items"
+              }
+            ],
+            "patch": "--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -11,7 +11,7 @@\n     if distance_km < 0:\n         raise ValueError(\"Distance cannot be negative\")\n\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 0.0 if weight_kg <= 0.0 else 15.0 / weight_kg\n     weight_charge = round(cost_per_kg * weight_kg, 2)\n     distance_charge = round(distance_km * 0.5, 2)\n     total_shipping = round(base_fee + weight_charge + distance_charge, 2)",
+            "rationale": "Division by zero when order weight_kg is 0.0 for digital items",
+            "characterization_test": null,
+            "change_size": 2
+          },
+          "score": 0,
+          "rank": 1,
+          "verdict": "UNKNOWN"
+        }
+      ],
+      "best_candidate_id": "c1_primary",
+      "breakdown": {
+        "blast_radius": {
+          "value": 0,
+          "score": 0,
+          "max": 30
+        },
+        "test_coverage": {
+          "has_tests": false,
+          "score": 20,
+          "max": 20
+        },
+        "coupling": {
+          "value": 0,
+          "score": 0,
+          "max": 15
+        },
+        "change_size": {
+          "value": 2,
+          "score": 0,
+          "max": 15
+        },
+        "environment": {
+          "value": "production",
+          "score": 10,
+          "max": 10
+        },
+        "cyclomatic_delta": {
+          "value": 0,
+          "score": 0,
+          "max": 10
+        }
+      }
+    },
+    "confidence_score": 0.37,
+    "reasoning_chain": [
+      "Incident INC-003 parsed: 'ZeroDivisionError in shipping rate calculation for digital orders' -- service: , type: logical_error",
+      "Stack trace analysis -> suspect files: ['app/services/shipping_service.py']",
+      "Root cause: Division by zero when order weight_kg is 0.0 for digital items",
+      "Fix applied: Minimal surgical fix for ZeroDivisionError in shipping rate calculation for digital orders",
+      "Validation: SKIPPED -- before: 0/0 passed, after: 0/0 passed"
+    ],
+    "resolution_time_seconds": 166.85654091835022
+  }
+}

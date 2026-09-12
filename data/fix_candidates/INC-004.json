@@ -1,0 +1,25 @@
+{
+  "incident_id": "INC-004",
+  "repo_url": "https://github.com/iykyk-vedant/AFH-DEMO",
+  "candidates": [
+    {
+      "candidate_id": "c1_primary",
+      "fix_plan": {
+        "description": "Minimal surgical fix for Unhandled KeyError in inventory reservation when item ID is not in catalog",
+        "files_to_modify": [
+          {
+            "file_path": "app/services/inventory_service.py",
+            "rationale": "Direct dictionary access on STOCK_CATALOG without verifying item existence"
+          }
+        ],
+        "patch": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -20,6 +20,8 @@\n     if quantity <= 0:\n         raise ValueError(\"Reservation quantity must be positive\")\n\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n     available = STOCK_CATALOG[item_id]\n     if available < quantity:\n         return {\"success\": False, \"reason\": \"Insufficient stock\", \"available\": available}",
+        "rationale": "Direct dictionary access on STOCK_CATALOG without verifying item existence",
+        "characterization_test": null,
+        "change_size": 2
+      },
+      "score": 95,
+      "rank": 1,
+      "verdict": "FIX_CONFIRMED"
+    }
+  ]
+}
