@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/analytics_service.py",
+            "original_code": "    return int(raw_param)",
+            "fixed_code": "    if isinstance(raw_param, str) and not raw_param.strip():\n        return default_days\n    return int(raw_param)",
             "rationale": "Attempting int() conversion on empty query string parameters"
           }
         ],

@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/user_service.py",
+            "original_code": "        user[\"phone\"] = updates[\"phone\"].strip()",
+            "fixed_code": "        user[\"phone\"] = updates[\"phone\"].strip() if updates[\"phone\"] is not None else None",
             "rationale": "Calling strip() on optional phone parameter when set to None"
           }
         ],

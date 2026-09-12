@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/cart_service.py",
+            "original_code": "    if computed_sum != reported_subtotal:",
+            "fixed_code": "    if round(computed_sum, 2) != round(reported_subtotal, 2):",
             "rationale": "Strict float equality check fails on IEEE-754 binary floating-point representation"
           }
         ],

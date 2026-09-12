@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/inventory_service.py",
+            "original_code": "        return CATALOG_ITEMS[start]",
+            "fixed_code": "        return []",
             "rationale": "Accessing items[start] out of range instead of returning empty slice"
           }
         ],

@@ -254,7 +254,76 @@ class MCPClientBridge:
                 return resp.json().get("sha", "")
         except Exception as e:
             logger.warning(f"get_file_sha failed for {path}: {e}")
-        return ""
+    @staticmethod
+    def _extract_changes_from_patch(patch_str: str) -> list[dict]:
+        """Extract file_path, original_code, and fixed_code from a unified diff."""
+        if not patch_str:
+            return []
+        import re
+        chunks = []
+        current_file = None
+        orig_lines = []
+        fixed_lines = []
+        context_after = []
+
+        for line in patch_str.splitlines():
+            if line.startswith('--- '):
+                if current_file and (orig_lines or fixed_lines):
+                    orig_code = '\n'.join(orig_lines)
+                    fixed_code = '\n'.join(fixed_lines)
+                    if not orig_code and context_after:
+                        anchor = context_after[0]
+                        orig_code = anchor
+                        fixed_code = fixed_code + '\n' + anchor
+                    chunks.append({
+                        'file_path': current_file,
+                        'original_code': orig_code,
+                        'fixed_code': fixed_code,
+                        'rationale': 'Extracted from unified diff',
+                    })
+                    orig_lines, fixed_lines, context_after = [], [], []
+                raw_path = line.split(' ', 1)[1].strip()
+                current_file = re.sub(r'^[ab]/', '', raw_path)
+            elif line.startswith('+++ '):
+                pass
+            elif line.startswith('@@'):
+                if current_file and (orig_lines or fixed_lines):
+                    orig_code = '\n'.join(orig_lines)
+                    fixed_code = '\n'.join(fixed_lines)
+                    if not orig_code and context_after:
+                        anchor = context_after[0]
+                        orig_code = anchor
+                        fixed_code = fixed_code + '\n' + anchor
+                    chunks.append({
+                        'file_path': current_file,
+                        'original_code': orig_code,
+                        'fixed_code': fixed_code,
+                        'rationale': 'Extracted from unified diff',
+                    })
+                    orig_lines, fixed_lines, context_after = [], [], []
+            elif current_file:
+                if line.startswith('-') and not line.startswith('---'):
+                    orig_lines.append(line[1:])
+                elif line.startswith('+') and not line.startswith('+++'):
+                    fixed_lines.append(line[1:])
+                elif line.startswith(' '):
+                    if fixed_lines and not orig_lines:
+                        context_after.append(line[1:])
+
+        if current_file and (orig_lines or fixed_lines):
+            orig_code = '\n'.join(orig_lines)
+            fixed_code = '\n'.join(fixed_lines)
+            if not orig_code and context_after:
+                anchor = context_after[0]
+                orig_code = anchor
+                fixed_code = fixed_code + '\n' + anchor
+            chunks.append({
+                'file_path': current_file,
+                'original_code': orig_code,
+                'fixed_code': fixed_code,
+                'rationale': 'Extracted from unified diff',
+            })
+        return chunks
 
     def create_fix_pr(
         self,
@@ -331,12 +400,44 @@ class MCPClientBridge:
                     return {"error": f"Branch creation failed (check GITHUB_TOKEN permissions): {e}"}
 
             # 2. Commit each modified file (using sanitizer + smart matching)
-            for change in fix_plan.get("files_to_modify", []):
+            changes = list(fix_plan.get("files_to_modify", []))
+
+            # If changes is empty or missing fixed_code, try extracting from patch or candidate cache
+            if not changes or any(not c.get("fixed_code") for c in changes):
+                patch_str = fix_plan.get("patch", "")
+                if patch_str:
+                    extracted = self._extract_changes_from_patch(patch_str)
+                    if extracted:
+                        if not changes:
+                            changes = extracted
+                        else:
+                            for idx, c in enumerate(changes):
+                                if not c.get("fixed_code"):
+                                    match = next((e for e in extracted if e.get("file_path") == c.get("file_path")), None)
+                                    if match:
+                                        changes[idx] = match
+
+            if not changes or any(not c.get("fixed_code") for c in changes):
+                # Fallback to local candidate file if available
+                cand_path = Path(f"data/fix_candidates/{incident_id}.json")
+                if cand_path.exists():
+                    try:
+                        cand_data = json.loads(cand_path.read_text(encoding="utf-8"))
+                        for c in cand_data.get("candidates", []):
+                            cand_files = c.get("fix_plan", {}).get("files_to_modify", [])
+                            if cand_files and all(cf.get("fixed_code") for cf in cand_files):
+                                changes = cand_files
+                                logger.info(f"[PR] Loaded {len(changes)} verified changes from {cand_path}")
+                                break
+                    except Exception as ce:
+                        logger.warning(f"[PR] Error reading candidate cache {cand_path}: {ce}")
+
+            for change in changes:
                 file_path = change.get("file_path", "")
                 original_code = change.get("original_code", "")
                 fixed_code = change.get("fixed_code", "")
                 if not file_path or not fixed_code:
-                    logger.warning(f"Skipping change with missing path or code")
+                    logger.warning(f"Skipping change with missing path or code (file={file_path})")
                     continue
 
                 # Sanitize LLM output

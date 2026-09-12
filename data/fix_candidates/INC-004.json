@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/inventory_service.py",
+            "original_code": "    available = STOCK_CATALOG[item_id]",
+            "fixed_code": "    if item_id not in STOCK_CATALOG:\n        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n    available = STOCK_CATALOG[item_id]",
             "rationale": "Direct dictionary access on STOCK_CATALOG without verifying item existence"
           }
         ],

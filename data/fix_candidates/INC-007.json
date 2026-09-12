@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/audit_service.py",
+            "original_code": "    return json.dumps(event_payload)",
+            "fixed_code": "    return json.dumps(event_payload, default=str)",
             "rationale": "json.dumps lacks default=str handler for native UUID objects"
           }
         ],

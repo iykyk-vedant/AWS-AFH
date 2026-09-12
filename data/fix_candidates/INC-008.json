@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/webhook_service.py",
+            "original_code": "    parsed = urlparse(target_url)",
+            "fixed_code": "    if not target_url.startswith(('http://', 'https://')):\n        target_url = f\"https://{target_url}\"\n    parsed = urlparse(target_url)",
             "rationale": "Strict urlparse fails to prepend https:// on schemeless target URLs"
           }
         ],

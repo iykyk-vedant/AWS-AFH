@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/rate_limiter.py",
+            "original_code": "    forwarded_for = headers[\"x-forwarded-for\"]",
+            "fixed_code": "    forwarded_for = headers.get(\"x-forwarded-for\")\n    if not forwarded_for:\n        return \"127.0.0.1\"",
             "rationale": "Direct header dictionary indexing throws KeyError when proxy header is absent"
           }
         ],

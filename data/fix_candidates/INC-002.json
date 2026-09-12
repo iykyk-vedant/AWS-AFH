@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/services/payment_service.py",
+            "original_code": "    discounted_subtotal = max(0.0, (subtotal - discount) - discount)",
+            "fixed_code": "    discounted_subtotal = max(0.0, subtotal - discount)",
             "rationale": "Discount was subtracted twice from subtotal in process_order_total"
           }
         ],

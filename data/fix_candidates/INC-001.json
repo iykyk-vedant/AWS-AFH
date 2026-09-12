@@ -9,6 +9,8 @@
         "files_to_modify": [
           {
             "file_path": "app/routes/auth.py",
+            "original_code": "        user.password_hash",
+            "fixed_code": "        user.password_hash.encode(\"utf-8\")",
             "rationale": "bcrypt.checkpw requires bytes but user.password_hash is a string"
           }
         ],
