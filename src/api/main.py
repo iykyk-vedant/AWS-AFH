@@ -25,8 +25,9 @@ logger = logging.getLogger("Amaze on Work")
 
 try:
     from fastapi import FastAPI, HTTPException
-    from fastapi.responses import JSONResponse
+    from fastapi.responses import JSONResponse, HTMLResponse
     from pydantic import BaseModel
+    from pathlib import Path
     HAS_FASTAPI = True
 except ImportError:
     HAS_FASTAPI = False
@@ -80,6 +81,49 @@ if HAS_FASTAPI:
     for _router in _WEBHOOK_ROUTERS:
         if _router is not None:
             app.include_router(_router)
+
+    @app.get("/", response_class=HTMLResponse)
+    async def dashboard():
+        """Serves the Amaze on Work SRE Mission Control Dashboard."""
+        static_file = Path("src/api/static/index.html")
+        if static_file.exists():
+            return HTMLResponse(content=static_file.read_text(encoding="utf-8"))
+        return HTMLResponse(content="<h1>Amaze on Work Mission Control</h1>")
+
+    @app.get("/api/incidents")
+    async def list_incidents():
+        """Returns the 11-incident demonstration catalog with diffs and metadata."""
+        catalog = []
+        inc_dir = Path("incidents")
+        cand_dir = Path("data/fix_candidates")
+        for i in range(1, 12):
+            inc_id = f"INC-{i:03d}"
+            inc_f = inc_dir / f"{inc_id}.json"
+            cand_f = cand_dir / f"{inc_id}.json"
+            data = {}
+            if inc_f.exists():
+                try:
+                    data = json.loads(inc_f.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+            cand = {}
+            if cand_f.exists():
+                try:
+                    cand = json.loads(cand_f.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+            catalog.append({
+                "id": inc_id,
+                "title": data.get("title", f"Production Incident {inc_id}"),
+                "severity": data.get("severity", "P2 - High"),
+                "service": cand.get("file") or data.get("affected_service", "python-service"),
+                "description": data.get("description", ""),
+                "tags": data.get("tags", []),
+                "fix_explanation": cand.get("explanation", ""),
+                "fix_diff": cand.get("diff", ""),
+                "pr_url": f"https://github.com/iykyk-vedant/AFH-DEMO/pull/{i}" if i <= 2 else "",
+            })
+        return catalog
 
     @app.get("/api/health")
     async def health_check():

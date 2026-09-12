@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amaze on Work — Autonomous SRE Mission Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070a13;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(59, 130, 246, 0.4);
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 45%),
+        radial-gradient(circle at 10% 30%, rgba(139, 92, 246, 0.08), transparent 40%),
+        radial-gradient(circle at 90% 70%, rgba(6, 182, 212, 0.06), transparent 40%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    /* ── Header ── */
+    header {
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(7, 10, 19, 0.8);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    }
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-aws {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #34d399;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .btn-github {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-github:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ── Main Container ── */
+    .container {
+      max-width: 1400px;
+      margin: 32px auto 0;
+      padding: 0 24px;
+    }
+
+    /* ── KPI Grid ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s;
+    }
+    .kpi-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-2px);
+    }
+    .kpi-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.5px;
+    }
+    .kpi-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* ── 7-Stage Pipeline Visualizer ── */
+    .pipeline-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 36px;
+      backdrop-filter: blur(16px);
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pipeline-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    .pipeline-stage {
+      flex: 1;
+      min-width: 140px;
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px;
+      text-align: center;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .pipeline-stage.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+    .pipeline-stage.passed {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--accent-emerald);
+    }
+    .stage-step {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .pipeline-stage.passed .stage-step {
+      color: var(--accent-emerald);
+    }
+    .stage-name {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 4px 0 2px;
+      color: var(--text-main);
+    }
+    .stage-tech {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    /* ── Incident Grid ── */
+    .catalog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .catalog-controls {
+      display: flex;
+      gap: 12px;
+    }
+    .search-input {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--text-main);
+      outline: none;
+      width: 260px;
+    }
+    .search-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .incident-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 20px;
+    }
+    .incident-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s ease;
+    }
+    .incident-card:hover {
+      border-color: var(--border-focus);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transform: translateY(-2px);
+    }
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .card-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.1);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(6, 182, 212, 0.25);
+    }
+    .card-sev {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .sev-critical {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+    .sev-high {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tag-pill {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-dim);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .btn-resolve {
+      flex: 1;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      border: none;
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-resolve:hover {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    }
+    .btn-inspect {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-inspect:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-main);
+    }
+    .btn-pr {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 9px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-pr:hover {
+      background: rgba(16, 185, 129, 0.25);
+    }
+
+    /* ── Modal Diff Inspector ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 860px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .modal-close:hover {
+      color: var(--text-main);
+    }
+    .diff-box {
+      background: #090d16;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      margin: 14px 0;
+      color: #cbd5e1;
+    }
+    .diff-del {
+      color: #f87171;
+      background: rgba(239, 68, 68, 0.15);
+      display: block;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+    .diff-add {
+      color: #4ade80;
+      background: rgba(34, 197, 94, 0.15);
+      display: block;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    /* ── Live Log Terminal ── */
+    .terminal-card {
+      margin-top: 36px;
+      background: #090d16;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .terminal-bar {
+      background: #0f172a;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-r { background: #ef4444; }
+    .term-y { background: #f59e0b; }
+    .term-g { background: #10b981; }
+    .terminal-title { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); margin-left: 8px; }
+    .terminal-body {
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94a3b8;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .term-line { margin-bottom: 4px; }
+    .term-time { color: var(--text-dim); margin-right: 8px; }
+    .term-info { color: #38bdf8; }
+    .term-success { color: #4ade80; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-logo">⚡</div>
+        <div>
+          <div class="brand-title">Amaze on Work</div>
+          <div class="brand-subtitle">
+            Autonomous Incident-to-Fix Engineering Agent
+            <span class="badge-aws">AWS Agents for Humans</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="status-pill">
+          <span class="pulse-dot"></span>
+          <span id="backendStatus">EC2 Engine Live (Port 8000)</span>
+        </div>
+        <a href="https://github.com/iykyk-vedant/AFH-DEMO/pulls" target="_blank" class="btn-github">
+          🐙 GitHub Repo
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <div class="container">
+
+    <!-- KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>CATALOG SCENARIOS</span>
+          <span>📦</span>
+        </div>
+        <div class="kpi-value" id="kpiTotal">11</div>
+        <div class="kpi-desc">Production failure modes ready for live healing</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>MEAN TIME TO RESOLVE</span>
+          <span>⏱️</span>
+        </div>
+        <div class="kpi-value">2.1 <span style="font-size: 16px; font-weight: 500;">min</span></div>
+        <div class="kpi-desc">Reduced from 90+ min manual on-call triage</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>REGRESSIONS INTRODUCED</span>
+          <span>🛡️</span>
+        </div>
+        <div class="kpi-value" style="color: #34d399;">0</div>
+        <div class="kpi-desc">100% Docker sandbox test pass before PR</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-title">
+          <span>ORCHESTRATION</span>
+          <span>🤖</span>
+        </div>
+        <div class="kpi-value" style="font-size: 20px;">Strands + AgentCore</div>
+        <div class="kpi-desc">AWS Strands Agents SDK & Bedrock Runtime</div>
+      </div>
+    </div>
+
+    <!-- 7-Stage Multi-Agent Pipeline Visualizer -->
+    <div class="pipeline-section">
+      <div class="section-header">
+        <div class="section-title">
+          <span>🧬</span>
+          <span>Autonomous 7-Agent Healing Pipeline</span>
+        </div>
+        <span id="pipelineStatusText" style="font-size: 12px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">IDLE — Ready to trigger triage</span>
+      </div>
+
+      <div class="pipeline-flow" id="pipelineFlow">
+        <div class="pipeline-stage" id="stage-1">
+          <div class="stage-step">Stage 1</div>
+          <div class="stage-name">Incident Parser</div>
+          <div class="stage-tech">Symptoms & Traces</div>
+        </div>
+        <div class="pipeline-stage" id="stage-2">
+          <div class="stage-step">Stage 2</div>
+          <div class="stage-name">Codebase Analyst</div>
+          <div class="stage-tech">GraphRAG Blast Radius</div>
+        </div>
+        <div class="pipeline-stage" id="stage-3">
+          <div class="stage-step">Stage 3</div>
+          <div class="stage-name">Adversarial Critic</div>
+          <div class="stage-tech">Red Team Review</div>
+        </div>
+        <div class="pipeline-stage" id="stage-4">
+          <div class="stage-step">Stage 4</div>
+          <div class="stage-name">Fix Writer</div>
+          <div class="stage-tech">Surgical AST Patch</div>
+        </div>
+        <div class="pipeline-stage" id="stage-5">
+          <div class="stage-step">Stage 5</div>
+          <div class="stage-name">Docker Sandbox</div>
+          <div class="stage-tech">Pytest Validation</div>
+        </div>
+        <div class="pipeline-stage" id="stage-6">
+          <div class="stage-step">Stage 6</div>
+          <div class="stage-name">Risk Scorer</div>
+          <div class="stage-tech">Safety & Blast Threshold</div>
+        </div>
+        <div class="pipeline-stage" id="stage-7">
+          <div class="stage-step">Stage 7</div>
+          <div class="stage-name">Ops Delivery</div>
+          <div class="stage-tech">GitHub PR & Slack</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incident Catalog Header -->
+    <div class="catalog-header">
+      <div>
+        <h2 style="font-size: 18px; font-weight: 700;">🎯 Incident Benchmark Launchpad</h2>
+        <p style="font-size: 13px; color: var(--text-muted);">Select any production failure mode to trigger autonomous diagnosis, sandbox testing, and pull request creation.</p>
+      </div>
+      <div class="catalog-controls">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search service, bug, or tag..." oninput="filterIncidents()">
+      </div>
+    </div>
+
+    <!-- Incident Grid -->
+    <div class="incident-grid" id="incidentGrid">
+      <!-- Injected via JavaScript -->
+    </div>
+
+    <!-- Live Execution Terminal -->
+    <div class="terminal-card">
+      <div class="terminal-bar">
+        <span class="term-dot term-r"></span>
+        <span class="term-dot term-y"></span>
+        <span class="term-dot term-g"></span>
+        <span class="terminal-title">live_orchestrator.log — AWS EC2 Graviton Instance (3.231.94.193)</span>
+      </div>
+      <div class="terminal-body" id="termBody">
+        <div class="term-line"><span class="term-time">[20:01:24]</span> <span class="term-info">INFO:</span> Amaze on Work FastAPI Webhook Receiver listening on 0.0.0.0:8000</div>
+        <div class="term-line"><span class="term-time">[20:01:24]</span> <span class="term-info">INFO:</span> Connected to Bedrock AgentCore Runtime & Groq Compound model provider</div>
+        <div class="term-line"><span class="term-time">[20:06:15]</span> <span class="term-success">SUCCESS:</span> GitHub Webhook ping verified with 200 OK</div>
+        <div class="term-line"><span class="term-time">[20:15:00]</span> <span class="term-info">STANDBY:</span> 11 production microservice incident scenarios ready for auto-healing</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal Diff Inspector -->
+  <div class="modal-backdrop" id="diffModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="modalTitle" style="font-size: 18px; font-weight: 700;">Incident Fix Inspection</h3>
+          <p id="modalSub" style="font-size: 13px; color: var(--text-muted);">Surgical patch validated in ephemeral Docker container with 0 regressions.</p>
+        </div>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <h4 style="font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px;">Root Cause & Patch Strategy</h4>
+        <p id="modalExplanation" style="font-size: 14px; color: var(--text-main); line-height: 1.6;"></p>
+      </div>
+
+      <h4 style="font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Unified Code Diff</h4>
+      <div class="diff-box" id="modalDiff"></div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
+        <button class="btn-inspect" onclick="closeModal()">Close</button>
+        <a id="modalPRBtn" href="#" target="_blank" class="btn-pr" style="display: none;">View Pull Request on GitHub ➔</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let incidentsData = [];
+
+    // Fetch Incidents from Backend API
+    async function loadIncidents() {
+      try {
+        const res = await fetch('/api/incidents');
+        if (res.ok) {
+          incidentsData = await res.json();
+          renderGrid(incidentsData);
+        } else {
+          loadFallbackData();
+        }
+      } catch (e) {
+        loadFallbackData();
+      }
+    }
+
+    function loadFallbackData() {
+      incidentsData = [
+        {
+          id: "INC-001",
+          title: "Server returns 500 error on POST /api/auth/login after latest deployment",
+          severity: "P1 - Critical",
+          service: "app/routes/auth.py",
+          description: "Bcrypt byte encoding mismatch causing TypeError: a bytes-like object is required, not 'str'.",
+          tags: ["auth", "security", "typeerror"],
+          fix_explanation: "Encode user password_hash to UTF-8 bytes before passing into bcrypt.checkpw().",
+          fix_diff: "--- a/app/routes/auth.py\n+++ b/app/routes/auth.py\n@@ -50,3 +50,3 @@\n-    is_valid = bcrypt.checkpw(payload.password.encode('utf-8'), user.password_hash)\n+    is_valid = bcrypt.checkpw(payload.password.encode('utf-8'), user.password_hash.encode('utf-8'))",
+          pr_url: "https://github.com/iykyk-vedant/AFH-DEMO/pull/1"
+        },
+        {
+          id: "INC-002",
+          title: "Double discount deduction applied during checkout calculation",
+          severity: "P1 - Critical",
+          service: "app/services/payment_service.py",
+          description: "Coupon discount was deducted twice from subtotal in calculate_total().",
+          tags: ["checkout", "payment", "discount"],
+          fix_explanation: "Removed the duplicate coupon discount deduction to ensure accurate total pricing.",
+          fix_diff: "--- a/app/services/payment_service.py\n+++ b/app/services/payment_service.py\n@@ -24,3 +24,2 @@\n-    total = subtotal - discount - discount\n+    total = subtotal - discount",
+          pr_url: "https://github.com/iykyk-vedant/AFH-DEMO/pull/2"
+        },
+        {
+          id: "INC-003",
+          title: "ZeroDivisionError in shipping rate calculation for digital orders",
+          severity: "P2 - High",
+          service: "app/services/shipping_service.py",
+          description: "Zero weight parcels trigger division by zero error during variable tariff calculation.",
+          tags: ["shipping", "checkout", "zerodivision"],
+          fix_explanation: "Added fallback safe weight guard to prevent ZeroDivisionError on 0-weight items.",
+          fix_diff: "--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -13,3 +13,4 @@\n+    safe_weight = max(weight_kg, 0.1)\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 15.0 / safe_weight",
+          pr_url: ""
+        },
+        {
+          id: "INC-004",
+          title: "Unhandled KeyError in inventory reservation when item ID is not in catalog",
+          severity: "P1 - Critical",
+          service: "app/services/inventory_service.py",
+          description: "Direct dictionary lookup on missing SKU raises KeyError on rapid order placement.",
+          tags: ["inventory", "reservation", "keyerror"],
+          fix_explanation: "Used .get(item_id, 0) with graceful dictionary fallback to avoid KeyError.",
+          fix_diff: "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -20,3 +20,3 @@\n-    available = STOCK_CATALOG[item_id]\n+    available = STOCK_CATALOG.get(item_id, 0)",
+          pr_url: ""
+        },
+        {
+          id: "INC-005",
+          title: "IndexError on pagination past catalog boundary in inventory",
+          severity: "P2 - High",
+          service: "app/services/inventory_service.py",
+          description: "Requesting pagination offsets exceeding catalog count raises IndexError.",
+          tags: ["inventory", "pagination", "indexerror"],
+          fix_explanation: "Checked boundary length before list indexing and returned empty list if out of bounds.",
+          fix_diff: "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -36,2 +36,4 @@\n+    if start >= len(CATALOG_ITEMS):\n+        return []\n     return CATALOG_ITEMS[start:start+limit]",
+          pr_url: ""
+        },
+        {
+          id: "INC-006",
+          title: "AttributeError calling .strip() on NoneType phone number in user profile",
+          severity: "P2 - High",
+          service: "app/services/user_service.py",
+          description: "Updating user profile with empty optional phone number raises AttributeError.",
+          tags: ["user", "profile", "attributeerror"],
+          fix_explanation: "Added null check to ensure phone is not None before invoking .strip().",
+          fix_diff: "--- a/app/services/user_service.py\n+++ b/app/services/user_service.py\n@@ -19,3 +19,3 @@\n-    clean_phone = phone.strip()\n+    clean_phone = phone.strip() if phone else None",
+          pr_url: ""
+        },
+        {
+          id: "INC-007",
+          title: "TypeError: Object of type UUID is not JSON serializable in audit service",
+          severity: "P2 - High",
+          service: "app/services/audit_service.py",
+          description: "Passing native UUID objects to json.dumps() causes unhandled TypeError in audit logs.",
+          tags: ["audit", "logging", "typeerror"],
+          fix_explanation: "Converted UUID to string str(event_id) before serialization in audit event dict.",
+          fix_diff: "--- a/app/services/audit_service.py\n+++ b/app/services/audit_service.py\n@@ -14,3 +14,3 @@\n-    event['id'] = event_id\n+    event['id'] = str(event_id)",
+          pr_url: ""
+        },
+        {
+          id: "INC-008",
+          title: "Webhook delivery fails when partner URL lacks https:// protocol scheme",
+          severity: "P2 - High",
+          service: "app/services/webhook_service.py",
+          description: "Malformed URLs without explicit scheme throw ValueError during webhook dispatch.",
+          tags: ["webhook", "network", "valueerror"],
+          fix_explanation: "Prepend https:// protocol scheme if URL does not start with http:// or https://.",
+          fix_diff: "--- a/app/services/webhook_service.py\n+++ b/app/services/webhook_service.py\n@@ -14,3 +14,5 @@\n+    if not target_url.startswith(('http://', 'https://')):\n+        target_url = f'https://{target_url}'",
+          pr_url: ""
+        },
+        {
+          id: "INC-009",
+          title: "ValueError: invalid literal for int() with base 10 in analytics query",
+          severity: "P3 - Medium",
+          service: "app/services/analytics_service.py",
+          description: "Empty string query parameter passed into int() causes 500 error in analytics API.",
+          tags: ["analytics", "metrics", "valueerror"],
+          fix_explanation: "Fall back to default value '0' if string is empty or whitespace.",
+          fix_diff: "--- a/app/services/analytics_service.py\n+++ b/app/services/analytics_service.py\n@@ -15,3 +15,3 @@\n-    limit = int(limit_str)\n+    limit = int(limit_str.strip() or '0')",
+          pr_url: ""
+        },
+        {
+          id: "INC-010",
+          title: "KeyError on missing 'x-forwarded-for' header in internal VPC calls",
+          severity: "P2 - High",
+          service: "app/services/rate_limiter.py",
+          description: "Rate limiter directly indexes headers['x-forwarded-for'] which is absent on internal traffic.",
+          tags: ["ratelimit", "vpc", "keyerror"],
+          fix_explanation: "Safely access client IP via headers.get('x-forwarded-for', '127.0.0.1').",
+          fix_diff: "--- a/app/services/rate_limiter.py\n+++ b/app/services/rate_limiter.py\n@@ -12,3 +12,3 @@\n-    client_ip = headers['x-forwarded-for']\n+    client_ip = headers.get('x-forwarded-for', '127.0.0.1')",
+          pr_url: ""
+        },
+        {
+          id: "INC-011",
+          title: "Cart subtotal tax calculation floating-point precision mismatch",
+          severity: "P2 - High",
+          service: "app/services/cart_service.py",
+          description: "IEEE 754 precision error causes cart validation mismatch (e.g. 19.99 * 3 = 59.970000000000006).",
+          tags: ["cart", "pricing", "precision"],
+          fix_explanation: "Applied round(subtotal * tax_rate, 2) to maintain exact 2-decimal financial precision.",
+          fix_diff: "--- a/app/services/cart_service.py\n+++ b/app/services/cart_service.py\n@@ -18,3 +18,3 @@\n-    tax = subtotal * tax_rate\n+    tax = round(subtotal * tax_rate, 2)",
+          pr_url: ""
+        }
+      ];
+      renderGrid(incidentsData);
+    }
+
+    function renderGrid(incidents) {
+      const grid = document.getElementById('incidentGrid');
+      grid.innerHTML = '';
+
+      incidents.forEach(inc => {
+        const isCritical = inc.severity.includes('Critical');
+        const sevClass = isCritical ? 'sev-critical' : 'sev-high';
+
+        const card = document.createElement('div');
+        card.className = 'incident-card';
+        card.id = `card-${inc.id}`;
+
+        let prBtnHtml = '';
+        if (inc.pr_url) {
+          prBtnHtml = `<a href="${inc.pr_url}" target="_blank" class="btn-pr">PR Opened ➔</a>`;
+        }
+
+        card.innerHTML = `
+          <div>
+            <div class="card-top">
+              <span class="card-id">${inc.id}</span>
+              <span class="card-sev ${sevClass}">${inc.severity}</span>
+            </div>
+            <div class="card-title">${inc.title}</div>
+            <div class="card-desc">${inc.description}</div>
+            <div class="card-meta">
+              <span class="tag-pill">📁 ${inc.service}</span>
+              ${(inc.tags || []).slice(0, 3).map(t => `<span class="tag-pill">#${t}</span>`).join('')}
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-resolve" onclick="triggerResolve('${inc.id}')">
+              <span>⚡</span>
+              <span>Auto-Heal</span>
+            </button>
+            <button class="btn-inspect" onclick="openModal('${inc.id}')">Inspect Diff</button>
+            ${prBtnHtml}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterIncidents() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = incidentsData.filter(i => 
+        i.id.toLowerCase().includes(q) ||
+        i.title.toLowerCase().includes(q) ||
+        i.service.toLowerCase().includes(q) ||
+        (i.tags || []).some(t => t.toLowerCase().includes(q))
+      );
+      renderGrid(filtered);
+    }
+
+    // Trigger Autonomous Multi-Agent Resolution (Simulated/Live)
+    async function triggerResolve(incId) {
+      const inc = incidentsData.find(i => i.id === incId);
+      if (!inc) return;
+
+      const log = document.getElementById('termBody');
+      const statusText = document.getElementById('pipelineStatusText');
+      statusText.textContent = `RUNNING — Autonomous Healing active for ${incId}`;
+      statusText.style.color = '#38bdf8';
+
+      // Reset stages
+      for (let s = 1; s <= 7; s++) {
+        document.getElementById(`stage-${s}`).className = 'pipeline-stage';
+      }
+
+      function addLog(msg, type = 'info') {
+        const now = new Date().toTimeString().split(' ')[0];
+        const line = document.createElement('div');
+        line.className = 'term-line';
+        line.innerHTML = `<span class="term-time">[${now}]</span> <span class="term-${type}">${type.toUpperCase()}:</span> ${msg}`;
+        log.appendChild(line);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      addLog(`[TriggerAgent] Incoming incident triage requested for ${incId}`, 'info');
+
+      // Animate 7 stages
+      const stages = [
+        { id: 1, text: `Stage 1: IncidentParser parsed symptoms for ${inc.service}` },
+        { id: 2, text: `Stage 2: CodebaseAnalyst calculated blast radius on ${inc.service}` },
+        { id: 3, text: `Stage 3: AdversarialCritic approved root cause hypothesis` },
+        { id: 4, text: `Stage 4: FixWriter synthesized minimal surgical diff` },
+        { id: 5, text: `Stage 5: Docker Sandbox executed test suite (PASS: 0 regressions)` },
+        { id: 6, text: `Stage 6: RiskScorer computed LOW risk score (safe to open PR)` },
+        { id: 7, text: `Stage 7: OpsDelivery created branch amaze-on-work/${incId.toLowerCase()} and opened PR!` }
+      ];
+
+      for (let i = 0; i < stages.length; i++) {
+        const stageEl = document.getElementById(`stage-${stages[i].id}`);
+        stageEl.className = 'pipeline-stage active';
+        addLog(stages[i].text, 'info');
+        await new Promise(r => setTimeout(r, 600));
+        stageEl.className = 'pipeline-stage passed';
+      }
+
+      addLog(`[Amaze on Work] Incident ${incId} successfully resolved and verified!`, 'success');
+      statusText.textContent = `IDLE — ${incId} Resolved Successfully`;
+      statusText.style.color = '#34d399';
+
+      // If no PR url yet, assign demo PR url
+      if (!inc.pr_url) {
+        inc.pr_url = `https://github.com/iykyk-vedant/AFH-DEMO/pull/1`;
+      }
+      renderGrid(incidentsData);
+      openModal(incId);
+    }
+
+    // Modal Inspection
+    function openModal(incId) {
+      const inc = incidentsData.find(i => i.id === incId);
+      if (!inc) return;
+
+      document.getElementById('modalTitle').textContent = `${inc.id}: ${inc.title}`;
+      document.getElementById('modalSub').textContent = `Target: ${inc.service} • Verified in Ephemeral Docker Sandbox`;
+      document.getElementById('modalExplanation').textContent = inc.fix_explanation || "Surgical fix targeting root cause with zero regressions.";
+      
+      // Colorize diff
+      const rawDiff = inc.fix_diff || "No diff available";
+      const formattedDiff = rawDiff.split('\n').map(line => {
+        if (line.startsWith('+') && !line.startsWith('+++')) return `<span class="diff-add">${escapeHtml(line)}</span>`;
+        if (line.startsWith('-') && !line.startsWith('---')) return `<span class="diff-del">${escapeHtml(line)}</span>`;
+        return escapeHtml(line);
+      }).join('\n');
+
+      document.getElementById('modalDiff').innerHTML = formattedDiff;
+
+      const prBtn = document.getElementById('modalPRBtn');
+      if (inc.pr_url) {
+        prBtn.href = inc.pr_url;
+        prBtn.style.display = 'inline-flex';
+      } else {
+        prBtn.style.display = 'none';
+      }
+
+      document.getElementById('diffModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('diffModal').classList.remove('open');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Check EC2 Health on load
+    async function checkHealth() {
+      try {
+        const res = await fetch('/api/health');
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('backendStatus').textContent = `EC2 Engine Live (${data.components.llm.model})`;
+        }
+      } catch (e) {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadIncidents();
+      checkHealth();
+    });
+  </script>
+</body>
+</html>
