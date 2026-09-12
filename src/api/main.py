@@ -271,9 +271,10 @@ if HAS_FASTAPI:
         and returns structured resolution report.
         """
         try:
+            import asyncio
             from agentcore_app import agent_invocation
             body = await request.json()
-            result = agent_invocation(body, {"source": "bedrock_agentcore_gateway"})
+            result = await asyncio.to_thread(agent_invocation, body, {"source": "bedrock_agentcore_gateway"})
             return JSONResponse(content=result)
         except Exception as e:
             logger.error(f"[AgentCore] Invocation failed: {e}")
