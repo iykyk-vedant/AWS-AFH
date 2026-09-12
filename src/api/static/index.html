@@ -445,6 +445,25 @@
       color: #fbbf24;
       border: 1px solid rgba(245, 158, 11, 0.3);
     }
+    .sev-open {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .sev-closed {
+      background: rgba(148, 163, 184, 0.15);
+      color: #94a3b8;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    .empty-state-banner {
+      grid-column: 1 / -1;
+      background: rgba(30, 41, 59, 0.35);
+      border: 1px dashed rgba(148, 163, 184, 0.25);
+      border-radius: var(--radius-md);
+      padding: 56px 24px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
     .card-title {
       font-size: 15px;
       font-weight: 600;
@@ -784,11 +803,14 @@
     <!-- Incident Catalog Header -->
     <div class="catalog-header">
       <div>
-        <h2 style="font-size: 18px; font-weight: 700;">🎯 Incident Benchmark Launchpad</h2>
-        <p style="font-size: 13px; color: var(--text-muted);">Select any production failure mode to trigger autonomous diagnosis, sandbox testing, and pull request creation.</p>
+        <h2 style="font-size: 18px; font-weight: 700;">🎯 Live GitHub Issues (iykyk-vedant/AFH-DEMO)</h2>
+        <p style="font-size: 13px; color: var(--text-muted);">Real-time issues tracked directly from GitHub. When you create an issue on AFH-DEMO, it appears here instantly and triggers autonomous healing.</p>
       </div>
       <div class="catalog-controls">
-        <input type="text" id="searchInput" class="search-input" placeholder="Search service, bug, or tag..." oninput="filterIncidents()">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search live issues..." oninput="filterIncidents()">
+        <a href="https://github.com/iykyk-vedant/AFH-DEMO/issues/new" target="_blank" class="btn-resolve" style="width: auto; text-decoration: none; padding: 8px 16px;">
+          <span>➕</span> <span>New Issue</span>
+        </a>
       </div>
     </div>
 
@@ -809,7 +831,7 @@
         <div class="term-line"><span class="term-time">[20:01:24]</span> <span class="term-info">INFO:</span> Amaze on Work FastAPI Webhook Receiver listening on 0.0.0.0:8000</div>
         <div class="term-line"><span class="term-time">[20:01:24]</span> <span class="term-info">INFO:</span> Connected to Bedrock AgentCore Runtime & Groq Compound model provider</div>
         <div class="term-line"><span class="term-time">[20:06:15]</span> <span class="term-success">SUCCESS:</span> GitHub Webhook ping verified with 200 OK</div>
-        <div class="term-line"><span class="term-time">[20:15:00]</span> <span class="term-info">STANDBY:</span> 11 production microservice incident scenarios ready for auto-healing</div>
+        <div class="term-line"><span class="term-time">[20:15:00]</span> <span class="term-info">STANDBY:</span> Live GitHub monitoring active for iykyk-vedant/AFH-DEMO</div>
       </div>
     </div>
 
@@ -846,7 +868,7 @@
     let knownLogCount = 0;
     let lastHandledEventId = null;
 
-    // Fetch Incidents from Backend API
+    // Fetch Incidents from Backend API (Real GitHub Issues on iykyk-vedant/AFH-DEMO)
     async function loadIncidents() {
       try {
         const res = await fetch('/api/incidents');
@@ -854,147 +876,45 @@
           incidentsData = await res.json();
           renderGrid(incidentsData);
         } else {
-          loadFallbackData();
+          incidentsData = [];
+          renderGrid([]);
         }
       } catch (e) {
-        loadFallbackData();
+        incidentsData = [];
+        renderGrid([]);
       }
-    }
-
-    function loadFallbackData() {
-      incidentsData = [
-        {
-          id: "INC-001",
-          title: "Server returns 500 error on POST /api/auth/login after latest deployment",
-          severity: "P1 - Critical",
-          service: "app/routes/auth.py",
-          description: "Bcrypt byte encoding mismatch causing TypeError: a bytes-like object is required, not 'str'.",
-          tags: ["auth", "security", "typeerror"],
-          fix_explanation: "Encode user password_hash to UTF-8 bytes before passing into bcrypt.checkpw().",
-          fix_diff: "--- a/app/routes/auth.py\n+++ b/app/routes/auth.py\n@@ -50,3 +50,3 @@\n-    is_valid = bcrypt.checkpw(payload.password.encode('utf-8'), user.password_hash)\n+    is_valid = bcrypt.checkpw(payload.password.encode('utf-8'), user.password_hash.encode('utf-8'))",
-          pr_url: "https://github.com/iykyk-vedant/AFH-DEMO/pull/1"
-        },
-        {
-          id: "INC-002",
-          title: "Double discount deduction applied during checkout calculation",
-          severity: "P1 - Critical",
-          service: "app/services/payment_service.py",
-          description: "Coupon discount was deducted twice from subtotal in calculate_total().",
-          tags: ["checkout", "payment", "discount"],
-          fix_explanation: "Removed the duplicate coupon discount deduction to ensure accurate total pricing.",
-          fix_diff: "--- a/app/services/payment_service.py\n+++ b/app/services/payment_service.py\n@@ -24,3 +24,2 @@\n-    total = subtotal - discount - discount\n+    total = subtotal - discount",
-          pr_url: "https://github.com/iykyk-vedant/AFH-DEMO/pull/2"
-        },
-        {
-          id: "INC-003",
-          title: "ZeroDivisionError in shipping rate calculation for digital orders",
-          severity: "P2 - High",
-          service: "app/services/shipping_service.py",
-          description: "Zero weight parcels trigger division by zero error during variable tariff calculation.",
-          tags: ["shipping", "checkout", "zerodivision"],
-          fix_explanation: "Added fallback safe weight guard to prevent ZeroDivisionError on 0-weight items.",
-          fix_diff: "--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -13,3 +13,4 @@\n+    safe_weight = max(weight_kg, 0.1)\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 15.0 / safe_weight",
-          pr_url: ""
-        },
-        {
-          id: "INC-004",
-          title: "Unhandled KeyError in inventory reservation when item ID is not in catalog",
-          severity: "P1 - Critical",
-          service: "app/services/inventory_service.py",
-          description: "Direct dictionary lookup on missing SKU raises KeyError on rapid order placement.",
-          tags: ["inventory", "reservation", "keyerror"],
-          fix_explanation: "Used .get(item_id, 0) with graceful dictionary fallback to avoid KeyError.",
-          fix_diff: "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -20,3 +20,3 @@\n-    available = STOCK_CATALOG[item_id]\n+    available = STOCK_CATALOG.get(item_id, 0)",
-          pr_url: ""
-        },
-        {
-          id: "INC-005",
-          title: "IndexError on pagination past catalog boundary in inventory",
-          severity: "P2 - High",
-          service: "app/services/inventory_service.py",
-          description: "Requesting pagination offsets exceeding catalog count raises IndexError.",
-          tags: ["inventory", "pagination", "indexerror"],
-          fix_explanation: "Checked boundary length before list indexing and returned empty list if out of bounds.",
-          fix_diff: "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -36,2 +36,4 @@\n+    if start >= len(CATALOG_ITEMS):\n+        return []\n     return CATALOG_ITEMS[start:start+limit]",
-          pr_url: ""
-        },
-        {
-          id: "INC-006",
-          title: "AttributeError calling .strip() on NoneType phone number in user profile",
-          severity: "P2 - High",
-          service: "app/services/user_service.py",
-          description: "Updating user profile with empty optional phone number raises AttributeError.",
-          tags: ["user", "profile", "attributeerror"],
-          fix_explanation: "Added null check to ensure phone is not None before invoking .strip().",
-          fix_diff: "--- a/app/services/user_service.py\n+++ b/app/services/user_service.py\n@@ -19,3 +19,3 @@\n-    clean_phone = phone.strip()\n+    clean_phone = phone.strip() if phone else None",
-          pr_url: ""
-        },
-        {
-          id: "INC-007",
-          title: "TypeError: Object of type UUID is not JSON serializable in audit service",
-          severity: "P2 - High",
-          service: "app/services/audit_service.py",
-          description: "Passing native UUID objects to json.dumps() causes unhandled TypeError in audit logs.",
-          tags: ["audit", "logging", "typeerror"],
-          fix_explanation: "Converted UUID to string str(event_id) before serialization in audit event dict.",
-          fix_diff: "--- a/app/services/audit_service.py\n+++ b/app/services/audit_service.py\n@@ -14,3 +14,3 @@\n-    event['id'] = event_id\n+    event['id'] = str(event_id)",
-          pr_url: ""
-        },
-        {
-          id: "INC-008",
-          title: "Webhook delivery fails when partner URL lacks https:// protocol scheme",
-          severity: "P2 - High",
-          service: "app/services/webhook_service.py",
-          description: "Malformed URLs without explicit scheme throw ValueError during webhook dispatch.",
-          tags: ["webhook", "network", "valueerror"],
-          fix_explanation: "Prepend https:// protocol scheme if URL does not start with http:// or https://.",
-          fix_diff: "--- a/app/services/webhook_service.py\n+++ b/app/services/webhook_service.py\n@@ -14,3 +14,5 @@\n+    if not target_url.startswith(('http://', 'https://')):\n+        target_url = f'https://{target_url}'",
-          pr_url: ""
-        },
-        {
-          id: "INC-009",
-          title: "ValueError: invalid literal for int() with base 10 in analytics query",
-          severity: "P3 - Medium",
-          service: "app/services/analytics_service.py",
-          description: "Empty string query parameter passed into int() causes 500 error in analytics API.",
-          tags: ["analytics", "metrics", "valueerror"],
-          fix_explanation: "Fall back to default value '0' if string is empty or whitespace.",
-          fix_diff: "--- a/app/services/analytics_service.py\n+++ b/app/services/analytics_service.py\n@@ -15,3 +15,3 @@\n-    limit = int(limit_str)\n+    limit = int(limit_str.strip() or '0')",
-          pr_url: ""
-        },
-        {
-          id: "INC-010",
-          title: "KeyError on missing 'x-forwarded-for' header in internal VPC calls",
-          severity: "P2 - High",
-          service: "app/services/rate_limiter.py",
-          description: "Rate limiter directly indexes headers['x-forwarded-for'] which is absent on internal traffic.",
-          tags: ["ratelimit", "vpc", "keyerror"],
-          fix_explanation: "Safely access client IP via headers.get('x-forwarded-for', '127.0.0.1').",
-          fix_diff: "--- a/app/services/rate_limiter.py\n+++ b/app/services/rate_limiter.py\n@@ -12,3 +12,3 @@\n-    client_ip = headers['x-forwarded-for']\n+    client_ip = headers.get('x-forwarded-for', '127.0.0.1')",
-          pr_url: ""
-        },
-        {
-          id: "INC-011",
-          title: "Cart subtotal tax calculation floating-point precision mismatch",
-          severity: "P2 - High",
-          service: "app/services/cart_service.py",
-          description: "IEEE 754 precision error causes cart validation mismatch (e.g. 19.99 * 3 = 59.970000000000006).",
-          tags: ["cart", "pricing", "precision"],
-          fix_explanation: "Applied round(subtotal * tax_rate, 2) to maintain exact 2-decimal financial precision.",
-          fix_diff: "--- a/app/services/cart_service.py\n+++ b/app/services/cart_service.py\n@@ -18,3 +18,3 @@\n-    tax = subtotal * tax_rate\n+    tax = round(subtotal * tax_rate, 2)",
-          pr_url: ""
-        }
-      ];
-      renderGrid(incidentsData);
     }
 
     function renderGrid(incidents) {
       const grid = document.getElementById('incidentGrid');
       grid.innerHTML = '';
 
+      if (!incidents || incidents.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state-banner">
+            <div style="font-size: 40px; margin-bottom: 12px;">🛡️</div>
+            <h3 style="font-size: 18px; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">No Open Issues on AFH-DEMO</h3>
+            <p style="font-size: 14px; color: var(--text-muted); max-width: 520px; margin: 0 auto 22px auto; line-height: 1.6;">
+              All pre-baked test incident cards have been removed. This dashboard is connected directly to <a href="https://github.com/iykyk-vedant/AFH-DEMO" target="_blank" style="color: #60a5fa; text-decoration: underline;">iykyk-vedant/AFH-DEMO</a>. Create an issue on GitHub to trigger autonomous self-healing in real time.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+              <a href="https://github.com/iykyk-vedant/AFH-DEMO/issues/new" target="_blank" class="btn-resolve" style="display: inline-flex; width: auto; padding: 10px 22px; font-size: 13px; text-decoration: none;">
+                <span>➕</span> <span>Create Issue on GitHub ➔</span>
+              </a>
+              <button onclick="loadIncidents()" class="btn-inspect" style="display: inline-flex; width: auto; padding: 10px 18px; font-size: 13px;">
+                <span>🔄</span> <span>Check Now</span>
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
       incidents.forEach(inc => {
         const isCritical = (inc.severity || '').includes('Critical');
-        const sevClass = isCritical ? 'sev-critical' : 'sev-high';
+        const isClosed = inc.state === 'closed';
+        const sevClass = isClosed ? 'sev-closed' : (isCritical ? 'sev-critical' : 'sev-high');
+        const stateBadge = inc.state ? inc.state.toUpperCase() : 'OPEN';
 
         const card = document.createElement('div');
         card.className = 'incident-card';
@@ -1002,28 +922,30 @@
 
         let prBtnHtml = '';
         if (inc.pr_url) {
-          prBtnHtml = `<a href="${inc.pr_url}" target="_blank" class="btn-pr">PR Opened ➔</a>`;
+          prBtnHtml = `<a href="${inc.pr_url}" target="_blank" class="btn-pr" style="flex: 1; text-decoration: none; justify-content: center;"><span>✨</span><span>PR Opened ➔</span></a>`;
         }
+
+        const ghUrl = inc.html_url || (inc.issue_number ? `https://github.com/iykyk-vedant/AFH-DEMO/issues/${inc.issue_number}` : 'https://github.com/iykyk-vedant/AFH-DEMO/issues');
 
         card.innerHTML = `
           <div>
             <div class="card-top">
               <span class="card-id">${inc.id}</span>
-              <span class="card-sev ${sevClass}">${inc.severity || 'P2 - High'}</span>
+              <span class="card-sev ${sevClass}">${stateBadge}</span>
             </div>
             <div class="card-title">${escapeHtml(inc.title)}</div>
             <div class="card-desc">${escapeHtml(inc.description || '')}</div>
             <div class="card-meta">
-              <span class="tag-pill">📁 ${inc.service}</span>
-              ${(inc.tags || []).slice(0, 3).map(t => `<span class="tag-pill">#${t}</span>`).join('')}
+              <span class="tag-pill">📁 ${escapeHtml(inc.service)}</span>
+              ${(inc.tags || []).slice(0, 3).map(t => `<span class="tag-pill">#${escapeHtml(t)}</span>`).join('')}
             </div>
           </div>
           <div class="card-actions">
-            <button class="btn-resolve" onclick="triggerResolve('${inc.id}')">
-              <span>⚡</span>
-              <span>Auto-Heal</span>
-            </button>
-            <button class="btn-inspect" onclick="openModal('${inc.id}')">Inspect Diff</button>
+            <a href="${ghUrl}" target="_blank" class="btn-inspect" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span>🐙</span>
+              <span>View Issue</span>
+            </a>
+            ${inc.fix_diff ? `<button class="btn-inspect" onclick="openModal('${inc.id}')">Inspect Diff</button>` : ''}
             ${prBtnHtml}
           </div>
         `;
@@ -1034,9 +956,9 @@
     function filterIncidents() {
       const q = document.getElementById('searchInput').value.toLowerCase();
       const filtered = incidentsData.filter(i => 
-        i.id.toLowerCase().includes(q) ||
-        i.title.toLowerCase().includes(q) ||
-        i.service.toLowerCase().includes(q) ||
+        (i.id || '').toLowerCase().includes(q) ||
+        (i.title || '').toLowerCase().includes(q) ||
+        (i.service || '').toLowerCase().includes(q) ||
         (i.tags || []).some(t => t.toLowerCase().includes(q))
       );
       renderGrid(filtered);
@@ -1241,6 +1163,7 @@
       loadIncidents();
       checkHealth();
       pollRealtimeEvents();
+      setInterval(loadIncidents, 3500);
     });
   </script>
 </body>
