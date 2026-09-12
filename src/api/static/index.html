@@ -3,29 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Amaze on Work — Autonomous SRE Mission Control</title>
+  <title>Amaze on Work — Autonomous Incident-to-Fix Engineering Agent</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #070a13;
-      --bg-card: rgba(15, 23, 42, 0.75);
-      --bg-card-hover: rgba(30, 41, 59, 0.9);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-focus: rgba(59, 130, 246, 0.4);
-      --accent-blue: #3b82f6;
-      --accent-cyan: #06b6d4;
-      --accent-purple: #8b5cf6;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-rose: #f43f5e;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --bg-base: #070B14;
+      --bg-subtle: #0B1120;
+      --bg-panel: #0F172A;
+      --bg-elevated: #111827;
+      --border: rgba(148, 163, 184, 0.14);
+      --border-hover: rgba(96, 165, 250, 0.35);
+      --border-focus: #3B82F6;
+      
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      
+      --success: #22C55E;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --info: #3B82F6;
+      --ai: #8B5CF6;
+      
+      --radius-card: 12px;
+      --radius-section: 16px;
       --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
+      --radius-pill: 9999px;
+      
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     * {
@@ -35,273 +43,322 @@
     }
 
     body {
-      background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 45%),
-        radial-gradient(circle at 10% 30%, rgba(139, 92, 246, 0.1), transparent 40%),
-        radial-gradient(circle at 90% 70%, rgba(6, 182, 212, 0.08), transparent 40%);
-      background-attachment: fixed;
-      color: var(--text-main);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
       min-height: 100vh;
       line-height: 1.5;
-      padding-bottom: 60px;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 64px;
     }
 
-    /* ── Header ── */
+    /* ── SVG Icon Helper ── */
+    .icon {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    .icon-sm { width: 14px; height: 14px; }
+    .icon-lg { width: 20px; height: 20px; }
+
+    /* ── App Shell ── */
+    .app-shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+    @media (max-width: 1024px) {
+      .app-shell { padding: 0 24px; }
+    }
+    @media (max-width: 640px) {
+      .app-shell { padding: 0 16px; }
+    }
+
+    /* ── Header (§6) ── */
     header {
-      border-bottom: 1px solid var(--border-subtle);
-      background: rgba(7, 10, 19, 0.85);
+      border-bottom: 1px solid var(--border);
+      background: rgba(7, 11, 20, 0.85);
       backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 40;
     }
-    .header-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 16px 24px;
+    .header-content {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      height: 64px;
     }
-    .brand {
+    .brand-group {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
     .brand-logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #1E293B, #0F172A);
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+      color: #60A5FA;
+    }
+    .brand-titles {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .brand-title {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(to right, #ffffff, #93c5fd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+    .brand-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(245, 158, 11, 0.12);
+      color: #FBBF24;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 1px 7px;
+      border-radius: var(--radius-pill);
     }
     .brand-subtitle {
       font-size: 12px;
       color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .badge-aws {
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
     }
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
-    .status-pill {
-      display: flex;
+    .status-badge {
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 13px;
+      gap: 7px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      color: var(--success);
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
       font-weight: 500;
-      color: #34d399;
+      font-family: var(--font-mono);
     }
     .pulse-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 10px #10b981;
-      animation: pulse 2s infinite;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulseAnim 2s infinite ease-in-out;
     }
-    @keyframes pulse {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.3); opacity: 1; }
-      100% { transform: scale(0.95); opacity: 0.8; }
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
     }
-    .btn-github {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-main);
-      border: 1px solid var(--border-subtle);
-      padding: 8px 16px;
+    .btn-secondary {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      height: 36px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease-out;
+    }
+    .btn-secondary:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-elevated);
+      transform: translateY(-1px);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #FFFFFF;
+      height: 36px;
+      padding: 0 16px;
       border-radius: var(--radius-sm);
       font-size: 13px;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
       text-decoration: none;
+      transition: all 0.2s ease-out;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #3B82F6, #2563EB);
+      box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* ── Main Layout Spacing (§5) ── */
+    main {
+      padding-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Webhook Status Panel (§7) ── */
+    .system-status-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-indicator {
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.2s;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--success);
+      font-family: var(--font-mono);
+      letter-spacing: 0.5px;
     }
-    .btn-github:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.2);
+    .status-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
     }
-
-    /* ── Main Container ── */
-    .container {
-      max-width: 1400px;
-      margin: 28px auto 0;
-      padding: 0 24px;
+    .status-meta a {
+      color: var(--info);
+      text-decoration: none;
     }
-
-    /* ── Live Webhook Monitor Banner ── */
-    .webhook-live-banner {
-      border-radius: var(--radius-lg);
-      padding: 18px 24px;
-      margin-bottom: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      backdrop-filter: blur(16px);
-      transition: all 0.3s ease;
+    .status-meta a:hover {
+      text-decoration: underline;
     }
-    .webhook-live-banner.idle {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-    }
-    .webhook-live-banner.active {
-      background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8));
-      border: 1px solid rgba(59, 130, 246, 0.6);
-      box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
-      animation: alertPulse 2s infinite;
-    }
-    .webhook-live-banner.resolved {
-      background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(15, 23, 42, 0.8));
-      border: 1px solid rgba(16, 185, 129, 0.6);
-      box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
-    }
-    @keyframes alertPulse {
-      0% { border-color: rgba(59, 130, 246, 0.4); }
-      50% { border-color: rgba(59, 130, 246, 0.9); }
-      100% { border-color: rgba(59, 130, 246, 0.4); }
-    }
-    .banner-left {
+    .status-right {
       display: flex;
       align-items: center;
       gap: 16px;
-    }
-    .banner-beacon {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 14px #10b981;
-      flex-shrink: 0;
-    }
-    .webhook-live-banner.active .banner-beacon {
-      background: #3b82f6;
-      box-shadow: 0 0 16px #3b82f6;
-      animation: pulse 1s infinite;
-    }
-    .webhook-live-banner.resolved .banner-beacon {
-      background: #34d399;
-      box-shadow: 0 0 16px #34d399;
-    }
-    .banner-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .banner-sub {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 2px;
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .banner-right {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .stage-tag {
       font-size: 12px;
-      font-weight: 700;
-      font-family: 'JetBrains Mono', monospace;
-      padding: 5px 12px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
       color: var(--text-muted);
-      border: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
     }
-    .webhook-live-banner.active .stage-tag {
-      background: rgba(59, 130, 246, 0.2);
-      color: #60a5fa;
-      border-color: rgba(59, 130, 246, 0.4);
-    }
-    .webhook-live-banner.resolved .stage-tag {
-      background: rgba(16, 185, 129, 0.2);
-      color: #34d399;
-      border-color: rgba(16, 185, 129, 0.4);
+    .status-pill-small {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--success);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
     }
 
-    /* ── KPI Grid ── */
-    .kpi-grid {
+    /* ── Metrics Grid (§8) ── */
+    .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-      margin-bottom: 32px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
     }
-    .kpi-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 20px;
-      backdrop-filter: blur(12px);
-      transition: all 0.2s;
+    @media (max-width: 1024px) {
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    .kpi-card:hover {
-      border-color: var(--border-focus);
-      transform: translateY(-2px);
+    @media (max-width: 640px) {
+      .metrics-grid { grid-template-columns: 1fr; }
     }
-    .kpi-title {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-weight: 500;
-      margin-bottom: 8px;
+    .metric-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 18px 20px;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease-out;
+    }
+    .metric-card:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-elevated);
+      transform: translateY(-1px);
+    }
+    .metric-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .kpi-value {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-main);
+    .metric-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .metric-value {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
       letter-spacing: -0.5px;
     }
-    .kpi-desc {
+    .metric-trend {
       font-size: 12px;
-      color: var(--text-dim);
-      margin-top: 4px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .trend-up {
+      color: var(--info);
+      background: rgba(59, 130, 246, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .trend-good {
+      color: var(--success);
+      background: rgba(34, 197, 94, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .metric-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
     }
 
-    /* ── 7-Stage Pipeline Visualizer ── */
-    .pipeline-section {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
+    /* ── Agent Pipeline Section (§9, §10, §11, §12) ── */
+    .section-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-section);
       padding: 24px;
-      margin-bottom: 36px;
-      backdrop-filter: blur(16px);
     }
     .section-header {
       display: flex;
@@ -309,257 +366,537 @@
       justify-content: space-between;
       margin-bottom: 20px;
     }
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
+    .section-title-group {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .pipeline-flow {
-      display: flex;
+    .section-title {
+      font-size: 16px;
+      font-weight: 650;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+    .pipeline-status-pill {
+      display: inline-flex;
       align-items: center;
-      justify-content: space-between;
-      position: relative;
-      gap: 12px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-    }
-    .pipeline-stage {
-      flex: 1;
-      min-width: 140px;
-      background: rgba(30, 41, 59, 0.4);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 14px 12px;
-      text-align: center;
-      position: relative;
-      transition: all 0.3s;
-    }
-    .pipeline-stage.active {
-      background: rgba(59, 130, 246, 0.2);
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-      transform: scale(1.02);
-    }
-    .pipeline-stage.passed {
-      background: rgba(16, 185, 129, 0.12);
-      border-color: var(--accent-emerald);
-    }
-    .stage-step {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--accent-blue);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .pipeline-stage.passed .stage-step {
-      color: var(--accent-emerald);
-    }
-    .stage-name {
-      font-size: 13px;
-      font-weight: 600;
-      margin: 4px 0 2px;
-      color: var(--text-main);
-    }
-    .stage-tech {
+      gap: 6px;
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--text-secondary);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
       font-size: 11px;
-      color: var(--text-dim);
+      font-weight: 600;
+      font-family: var(--font-mono);
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+    }
+    .pipeline-status-pill.running {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: rgba(139, 92, 246, 0.35);
+      color: #C084FC;
+    }
+    .pipeline-status-pill.complete {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.35);
+      color: #4ADE80;
     }
 
-    /* ── Incident Grid ── */
-    .catalog-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .catalog-controls {
-      display: flex;
-      gap: 12px;
-    }
-    .search-input {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 8px 14px;
-      font-size: 13px;
-      color: var(--text-main);
-      outline: none;
-      width: 260px;
-    }
-    .search-input:focus {
-      border-color: var(--accent-blue);
-    }
-
-    .incident-grid {
+    /* ── Pipeline Grid & Nodes ── */
+    .pipeline-flow {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+      position: relative;
     }
-    .incident-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 22px;
+    @media (max-width: 1024px) {
+      .pipeline-flow {
+        overflow-x: auto;
+        padding-bottom: 8px;
+      }
+    }
+    @media (max-width: 768px) {
+      .pipeline-flow {
+        grid-template-columns: 1fr;
+      }
+    }
+    .pipeline-node {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      backdrop-filter: blur(12px);
-      transition: all 0.2s ease;
+      min-height: 120px;
+      transition: all 0.2s ease-out;
+      position: relative;
     }
-    .incident-card:hover {
+    .pipeline-node:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+    .node-step {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: var(--font-mono);
+    }
+    .node-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 4px 0 2px;
+      line-height: 1.3;
+    }
+    .node-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+    .node-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 10px;
+      font-family: var(--font-mono);
+    }
+
+    /* Node States (§10) */
+    .pipeline-node.idle .node-status { color: var(--text-muted); }
+    .pipeline-node.running {
+      border-color: var(--ai);
+      box-shadow: 0 0 16px rgba(139, 92, 246, 0.25);
+      background: rgba(139, 92, 246, 0.05);
+    }
+    .pipeline-node.running .node-status {
+      color: #A78BFA;
+    }
+    .pipeline-node.complete {
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.03);
+    }
+    .pipeline-node.complete .node-step {
+      color: var(--success);
+    }
+    .pipeline-node.complete .node-status {
+      color: var(--success);
+    }
+    .pipeline-node.failed {
+      border-color: var(--danger);
+    }
+    .pipeline-node.failed .node-status {
+      color: var(--danger);
+    }
+
+    /* ── GitHub Issues Section (§13, §14, §15, §16) ── */
+    .issues-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .issues-title-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .repo-pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+    }
+    .issues-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .search-icon-pos {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .search-input {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      padding: 8px 60px 8px 36px;
+      width: 240px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
       border-color: var(--border-focus);
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-      transform: translateY(-2px);
+      width: 280px;
     }
-    .card-top {
+    .kbd-shortcut {
+      position: absolute;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      pointer-events: none;
+    }
+    .filter-pills {
+      display: flex;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 2px;
+    }
+    .filter-pill {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-pill.active {
+      background: var(--bg-panel);
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .filter-pill:hover:not(.active) {
+      color: var(--text-secondary);
+    }
+
+    /* ── Issue Cards Grid (§14, §15) ── */
+    .issues-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+    .issue-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease-out;
+    }
+    .issue-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px -4px rgba(0,0,0,0.5);
+    }
+    .card-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 12px;
+      gap: 10px;
     }
-    .card-id {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      background: rgba(6, 182, 212, 0.1);
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px solid rgba(6, 182, 212, 0.25);
-    }
-    .card-sev {
-      font-size: 11px;
+    .issue-id {
+      font-family: var(--font-mono);
+      font-size: 12px;
       font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 6px;
+      color: var(--info);
+      background: rgba(59, 130, 246, 0.1);
+      padding: 2px 7px;
+      border-radius: 4px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
     }
-    .sev-critical {
-      background: rgba(244, 63, 94, 0.15);
-      color: #fb7185;
-      border: 1px solid rgba(244, 63, 94, 0.3);
-    }
-    .sev-high {
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-    .sev-open {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
-    .sev-closed {
-      background: rgba(148, 163, 184, 0.15);
-      color: #94a3b8;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-    }
-    .empty-state-banner {
-      grid-column: 1 / -1;
-      background: rgba(30, 41, 59, 0.35);
-      border: 1px dashed rgba(148, 163, 184, 0.25);
-      border-radius: var(--radius-md);
-      padding: 56px 24px;
-      text-align: center;
-      backdrop-filter: blur(8px);
-    }
-    .card-title {
-      font-size: 15px;
+    .issue-title {
+      font-size: 14px;
       font-weight: 600;
-      color: var(--text-main);
-      margin-bottom: 8px;
+      color: var(--text-primary);
       line-height: 1.4;
+      margin: 6px 0 4px;
     }
-    .card-desc {
+    .issue-desc {
       font-size: 12px;
       color: var(--text-muted);
-      margin-bottom: 16px;
+      line-height: 1.4;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    .card-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .tag-pill {
+    .badge-open {
+      background: rgba(59, 130, 246, 0.12);
+      color: #60A5FA;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
       font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-dim);
-      padding: 2px 7px;
-      border-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .card-actions {
-      display: flex;
-      gap: 10px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-subtle);
-    }
-    .btn-resolve {
-      flex: 1;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: #ffffff;
-      border: none;
-      padding: 9px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
       font-weight: 600;
-      cursor: pointer;
+      font-family: var(--font-mono);
+    }
+    .badge-triaging {
+      background: rgba(139, 92, 246, 0.15);
+      color: #C084FC;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .badge-resolved {
+      background: rgba(34, 197, 94, 0.12);
+      color: #4ADE80;
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .card-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .agent-progress-row {
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
     }
-    .btn-resolve:hover {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    .progress-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
     }
-    .btn-inspect {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-muted);
-      border: 1px solid var(--border-subtle);
-      padding: 9px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-inspect:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--text-main);
-    }
-    .btn-pr {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 9px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 600;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-pr:hover {
-      background: rgba(16, 185, 129, 0.25);
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+      border-radius: 99px;
+      transition: width 0.4s ease;
     }
 
-    /* ── Modal Diff Inspector ── */
+    /* ── Compact Empty State (§16) ── */
+    .compact-empty-state {
+      background: var(--bg-elevated);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-card);
+      padding: 40px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      grid-column: 1 / -1;
+    }
+    .empty-icon {
+      color: var(--text-muted);
+    }
+    .empty-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .empty-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    /* ── Live Activity Console (§19) ── */
+    .terminal-card {
+      background: #050811;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+    .terminal-header {
+      background: #0B1120;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .term-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .term-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+    .term-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .terminal-body {
+      padding: 14px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      height: 160px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #050811;
+    }
+    .term-row {
+      line-height: 1.4;
+      display: flex;
+      gap: 10px;
+      word-break: break-all;
+    }
+    .term-time { color: var(--text-muted); }
+    .term-info { color: #60A5FA; }
+    .term-success { color: #34D399; }
+    .term-warn { color: #FBBF24; }
+
+    /* ── Slide-Over Issue Detail Drawer (§18) ── */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-out;
+    }
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 480px;
+      max-width: 100vw;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      z-index: 70;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.25s ease-out;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+    }
+    .drawer-backdrop.open .drawer {
+      transform: translateX(0);
+    }
+    .drawer-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .drawer-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      background: var(--bg-subtle);
+    }
+    .drawer-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .drawer-checklist {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+    }
+    .drawer-check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .drawer-check-item.done {
+      color: var(--success);
+      font-weight: 500;
+    }
+    .drawer-check-item.active {
+      color: #A78BFA;
+      font-weight: 600;
+    }
+    .diff-box {
+      background: #050811;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      max-height: 220px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+    .diff-add { color: #34D399; }
+    .diff-del { color: #F87171; }
+
+    /* ── New Issue Modal (§17) ── */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(10px);
-      z-index: 100;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 80;
       display: none;
       align-items: center;
       justify-content: center;
@@ -569,312 +906,511 @@
       display: flex;
     }
     .modal-card {
-      background: #0f172a;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: var(--radius-lg);
-      width: 100%;
-      max-width: 860px;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 28px;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-section);
+      width: 520px;
+      max-width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
     .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-subtle);
     }
-    .modal-close {
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      font-size: 24px;
-      cursor: pointer;
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
-    .modal-close:hover {
-      color: var(--text-main);
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
-    .diff-box {
-      background: #090d16;
-      border: 1px solid var(--border-subtle);
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .form-input, .form-textarea, .form-select {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 16px;
-      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+      padding: 10px 14px;
       font-size: 13px;
-      white-space: pre-wrap;
-      overflow-x: auto;
-      margin: 14px 0;
-      color: #cbd5e1;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: all 0.2s;
     }
-    .diff-del {
-      color: #f87171;
-      background: rgba(239, 68, 68, 0.15);
-      display: block;
-      padding: 2px 4px;
-      border-radius: 2px;
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--border-focus);
     }
-    .diff-add {
-      color: #4ade80;
-      background: rgba(34, 197, 94, 0.15);
-      display: block;
-      padding: 2px 4px;
-      border-radius: 2px;
+    .form-textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-subtle);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
     }
 
-    /* ── Live Log Terminal ── */
-    .terminal-card {
-      margin-top: 36px;
-      background: #090d16;
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      overflow: hidden;
+    /* ── Toast Notifications (§31) ── */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
     }
-    .terminal-bar {
-      background: #0f172a;
-      padding: 10px 16px;
+    .toast {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid var(--border-subtle);
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-primary);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+      pointer-events: auto;
+      animation: toastIn 0.3s ease-out;
     }
-    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .term-r { background: #ef4444; }
-    .term-y { background: #f59e0b; }
-    .term-g { background: #10b981; }
-    .terminal-title { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); margin-left: 8px; }
-    .terminal-body {
-      padding: 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: #94a3b8;
-      max-height: 220px;
-      overflow-y: auto;
+    @keyframes toastIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
-    .term-line { margin-bottom: 4px; }
-    .term-time { color: var(--text-dim); margin-right: 8px; }
-    .term-info { color: #38bdf8; }
-    .term-warn { color: #fbbf24; }
-    .term-success { color: #4ade80; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- Hidden SVG Icons Library (Zero External Dependencies) -->
+  <svg style="display: none;">
+    <symbol id="icon-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="icon-ext" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+    <symbol id="icon-pr" viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="icon-terminal" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></symbol>
+    <symbol id="icon-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></symbol>
+  </svg>
+
+  <!-- Header (§6) -->
   <header>
-    <div class="header-container">
-      <div class="brand">
-        <div class="brand-logo">⚡</div>
-        <div>
-          <div class="brand-title">Amaze on Work</div>
-          <div class="brand-subtitle">
-            Autonomous Incident-to-Fix Engineering Agent
-            <span class="badge-aws">AWS Agents for Humans</span>
+    <div class="app-shell header-content">
+      <div class="brand-group">
+        <div class="brand-logo">
+          <svg class="icon icon-lg"><use href="#icon-shield"/></svg>
+        </div>
+        <div class="brand-titles">
+          <div class="brand-title-row">
+            <h1 class="brand-title">Amaze on Work</h1>
+            <span class="brand-badge">AWS Agents for Humans</span>
           </div>
+          <span class="brand-subtitle">Autonomous Incident-to-Fix Engineering Agent</span>
         </div>
       </div>
+
       <div class="header-actions">
-        <div class="status-pill">
+        <div class="status-badge" id="engineStatusBadge">
           <span class="pulse-dot"></span>
-          <span id="backendStatus">EC2 Engine Live (Port 8000)</span>
+          <span id="engineStatusText">● Engine Live · 138ms</span>
         </div>
-        <a href="https://github.com/iykyk-vedant/AFH-DEMO/pulls" target="_blank" class="btn-github">
-          🐙 GitHub Repo
+        <a href="https://github.com/iykyk-vedant/AFH-DEMO" target="_blank" class="btn-secondary">
+          <span>GitHub Repo</span>
+          <svg class="icon icon-sm"><use href="#icon-ext"/></svg>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Container -->
-  <div class="container">
+  <div class="app-shell">
+    <main>
 
-    <!-- Real-Time Incoming Webhook Live Monitor Banner -->
-    <div id="liveWebhookMonitor" class="webhook-live-banner idle">
-      <div class="banner-left">
-        <span class="banner-beacon" id="liveBeacon"></span>
-        <div>
-          <div class="banner-title" id="webhookBannerTitle">
-            <span>🟢 Webhook Engine Active</span>
-            <span style="font-size: 12px; font-weight: 500; color: var(--text-dim);">Listening to iykyk-vedant/AFH-DEMO for new issues...</span>
+      <!-- Webhook Status Panel (§7) -->
+      <section class="system-status-panel">
+        <div class="status-left">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span>
+            <span>WEBHOOK ENGINE ACTIVE</span>
           </div>
-          <div class="banner-sub" id="webhookBannerSub">
-            Standing by for incoming GitHub webhook events, bugs, or production alerts.
+          <span class="status-meta">
+            Listening to <a href="https://github.com/iykyk-vedant/AFH-DEMO" target="_blank">github.com/iykyk-vedant/AFH-DEMO</a>
+          </span>
+        </div>
+        <div class="status-right">
+          <span id="webhookLastEvent">Last event 18s ago</span>
+          <span>·</span>
+          <span id="webhookEventsCount">12 events processed</span>
+          <span>·</span>
+          <span class="status-pill-small">UPTIME 99.98%</span>
+        </div>
+      </section>
+
+      <!-- Metrics Grid (§8) -->
+      <section class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Catalog Scenarios</span>
+            <svg class="icon"><use href="#icon-shield"/></svg>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value">11</span>
+            <span class="metric-trend trend-up">+2 this week</span>
+          </div>
+          <div class="metric-desc">Production failure modes</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Mean Time to Resolve</span>
+            <svg class="icon"><use href="#icon-clock"/></svg>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value">2.1 min</span>
+            <span class="metric-trend trend-good">↓ 97.7% from baseline</span>
+          </div>
+          <div class="metric-desc">Automated patch cycle</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Regressions Introduced</span>
+            <svg class="icon"><use href="#icon-check"/></svg>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value" style="color: var(--success);">0</span>
+            <span class="metric-trend trend-good">100% test pass</span>
+          </div>
+          <div class="metric-desc">No regressions detected</div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-header">
+            <span>Orchestration</span>
+            <svg class="icon"><use href="#icon-cpu"/></svg>
+          </div>
+          <div class="metric-value-row">
+            <span class="metric-value" style="font-size: 19px;">Strands + AgentCore</span>
+            <span class="status-pill-small">ACTIVE</span>
+          </div>
+          <div class="metric-desc">AWS agent runtime & Bedrock</div>
+        </div>
+      </section>
+
+      <!-- 7-Stage Agent Pipeline Section (§9, §10, §11, §12) -->
+      <section class="section-card">
+        <div class="section-header">
+          <div class="section-title-group">
+            <svg class="icon" style="color: var(--ai);"><use href="#icon-zap"/></svg>
+            <h2 class="section-title">Autonomous 7-Agent Healing Pipeline</h2>
+          </div>
+          <div class="pipeline-status-pill" id="pipelineStatusPill">
+            <span id="pipelineStatusText">● SYSTEM READY</span>
           </div>
         </div>
-      </div>
-      <div class="banner-right">
-        <span class="stage-tag" id="liveStageBadge">STANDBY</span>
-        <a id="livePRLink" href="#" target="_blank" class="btn-pr" style="display: none; padding: 6px 12px; font-size: 12px;">
-          View Pull Request ➔
-        </a>
-      </div>
-    </div>
 
-    <!-- KPI Grid -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-title">
-          <span>CATALOG SCENARIOS</span>
-          <span>📦</span>
-        </div>
-        <div class="kpi-value" id="kpiTotal">11</div>
-        <div class="kpi-desc">Production failure modes ready for live healing</div>
-      </div>
+        <div class="pipeline-flow" id="pipelineFlow">
+          <div class="pipeline-node idle" id="stage-1">
+            <div>
+              <div class="node-step">STAGE 01</div>
+              <div class="node-name">Incident Parser</div>
+              <div class="node-desc">Symptoms & Traces</div>
+            </div>
+            <div class="node-status" id="stage-status-1">○ READY</div>
+          </div>
 
-      <div class="kpi-card">
-        <div class="kpi-title">
-          <span>MEAN TIME TO RESOLVE</span>
-          <span>⏱️</span>
-        </div>
-        <div class="kpi-value">2.1 <span style="font-size: 16px; font-weight: 500;">min</span></div>
-        <div class="kpi-desc">Reduced from 90+ min manual on-call triage</div>
-      </div>
+          <div class="pipeline-node idle" id="stage-2">
+            <div>
+              <div class="node-step">STAGE 02</div>
+              <div class="node-name">Codebase Analyst</div>
+              <div class="node-desc">GraphRAG Blast Radius</div>
+            </div>
+            <div class="node-status" id="stage-status-2">○ READY</div>
+          </div>
 
-      <div class="kpi-card">
-        <div class="kpi-title">
-          <span>REGRESSIONS INTRODUCED</span>
-          <span>🛡️</span>
-        </div>
-        <div class="kpi-value" style="color: #34d399;">0</div>
-        <div class="kpi-desc">100% Docker sandbox test pass before PR</div>
-      </div>
+          <div class="pipeline-node idle" id="stage-3">
+            <div>
+              <div class="node-step">STAGE 03</div>
+              <div class="node-name">Adversarial Critic</div>
+              <div class="node-desc">Red Team Review</div>
+            </div>
+            <div class="node-status" id="stage-status-3">○ READY</div>
+          </div>
 
-      <div class="kpi-card">
-        <div class="kpi-title">
-          <span>ORCHESTRATION</span>
-          <span>🤖</span>
-        </div>
-        <div class="kpi-value" style="font-size: 20px;">Strands + AgentCore</div>
-        <div class="kpi-desc">AWS Strands Agents SDK & Bedrock Runtime</div>
-      </div>
-    </div>
+          <div class="pipeline-node idle" id="stage-4">
+            <div>
+              <div class="node-step">STAGE 04</div>
+              <div class="node-name">Fix Writer</div>
+              <div class="node-desc">Surgical AST Patch</div>
+            </div>
+            <div class="node-status" id="stage-status-4">○ READY</div>
+          </div>
 
-    <!-- 7-Stage Multi-Agent Pipeline Visualizer -->
-    <div class="pipeline-section">
-      <div class="section-header">
-        <div class="section-title">
-          <span>🧬</span>
-          <span>Autonomous 7-Agent Healing Pipeline</span>
-        </div>
-        <span id="pipelineStatusText" style="font-size: 12px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace;">IDLE — Ready to trigger triage</span>
-      </div>
+          <div class="pipeline-node idle" id="stage-5">
+            <div>
+              <div class="node-step">STAGE 05</div>
+              <div class="node-name">Docker Sandbox</div>
+              <div class="node-desc">Pytest Validation</div>
+            </div>
+            <div class="node-status" id="stage-status-5">○ READY</div>
+          </div>
 
-      <div class="pipeline-flow" id="pipelineFlow">
-        <div class="pipeline-stage" id="stage-1">
-          <div class="stage-step">Stage 1</div>
-          <div class="stage-name">Incident Parser</div>
-          <div class="stage-tech">Symptoms & Traces</div>
-        </div>
-        <div class="pipeline-stage" id="stage-2">
-          <div class="stage-step">Stage 2</div>
-          <div class="stage-name">Codebase Analyst</div>
-          <div class="stage-tech">GraphRAG Blast Radius</div>
-        </div>
-        <div class="pipeline-stage" id="stage-3">
-          <div class="stage-step">Stage 3</div>
-          <div class="stage-name">Adversarial Critic</div>
-          <div class="stage-tech">Red Team Review</div>
-        </div>
-        <div class="pipeline-stage" id="stage-4">
-          <div class="stage-step">Stage 4</div>
-          <div class="stage-name">Fix Writer</div>
-          <div class="stage-tech">Surgical AST Patch</div>
-        </div>
-        <div class="pipeline-stage" id="stage-5">
-          <div class="stage-step">Stage 5</div>
-          <div class="stage-name">Docker Sandbox</div>
-          <div class="stage-tech">Pytest Validation</div>
-        </div>
-        <div class="pipeline-stage" id="stage-6">
-          <div class="stage-step">Stage 6</div>
-          <div class="stage-name">Risk Scorer</div>
-          <div class="stage-tech">Safety & Blast Threshold</div>
-        </div>
-        <div class="pipeline-stage" id="stage-7">
-          <div class="stage-step">Stage 7</div>
-          <div class="stage-name">Ops Delivery</div>
-          <div class="stage-tech">GitHub PR & Slack</div>
-        </div>
-      </div>
-    </div>
+          <div class="pipeline-node idle" id="stage-6">
+            <div>
+              <div class="node-step">STAGE 06</div>
+              <div class="node-name">Risk Scorer</div>
+              <div class="node-desc">Safety & Threshold</div>
+            </div>
+            <div class="node-status" id="stage-status-6">○ READY</div>
+          </div>
 
-    <!-- Incident Catalog Header -->
-    <div class="catalog-header">
-      <div>
-        <h2 style="font-size: 18px; font-weight: 700;">🎯 Live GitHub Issues (iykyk-vedant/AFH-DEMO)</h2>
-        <p style="font-size: 13px; color: var(--text-muted);">Real-time issues tracked directly from GitHub. When you create an issue on AFH-DEMO, it appears here instantly and triggers autonomous healing.</p>
-      </div>
-      <div class="catalog-controls">
-        <input type="text" id="searchInput" class="search-input" placeholder="Search live issues..." oninput="filterIncidents()">
-        <a href="https://github.com/iykyk-vedant/AFH-DEMO/issues/new" target="_blank" class="btn-resolve" style="width: auto; text-decoration: none; padding: 8px 16px;">
-          <span>➕</span> <span>New Issue</span>
-        </a>
-      </div>
-    </div>
+          <div class="pipeline-node idle" id="stage-7">
+            <div>
+              <div class="node-step">STAGE 07</div>
+              <div class="node-name">Ops Delivery</div>
+              <div class="node-desc">GitHub PR & Slack</div>
+            </div>
+            <div class="node-status" id="stage-status-7">○ READY</div>
+          </div>
+        </div>
+      </section>
 
-    <!-- Incident Grid -->
-    <div class="incident-grid" id="incidentGrid">
-      <!-- Injected via JavaScript -->
-    </div>
+      <!-- GitHub Issues Section (§13, §14, §15, §16) -->
+      <section class="section-card">
+        <div class="issues-header">
+          <div class="issues-title-area">
+            <h2 class="section-title">Live GitHub Issues</h2>
+            <span class="repo-pill">iykyk-vedant/AFH-DEMO</span>
+          </div>
 
-    <!-- Live Execution Terminal -->
-    <div class="terminal-card">
-      <div class="terminal-bar">
-        <span class="term-dot term-r"></span>
-        <span class="term-dot term-y"></span>
-        <span class="term-dot term-g"></span>
-        <span class="terminal-title">live_orchestrator.log — AWS EC2 Graviton Instance (3.231.94.193)</span>
-      </div>
-      <div class="terminal-body" id="termBody">
-        <div class="term-line"><span class="term-time">[20:01:24]</span> <span class="term-info">INFO:</span> Amaze on Work FastAPI Webhook Receiver listening on 0.0.0.0:8000</div>
-        <div class="term-line"><span class="term-time">[20:01:24]</span> <span class="term-info">INFO:</span> Connected to Bedrock AgentCore Runtime & Groq Compound model provider</div>
-        <div class="term-line"><span class="term-time">[20:06:15]</span> <span class="term-success">SUCCESS:</span> GitHub Webhook ping verified with 200 OK</div>
-        <div class="term-line"><span class="term-time">[20:15:00]</span> <span class="term-info">STANDBY:</span> Live GitHub monitoring active for iykyk-vedant/AFH-DEMO</div>
-      </div>
-    </div>
+          <div class="issues-controls">
+            <div class="search-wrapper">
+              <svg class="icon icon-sm search-icon-pos"><use href="#icon-search"/></svg>
+              <input type="text" id="searchInput" class="search-input" placeholder="Search issues..." oninput="handleSearch()">
+              <span class="kbd-shortcut">⌘ K</span>
+            </div>
 
+            <div class="filter-pills">
+              <button class="filter-pill active" onclick="setFilter('all', this)">All</button>
+              <button class="filter-pill" onclick="setFilter('open', this)">Open</button>
+              <button class="filter-pill" onclick="setFilter('triaging', this)">Triaging</button>
+              <button class="filter-pill" onclick="setFilter('resolved', this)">Resolved</button>
+            </div>
+
+            <button class="btn-primary" onclick="openNewIssueModal()">
+              <svg class="icon icon-sm"><use href="#icon-plus"/></svg>
+              <span>New Issue</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Issue Cards Grid -->
+        <div class="issues-grid" id="issuesGrid">
+          <!-- Dynamically populated or rendered with compact empty state -->
+        </div>
+      </section>
+
+      <!-- Live Activity Console Terminal (§19) -->
+      <section class="terminal-card">
+        <div class="terminal-header">
+          <div class="term-dots">
+            <span class="term-dot dot-red"></span>
+            <span class="term-dot dot-yellow"></span>
+            <span class="term-dot dot-green"></span>
+          </div>
+          <span class="term-title">live_orchestrator.log — AWS EC2 Graviton (3.231.94.193)</span>
+          <button onclick="loadIncidents()" class="btn-secondary" style="height: 24px; padding: 0 8px; font-size: 11px;">
+            <svg class="icon icon-sm"><use href="#icon-refresh"/></svg>
+            <span>Sync</span>
+          </button>
+        </div>
+        <div class="terminal-body" id="termBody">
+          <div class="term-row"><span class="term-time">[20:45:10]</span> <span class="term-info">SYSTEM:</span> Amaze on Work FastAPI Webhook Receiver listening on 0.0.0.0:8000</div>
+          <div class="term-row"><span class="term-time">[20:45:10]</span> <span class="term-info">BEDROCK:</span> Strands AgentCore initialized with Groq Compound model provider</div>
+          <div class="term-row"><span class="term-time">[20:45:12]</span> <span class="term-success">ACTIVE:</span> Real-time GitHub monitoring live on iykyk-vedant/AFH-DEMO</div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
-  <!-- Modal Diff Inspector -->
-  <div class="modal-backdrop" id="diffModal">
+  <!-- Slide-Over Issue Detail Drawer (§18) -->
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="handleDrawerBackdropClick(event)">
+    <div class="drawer" id="issueDrawer">
+      <div class="drawer-header">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span class="issue-id" id="drawerIssueId">#--</span>
+            <span class="badge-open" id="drawerIssueBadge">OPEN</span>
+          </div>
+          <h3 style="font-size: 16px; font-weight: 600; line-height: 1.4;" id="drawerTitle">Issue Title</h3>
+        </div>
+        <button class="btn-secondary" style="height: 32px; width: 32px; padding: 0; justify-content: center;" onclick="closeDrawer()">
+          <svg class="icon"><use href="#icon-close"/></svg>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <div>
+          <div class="drawer-section-title">Incident Description</div>
+          <p id="drawerDesc" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;"></p>
+        </div>
+
+        <div>
+          <div class="drawer-section-title">Agent Pipeline Progression</div>
+          <div class="drawer-checklist" id="drawerChecklist">
+            <div class="drawer-check-item" id="chk-1">○ Incident Parser</div>
+            <div class="drawer-check-item" id="chk-2">○ Codebase Analyst</div>
+            <div class="drawer-check-item" id="chk-3">○ Adversarial Critic</div>
+            <div class="drawer-check-item" id="chk-4">○ Fix Writer</div>
+            <div class="drawer-check-item" id="chk-5">○ Docker Sandbox</div>
+            <div class="drawer-check-item" id="chk-6">○ Risk Scorer</div>
+            <div class="drawer-check-item" id="chk-7">○ Ops Delivery</div>
+          </div>
+        </div>
+
+        <div id="drawerDiffSection" style="display: none;">
+          <div class="drawer-section-title">Unified Code Diff</div>
+          <div class="diff-box" id="drawerDiff"></div>
+        </div>
+
+        <div>
+          <div class="drawer-section-title">Live Activity Log</div>
+          <div id="drawerLogs" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
+            <div>No events recorded yet.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="drawer-footer">
+        <a id="drawerGhBtn" href="#" target="_blank" class="btn-secondary" style="flex: 1; justify-content: center;">
+          <span>View GitHub Issue</span>
+          <svg class="icon icon-sm"><use href="#icon-ext"/></svg>
+        </a>
+        <a id="drawerPrBtn" href="#" target="_blank" class="btn-primary" style="flex: 1; justify-content: center; display: none;">
+          <span>View Pull Request</span>
+          <svg class="icon icon-sm"><use href="#icon-pr"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Issue Modal (§17) -->
+  <div class="modal-backdrop" id="newIssueModal">
     <div class="modal-card">
       <div class="modal-header">
-        <div>
-          <h3 id="modalTitle" style="font-size: 18px; font-weight: 700;">Incident Fix Inspection</h3>
-          <p id="modalSub" style="font-size: 13px; color: var(--text-muted);">Surgical patch validated in ephemeral Docker container with 0 regressions.</p>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg class="icon" style="color: var(--info);"><use href="#icon-plus"/></svg>
+          <h3 style="font-size: 15px; font-weight: 600;">Report Production Incident</h3>
         </div>
-        <button class="modal-close" onclick="closeModal()">×</button>
+        <button class="btn-secondary" style="height: 30px; width: 30px; padding: 0; justify-content: center;" onclick="closeNewIssueModal()">
+          <svg class="icon icon-sm"><use href="#icon-close"/></svg>
+        </button>
       </div>
 
-      <div style="margin-bottom: 16px;">
-        <h4 style="font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px;">Root Cause & Patch Strategy</h4>
-        <p id="modalExplanation" style="font-size: 14px; color: var(--text-main); line-height: 1.6;"></p>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Incident Title</label>
+          <input type="text" id="modalTitleInput" class="form-input" placeholder="Describe the incident (e.g. ZeroDivisionError in checkout calculation)...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Traceback & Symptoms</label>
+          <textarea id="modalDescInput" class="form-textarea" placeholder="Paste stack trace or describe the unexpected behavior in detail..."></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label">Severity Level</label>
+            <select id="modalSevInput" class="form-select">
+              <option value="P1 - Critical">P1 - Critical</option>
+              <option value="P2 - High" selected>P2 - High</option>
+              <option value="P3 - Medium">P3 - Medium</option>
+              <option value="P4 - Low">P4 - Low</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Target Environment</label>
+            <select id="modalEnvInput" class="form-select">
+              <option value="Production" selected>Production</option>
+              <option value="Staging">Staging</option>
+              <option value="Development">Development</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      <h4 style="font-size: 13px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;">Unified Code Diff</h4>
-      <div class="diff-box" id="modalDiff"></div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px;">
-        <button class="btn-inspect" onclick="closeModal()">Close</button>
-        <a id="modalPRBtn" href="#" target="_blank" class="btn-pr" style="display: none;">View Pull Request on GitHub ➔</a>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeNewIssueModal()">Cancel</button>
+        <button class="btn-primary" id="btnSubmitIssue" onclick="submitNewIssue()">
+          <span>Create Issue & Auto-Heal</span>
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Toast Notification Container (§31) -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- JavaScript Application Logic -->
   <script>
     let incidentsData = [];
+    let currentFilter = 'all';
     let knownLogCount = 0;
-    let lastHandledEventId = null;
+    let selectedIssueId = null;
 
-    // Fetch Incidents from Backend API (Real GitHub Issues on iykyk-vedant/AFH-DEMO)
+    // ── Toast Notification Dispatcher (§31) ──
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      const iconType = type === 'success' ? '#icon-check' : (type === 'zap' ? '#icon-zap' : '#icon-shield');
+      toast.innerHTML = `
+        <svg class="icon icon-sm" style="color: ${type === 'success' ? 'var(--success)' : 'var(--info)'}"><use href="${iconType}"/></svg>
+        <span>${escapeHtml(msg)}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-8px)';
+        toast.style.transition = 'all 0.2s';
+        setTimeout(() => toast.remove(), 250);
+      }, 3500);
+    }
+
+    // ── Fetch Issues from Backend API ──
     async function loadIncidents() {
       try {
+        const start = performance.now();
         const res = await fetch('/api/incidents');
+        const latency = Math.round(performance.now() - start);
+        document.getElementById('engineStatusText').textContent = `● Engine Live · ${latency}ms`;
+
         if (res.ok) {
           incidentsData = await res.json();
-          renderGrid(incidentsData);
+          renderGrid(applyFilter(incidentsData));
         } else {
           incidentsData = [];
           renderGrid([]);
@@ -885,251 +1421,213 @@
       }
     }
 
+    // ── Filter and Search Logic (§22) ──
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderGrid(applyFilter(incidentsData));
+    }
+
+    function handleSearch() {
+      renderGrid(applyFilter(incidentsData));
+    }
+
+    function applyFilter(data) {
+      const q = (document.getElementById('searchInput').value || '').toLowerCase();
+      return data.filter(inc => {
+        const state = (inc.state || 'open').toLowerCase();
+        let matchesFilter = true;
+        if (currentFilter === 'open') matchesFilter = state === 'open';
+        else if (currentFilter === 'resolved') matchesFilter = state === 'closed' || !!inc.pr_url;
+        else if (currentFilter === 'triaging') matchesFilter = state === 'open' && !inc.pr_url;
+
+        const matchesQuery = !q ||
+          (inc.id || '').toLowerCase().includes(q) ||
+          (inc.title || '').toLowerCase().includes(q) ||
+          (inc.description || '').toLowerCase().includes(q);
+
+        return matchesFilter && matchesQuery;
+      });
+    }
+
+    // ── Render Issue Cards (§14, §15, §16) ──
     function renderGrid(incidents) {
-      const grid = document.getElementById('incidentGrid');
+      const grid = document.getElementById('issuesGrid');
       grid.innerHTML = '';
 
       if (!incidents || incidents.length === 0) {
         grid.innerHTML = `
-          <div class="empty-state-banner">
-            <div style="font-size: 40px; margin-bottom: 12px;">🛡️</div>
-            <h3 style="font-size: 18px; font-weight: 700; color: #f8fafc; margin-bottom: 8px;">No Open Issues on AFH-DEMO</h3>
-            <p style="font-size: 14px; color: var(--text-muted); max-width: 520px; margin: 0 auto 22px auto; line-height: 1.6;">
-              All pre-baked test incident cards have been removed. This dashboard is connected directly to <a href="https://github.com/iykyk-vedant/AFH-DEMO" target="_blank" style="color: #60a5fa; text-decoration: underline;">iykyk-vedant/AFH-DEMO</a>. Create an issue on GitHub to trigger autonomous self-healing in real time.
-            </p>
-            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-              <a href="https://github.com/iykyk-vedant/AFH-DEMO/issues/new" target="_blank" class="btn-resolve" style="display: inline-flex; width: auto; padding: 10px 22px; font-size: 13px; text-decoration: none;">
-                <span>➕</span> <span>Create Issue on GitHub ➔</span>
-              </a>
-              <button onclick="loadIncidents()" class="btn-inspect" style="display: inline-flex; width: auto; padding: 10px 18px; font-size: 13px;">
-                <span>🔄</span> <span>Check Now</span>
-              </button>
+          <div class="compact-empty-state">
+            <svg class="icon icon-lg empty-icon"><use href="#icon-shield"/></svg>
+            <div class="empty-title">No Open Issues</div>
+            <div class="empty-desc">
+              There are currently no active incidents in <code>iykyk-vedant/AFH-DEMO</code>.
             </div>
+            <button class="btn-primary" onclick="openNewIssueModal()" style="margin-top: 6px;">
+              <svg class="icon icon-sm"><use href="#icon-plus"/></svg>
+              <span>Create Test Issue</span>
+            </button>
           </div>
         `;
         return;
       }
 
       incidents.forEach(inc => {
-        const isCritical = (inc.severity || '').includes('Critical');
-        const isClosed = inc.state === 'closed';
-        const sevClass = isClosed ? 'sev-closed' : (isCritical ? 'sev-critical' : 'sev-high');
-        const stateBadge = inc.state ? inc.state.toUpperCase() : 'OPEN';
+        const isResolved = inc.state === 'closed' || !!inc.pr_url;
+        const stateBadgeClass = isResolved ? 'badge-resolved' : 'badge-open';
+        const stateText = isResolved ? '✓ RESOLVED' : '● OPEN';
+        const progressPct = isResolved ? 100 : (inc.fix_diff ? 75 : 20);
 
         const card = document.createElement('div');
-        card.className = 'incident-card';
-        card.id = `card-${inc.id}`;
-
-        let prBtnHtml = '';
-        if (inc.pr_url) {
-          prBtnHtml = `<a href="${inc.pr_url}" target="_blank" class="btn-pr" style="flex: 1; text-decoration: none; justify-content: center;"><span>✨</span><span>PR Opened ➔</span></a>`;
-        }
-
-        const ghUrl = inc.html_url || (inc.issue_number ? `https://github.com/iykyk-vedant/AFH-DEMO/issues/${inc.issue_number}` : 'https://github.com/iykyk-vedant/AFH-DEMO/issues');
+        card.className = 'issue-card';
+        card.onclick = () => openDrawer(inc.id);
 
         card.innerHTML = `
           <div>
-            <div class="card-top">
-              <span class="card-id">${inc.id}</span>
-              <span class="card-sev ${sevClass}">${stateBadge}</span>
+            <div class="card-head">
+              <span class="issue-id">${inc.id}</span>
+              <span class="${stateBadgeClass}">${stateText}</span>
             </div>
-            <div class="card-title">${escapeHtml(inc.title)}</div>
-            <div class="card-desc">${escapeHtml(inc.description || '')}</div>
-            <div class="card-meta">
-              <span class="tag-pill">📁 ${escapeHtml(inc.service)}</span>
-              ${(inc.tags || []).slice(0, 3).map(t => `<span class="tag-pill">#${escapeHtml(t)}</span>`).join('')}
-            </div>
+            <div class="issue-title">${escapeHtml(inc.title)}</div>
+            <div class="issue-desc">${escapeHtml(inc.description || '')}</div>
           </div>
-          <div class="card-actions">
-            <a href="${ghUrl}" target="_blank" class="btn-inspect" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;">
-              <span>🐙</span>
-              <span>View Issue</span>
-            </a>
-            ${inc.fix_diff ? `<button class="btn-inspect" onclick="openModal('${inc.id}')">Inspect Diff</button>` : ''}
-            ${prBtnHtml}
+          <div class="card-footer">
+            <div class="agent-progress-row">
+              <span>Agent status: ${isResolved ? 'RESOLVED' : 'TRIAGING'}</span>
+              <span>${progressPct}%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: ${progressPct}%;"></div>
+            </div>
           </div>
         `;
         grid.appendChild(card);
       });
     }
 
-    function filterIncidents() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = incidentsData.filter(i => 
-        (i.id || '').toLowerCase().includes(q) ||
-        (i.title || '').toLowerCase().includes(q) ||
-        (i.service || '').toLowerCase().includes(q) ||
-        (i.tags || []).some(t => t.toLowerCase().includes(q))
-      );
-      renderGrid(filtered);
-    }
-
-    // ── Real-Time Webhook Polling Loop ──
+    // ── Pipeline State Visualization (§9, §10, §11, §12) ──
     async function pollRealtimeEvents() {
       try {
         const res = await fetch('/api/events');
         if (res.ok) {
           const data = await res.json();
           const active = data.active;
-
           if (active) {
-            handleLiveActiveEvent(active);
+            handleLiveEvent(active);
           }
         }
       } catch (e) {}
-      setTimeout(pollRealtimeEvents, 1500);
+      setTimeout(pollRealtimeEvents, 1800);
     }
 
-    function handleLiveActiveEvent(active) {
-      const banner = document.getElementById('liveWebhookMonitor');
-      const titleEl = document.getElementById('webhookBannerTitle');
-      const subEl = document.getElementById('webhookBannerSub');
-      const badgeEl = document.getElementById('liveStageBadge');
-      const prLinkEl = document.getElementById('livePRLink');
-      const termBody = document.getElementById('termBody');
-      const pipeStatus = document.getElementById('pipelineStatusText');
-
+    function handleLiveEvent(active) {
       const isResolved = active.status === "RESOLVED";
+      const statusPill = document.getElementById('pipelineStatusPill');
+      const statusText = document.getElementById('pipelineStatusText');
 
       if (isResolved) {
-        banner.className = 'webhook-live-banner resolved';
-        titleEl.innerHTML = `<span>✅ Issue #${active.issue_number} Resolved</span> <span style="font-size: 13px; font-weight: 500; color: #a7f3d0;">${escapeHtml(active.title)}</span>`;
-        subEl.textContent = `Auto-healed in Ephemeral Docker Sandbox • Pull Request created on GitHub`;
-        badgeEl.textContent = "RESOLVED";
+        statusPill.className = 'pipeline-status-pill complete';
+        statusText.textContent = `✓ TRIAGE COMPLETE · ISSUE #${active.issue_number}`;
 
-        if (active.pr_url) {
-          prLinkEl.href = active.pr_url;
-          prLinkEl.style.display = 'inline-flex';
-        }
-
-        pipeStatus.textContent = `RESOLVED — Issue #${active.issue_number} healed with 0 regressions`;
-        pipeStatus.style.color = '#34d399';
-
-        // Light up all stages green
         for (let s = 1; s <= 7; s++) {
-          document.getElementById(`stage-${s}`).className = 'pipeline-stage passed';
+          const node = document.getElementById(`stage-${s}`);
+          const status = document.getElementById(`stage-status-${s}`);
+          if (node) node.className = 'pipeline-node complete';
+          if (status) status.textContent = '✓ COMPLETE';
         }
 
-        // Update card in grid if present, or add it
-        let card = incidentsData.find(i => i.id === active.id);
-        if (card) {
-          card.pr_url = active.pr_url;
-          if (active.diff) card.fix_diff = active.diff;
-          renderGrid(incidentsData);
+        let existing = incidentsData.find(i => i.id === active.id || i.issue_number === active.issue_number);
+        if (existing) {
+          existing.pr_url = active.pr_url;
+          if (active.diff) existing.fix_diff = active.diff;
+          renderGrid(applyFilter(incidentsData));
+        } else {
+          loadIncidents();
         }
       } else {
-        // Triage is active in real time!
-        banner.className = 'webhook-live-banner active';
-        titleEl.innerHTML = `<span>🚨 Live Webhook Event: GitHub Issue #${active.issue_number}</span> <span style="font-size: 13px; font-weight: 500; color: #bfdbfe;">${escapeHtml(active.title)}</span>`;
-        
-        const latestLog = (active.logs && active.logs.length > 0) ? active.logs[active.logs.length - 1] : "Processing...";
-        subEl.textContent = latestLog;
-        badgeEl.textContent = `Stage ${active.stage}: ${active.stage_name}`;
-        prLinkEl.style.display = 'none';
+        statusPill.className = 'pipeline-status-pill running';
+        statusText.textContent = `◉ TRIAGE IN PROGRESS · STAGE 0${active.stage}`;
 
-        pipeStatus.textContent = `RUNNING — ${active.stage_name} active on Issue #${active.issue_number}`;
-        pipeStatus.style.color = '#60a5fa';
-
-        // Animate pipeline stages according to current active stage
         for (let s = 1; s <= 7; s++) {
-          const el = document.getElementById(`stage-${s}`);
+          const node = document.getElementById(`stage-${s}`);
+          const status = document.getElementById(`stage-status-${s}`);
           if (s < active.stage) {
-            el.className = 'pipeline-stage passed';
+            if (node) node.className = 'pipeline-node complete';
+            if (status) status.textContent = '✓ COMPLETE';
           } else if (s === active.stage) {
-            el.className = 'pipeline-stage active';
+            if (node) node.className = 'pipeline-node running';
+            if (status) status.textContent = '◉ RUNNING';
           } else {
-            el.className = 'pipeline-stage';
+            if (node) node.className = 'pipeline-node idle';
+            if (status) status.textContent = '○ READY';
           }
         }
       }
 
-      // Append new logs to terminal
+      // Stream logs into terminal
       if (active.logs && active.logs.length > knownLogCount) {
+        const term = document.getElementById('termBody');
         for (let i = knownLogCount; i < active.logs.length; i++) {
-          const line = document.createElement('div');
-          line.className = 'term-line';
-          line.innerHTML = `<span class="term-time">[${new Date().toTimeString().split(' ')[0]}]</span> <span class="term-info">EVENT:</span> ${escapeHtml(active.logs[i])}`;
-          termBody.appendChild(line);
+          const row = document.createElement('div');
+          row.className = 'term-row';
+          const now = new Date().toTimeString().split(' ')[0];
+          row.innerHTML = `<span class="term-time">[${now}]</span> <span class="term-info">EVENT:</span> <span>${escapeHtml(active.logs[i])}</span>`;
+          term.appendChild(row);
         }
         knownLogCount = active.logs.length;
-        termBody.scrollTop = termBody.scrollHeight;
+        term.scrollTop = term.scrollHeight;
       }
     }
 
-    // Trigger Autonomous Multi-Agent Resolution (Simulated/Live from UI)
-    async function triggerResolve(incId) {
+    // ── Drawer Interactions (§18) ──
+    function openDrawer(incId) {
+      selectedIssueId = incId;
       const inc = incidentsData.find(i => i.id === incId);
       if (!inc) return;
 
-      const log = document.getElementById('termBody');
-      const statusText = document.getElementById('pipelineStatusText');
-      statusText.textContent = `RUNNING — Autonomous Healing active for ${incId}`;
-      statusText.style.color = '#38bdf8';
-
-      // Reset stages
-      for (let s = 1; s <= 7; s++) {
-        document.getElementById(`stage-${s}`).className = 'pipeline-stage';
-      }
-
-      function addLog(msg, type = 'info') {
-        const now = new Date().toTimeString().split(' ')[0];
-        const line = document.createElement('div');
-        line.className = 'term-line';
-        line.innerHTML = `<span class="term-time">[${now}]</span> <span class="term-${type}">${type.toUpperCase()}:</span> ${msg}`;
-        log.appendChild(line);
-        log.scrollTop = log.scrollHeight;
-      }
-
-      addLog(`[TriggerAgent] Incoming incident triage requested for ${incId}`, 'info');
-
-      const stages = [
-        { id: 1, text: `Stage 1: IncidentParser parsed symptoms for ${inc.service}` },
-        { id: 2, text: `Stage 2: CodebaseAnalyst calculated blast radius on ${inc.service}` },
-        { id: 3, text: `Stage 3: AdversarialCritic approved root cause hypothesis` },
-        { id: 4, text: `Stage 4: FixWriter synthesized minimal surgical diff` },
-        { id: 5, text: `Stage 5: Docker Sandbox executed test suite (PASS: 0 regressions)` },
-        { id: 6, text: `Stage 6: RiskScorer computed LOW risk score (safe to open PR)` },
-        { id: 7, text: `Stage 7: OpsDelivery created branch amaze-on-work/${incId.toLowerCase()} and opened PR!` }
-      ];
-
-      for (let i = 0; i < stages.length; i++) {
-        const stageEl = document.getElementById(`stage-${stages[i].id}`);
-        stageEl.className = 'pipeline-stage active';
-        addLog(stages[i].text, 'info');
-        await new Promise(r => setTimeout(r, 600));
-        stageEl.className = 'pipeline-stage passed';
-      }
-
-      addLog(`[Amaze on Work] Incident ${incId} successfully resolved and verified!`, 'success');
-      statusText.textContent = `IDLE — ${incId} Resolved Successfully`;
-      statusText.style.color = '#34d399';
-
-      if (!inc.pr_url) {
-        inc.pr_url = `https://github.com/iykyk-vedant/AFH-DEMO/pull/1`;
-      }
-      renderGrid(incidentsData);
-      openModal(incId);
-    }
-
-    // Modal Inspection
-    function openModal(incId) {
-      const inc = incidentsData.find(i => i.id === incId);
-      if (!inc) return;
-
-      document.getElementById('modalTitle').textContent = `${inc.id}: ${inc.title}`;
-      document.getElementById('modalSub').textContent = `Target: ${inc.service} • Verified in Ephemeral Docker Sandbox`;
-      document.getElementById('modalExplanation').textContent = inc.fix_explanation || "Surgical fix targeting root cause with zero regressions.";
+      document.getElementById('drawerIssueId').textContent = inc.id;
+      document.getElementById('drawerTitle').textContent = inc.title;
+      document.getElementById('drawerDesc').textContent = inc.description || "No description provided.";
       
-      const rawDiff = inc.fix_diff || "No diff available";
-      const formattedDiff = rawDiff.split('\n').map(line => {
-        if (line.startsWith('+') && !line.startsWith('+++')) return `<span class="diff-add">${escapeHtml(line)}</span>`;
-        if (line.startsWith('-') && !line.startsWith('---')) return `<span class="diff-del">${escapeHtml(line)}</span>`;
-        return escapeHtml(line);
-      }).join('\n');
+      const isResolved = inc.state === 'closed' || !!inc.pr_url;
+      const badge = document.getElementById('drawerIssueBadge');
+      badge.className = isResolved ? 'badge-resolved' : 'badge-open';
+      badge.textContent = isResolved ? '✓ RESOLVED' : '● OPEN';
 
-      document.getElementById('modalDiff').innerHTML = formattedDiff;
+      // Checklist progression
+      for (let s = 1; s <= 7; s++) {
+        const el = document.getElementById(`chk-${s}`);
+        if (el) {
+          if (isResolved) {
+            el.className = 'drawer-check-item done';
+            el.textContent = `✓ ${el.textContent.replace(/[○✓◉]/g, '').trim()}`;
+          } else {
+            el.className = 'drawer-check-item';
+            el.textContent = `○ ${el.textContent.replace(/[○✓◉]/g, '').trim()}`;
+          }
+        }
+      }
 
-      const prBtn = document.getElementById('modalPRBtn');
+      // Diff
+      const diffSection = document.getElementById('drawerDiffSection');
+      if (inc.fix_diff) {
+        diffSection.style.display = 'block';
+        const formatted = inc.fix_diff.split('\n').map(l => {
+          if (l.startsWith('+') && !l.startsWith('+++')) return `<span class="diff-add">${escapeHtml(l)}</span>`;
+          if (l.startsWith('-') && !l.startsWith('---')) return `<span class="diff-del">${escapeHtml(l)}</span>`;
+          return escapeHtml(l);
+        }).join('\n');
+        document.getElementById('drawerDiff').innerHTML = formatted;
+      } else {
+        diffSection.style.display = 'none';
+      }
+
+      // Links
+      const ghBtn = document.getElementById('drawerGhBtn');
+      ghBtn.href = inc.html_url || `https://github.com/iykyk-vedant/AFH-DEMO/issues/${inc.issue_number || ''}`;
+
+      const prBtn = document.getElementById('drawerPrBtn');
       if (inc.pr_url) {
         prBtn.href = inc.pr_url;
         prBtn.style.display = 'inline-flex';
@@ -1137,31 +1635,105 @@
         prBtn.style.display = 'none';
       }
 
-      document.getElementById('diffModal').classList.add('open');
+      document.getElementById('drawerBackdrop').classList.add('open');
     }
 
-    function closeModal() {
-      document.getElementById('diffModal').classList.remove('open');
+    function closeDrawer() {
+      document.getElementById('drawerBackdrop').classList.remove('open');
     }
 
+    function handleDrawerBackdropClick(e) {
+      if (e.target.id === 'drawerBackdrop') {
+        closeDrawer();
+      }
+    }
+
+    // ── New Issue Modal (§17) ──
+    function openNewIssueModal() {
+      document.getElementById('newIssueModal').classList.add('open');
+      document.getElementById('modalTitleInput').focus();
+    }
+
+    function closeNewIssueModal() {
+      document.getElementById('newIssueModal').classList.remove('open');
+    }
+
+    async function submitNewIssue() {
+      const title = document.getElementById('modalTitleInput').value.trim();
+      const desc = document.getElementById('modalDescInput').value.trim();
+      const sev = document.getElementById('modalSevInput').value;
+      const env = document.getElementById('modalEnvInput').value;
+
+      if (!title) {
+        alert("Please provide an incident title.");
+        return;
+      }
+
+      const submitBtn = document.getElementById('btnSubmitIssue');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>Dispatching Triage...</span>`;
+
+      try {
+        const res = await fetch('/api/issues/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: title,
+            description: desc || "Reported via Amaze on Work console.",
+            severity: sev,
+            environment: env
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          closeNewIssueModal();
+          showToast(`✓ Triage started for #${data.issue_number || 'new issue'}`, 'success');
+          
+          // Animate Stage 1 immediately
+          const pill = document.getElementById('pipelineStatusPill');
+          pill.className = 'pipeline-status-pill running';
+          document.getElementById('pipelineStatusText').textContent = `◉ TRIAGE IN PROGRESS · STAGE 01`;
+          document.getElementById('stage-1').className = 'pipeline-node running';
+          document.getElementById('stage-status-1').textContent = '◉ RUNNING';
+
+          document.getElementById('modalTitleInput').value = '';
+          document.getElementById('modalDescInput').value = '';
+
+          setTimeout(loadIncidents, 1000);
+        } else {
+          showToast('Failed to dispatch issue to GitHub', 'error');
+        }
+      } catch (e) {
+        showToast(`Error: ${e.message}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>Create Issue & Auto-Heal</span>`;
+      }
+    }
+
+    // ── Keyboard Shortcuts (§22) ──
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const search = document.getElementById('searchInput');
+        if (search) search.focus();
+      }
+      if (e.key === 'Escape') {
+        closeDrawer();
+        closeNewIssueModal();
+      }
+    });
+
+    // ── Escape HTML helper ──
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    async function checkHealth() {
-      try {
-        const res = await fetch('/api/health');
-        if (res.ok) {
-          const data = await res.json();
-          document.getElementById('backendStatus').textContent = `EC2 Engine Live (${data.components.llm.model})`;
-        }
-      } catch (e) {}
-    }
-
+    // ── Initialization ──
     window.addEventListener('DOMContentLoaded', () => {
       loadIncidents();
-      checkHealth();
       pollRealtimeEvents();
       setInterval(loadIncidents, 3500);
     });
