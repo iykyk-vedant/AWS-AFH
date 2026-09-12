@@ -1,0 +1,22 @@
+## 🤖 Amaze on Work — Automated Analysis
+
+**Incident:** {{ incident_id }} — {{ title }}
+
+### Root Cause
+{{ root_cause }}
+
+### Proposed Fix
+{{ fix_description }}
+
+### Validation
+- **Verdict:** {{ verdict }}
+- **Tests:** {{ after_passed }}/{{ after_total }} passed (was {{ before_passed }}/{{ before_total }})
+- **Regressions:** {{ regressions_count }}
+- **Confidence:** {{ confidence }}%
+
+{% if pr_url -%}
+**PR:** #{{ pr_number }}
+{% endif -%}
+
+---
+*This comment was generated automatically by Amaze on Work*
