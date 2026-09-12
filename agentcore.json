@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/aws/agentcore-cli/main/schema/agentcore.schema.json",
+  "version": "1.0.0",
+  "project": {
+    "name": "amaze-on-work",
+    "description": "Autonomous Incident-to-Fix Engineering Agent built with Strands Agents SDK and Bedrock AgentCore",
+    "framework": "strands-agents",
+    "track": "Professional Agents"
+  },
+  "runtime": {
+    "type": "python",
+    "version": "3.11",
+    "entrypoint": "agentcore_app.py:agent_invocation",
+    "env": {
+      "PYTHONIOENCODING": "utf-8",
+      "ACTIVE_LLM_PROVIDER": "cerebras"
+    },
+    "scaling": {
+      "min_instances": 0,
+      "max_instances": 5,
+      "timeout_seconds": 300
+    }
+  },
+  "gateways": [
+    {
+      "name": "github-gateway",
+      "type": "mcp",
+      "server": "src.mcp.github_server",
+      "description": "IAM-authenticated gateway for GitHub issue ingestion and automated Pull Request creation"
+    },
+    {
+      "name": "slack-gateway",
+      "type": "mcp",
+      "server": "src.mcp.slack_server",
+      "description": "Incident alerts ingestion, thread updates, and interactive fix approval"
+    },
+    {
+      "name": "jira-gateway",
+      "type": "mcp",
+      "server": "src.mcp.jira_server",
+      "description": "Jira ticket status transitions, resolution comments, and PR linking"
+    }
+  ],
+  "memory": {
+    "type": "graph",
+    "provider": "neo4j",
+    "fallback": "networkx",
+    "description": "Code Property Graph for blast-radius calculation and historical incident GraphRAG"
+  },
+  "sandbox": {
+    "type": "container",
+    "images": {
+      "python": "amaze-python:base",
+      "node": "amaze-node:base"
+    },
+    "isolation": "ephemeral",
+    "memory_limit": "512m",
+    "cpu_quota": 50000,
+    "network_disabled": true
+  }
+}
