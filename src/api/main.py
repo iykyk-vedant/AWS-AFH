@@ -280,6 +280,28 @@ if HAS_FASTAPI:
             logger.error(f"[AgentCore] Invocation failed: {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
+    @app.get("/api/agentcore/status")
+    async def agentcore_status():
+        """Returns the active Amazon Bedrock AgentCore runtime status and specification."""
+        try:
+            manifest_file = Path("agentcore.json")
+            manifest_data = json.loads(manifest_file.read_text(encoding="utf-8")) if manifest_file.exists() else {}
+        except Exception:
+            manifest_data = {}
+
+        return {
+            "status": "ready",
+            "runtime": "Amazon Bedrock AgentCore",
+            "version": manifest_data.get("version", "1.0.0"),
+            "project": manifest_data.get("project", {}),
+            "entrypoint": manifest_data.get("runtime", {}).get("entrypoint", "agentcore_app.py:agent_invocation"),
+            "scaling": manifest_data.get("runtime", {}).get("scaling", {}),
+            "gateways": manifest_data.get("gateways", []),
+            "memory": manifest_data.get("memory", {}),
+            "sandbox": manifest_data.get("sandbox", {}),
+            "endpoint": "/api/agentcore/invoke",
+        }
+
     @app.post("/api/incidents/resolve")
     async def resolve_incident(request: IncidentRequest):
         """Resolve a single incident."""
