@@ -262,8 +262,22 @@ class TriggerAgent:
         incident = self._parse_slack_text(inc_id, f"{title}\n\n{body}")
         incident["linked_issue_url"] = f"https://github.com/{repo_owner}/{repo_name}/issues/{issue_number}" if repo_owner and repo_name else ""
         incident["github_issue_number"] = issue_number
+        final_inc_id = preset_id or inc_id
         if preset_id:
             incident["id"] = preset_id
+
+        # Register event with live dashboard stream
+        try:
+            from src.api.event_stream import record_event_start
+            record_event_start(
+                incident_id=final_inc_id,
+                issue_number=issue_number,
+                title=title,
+                body=body,
+                repo=f"{repo_owner}/{repo_name}" if repo_owner and repo_name else "iykyk-vedant/AFH-DEMO",
+            )
+        except Exception:
+            pass
 
         def _run():
             try:
@@ -274,12 +288,12 @@ class TriggerAgent:
                     slack_thread_ts=None,
                 )
             except Exception as e:
-                logger.error(f"[TriggerAgent] Pipeline failed for GitHub issue #{issue_number} ({inc_id}): {e}")
+                logger.error(f"[TriggerAgent] Pipeline failed for GitHub issue #{issue_number} ({final_inc_id}): {e}")
 
-        t = threading.Thread(target=_run, daemon=True, name=f"pipeline-{inc_id}")
+        t = threading.Thread(target=_run, daemon=True, name=f"pipeline-{final_inc_id}")
         t.start()
 
-        return {"incident_id": incident.get("id", inc_id), "issue_number": issue_number, "status": "queued"}
+        return {"incident_id": final_inc_id, "issue_number": issue_number, "status": "queued"}
 
     # ── Repo URL Extraction ────────────────────────────────────
 

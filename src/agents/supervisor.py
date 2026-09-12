@@ -538,7 +538,7 @@ class SupervisorAgent:
         jira_ticket_id: str = "",
         incident_id: str = "",
     ) -> None:
-        """Post live agent progress to Slack thread + Jira ticket (best-effort)."""
+        """Post live agent progress to Slack thread + Jira ticket + Live Dashboard."""
         try:
             self.bridge.post_progress_update(
                 status_msg=status_msg,
@@ -550,6 +550,29 @@ class SupervisorAgent:
         except Exception as e:
             logger.debug(f"Progress update error (non-fatal): {e}")
 
+        # Update Live Dashboard Event Stream
+        if incident_id:
+            try:
+                from src.api.event_stream import update_event_stage
+                stage_map = [
+                    ("Incident Parser", 1, "Incident Parser"),
+                    ("Codebase Analyst", 2, "Codebase Analyst"),
+                    ("Critic", 3, "Adversarial Critic"),
+                    ("Fix Writer", 4, "Fix Writer"),
+                    ("Validation", 5, "Docker Sandbox"),
+                    ("Risk", 6, "Risk Scorer"),
+                    ("Synthesis", 7, "Ops Delivery"),
+                ]
+                stage_num = 1
+                stage_lbl = "Incident Parser"
+                for kw, s_num, s_lbl in stage_map:
+                    if kw.lower() in status_msg.lower():
+                        stage_num, stage_lbl = s_num, s_lbl
+                        break
+                update_event_stage(incident_id, stage_num, stage_lbl, status_msg)
+            except Exception:
+                pass
+
     def _post_final_success(
         self,
         incident_id: str,
@@ -560,13 +583,30 @@ class SupervisorAgent:
         jira_ticket_id: str,
         resolution_time: float,
     ) -> None:
-        """Post the final resolution summary to Slack + Jira."""
+        """Post the final resolution summary to Slack + Jira + Live Dashboard."""
         root_cause = state.get("root_cause", {})
         cause_summary = (
             root_cause.get("root_cause_summary", "")
             or root_cause.get("summary", "")
             if isinstance(root_cause, dict) else str(root_cause)
         )[:300]
+
+        # Update Live Dashboard Event Stream to RESOLVED
+        try:
+            from src.api.event_stream import update_event_stage
+            fix_plan = state.get("fix_plan", {}) or {}
+            diff = fix_plan.get("diff", "")
+            update_event_stage(
+                incident_id,
+                stage=7,
+                stage_name="Ops Delivery",
+                log_msg=f"Successfully resolved in {resolution_time:.1f}s. Pull Request opened: {pr_url}",
+                status="RESOLVED",
+                pr_url=pr_url,
+                diff=diff,
+            )
+        except Exception:
+            pass
 
         risk = state.get("risk_assessment", {})
         risk_level = risk.get("risk_level", "UNKNOWN") if isinstance(risk, dict) else "UNKNOWN"

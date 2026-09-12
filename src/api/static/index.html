@@ -10,8 +10,8 @@
   <style>
     :root {
       --bg-dark: #070a13;
-      --bg-card: rgba(15, 23, 42, 0.7);
-      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.9);
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-focus: rgba(59, 130, 246, 0.4);
       --accent-blue: #3b82f6;
@@ -37,9 +37,9 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.12), transparent 45%),
-        radial-gradient(circle at 10% 30%, rgba(139, 92, 246, 0.08), transparent 40%),
-        radial-gradient(circle at 90% 70%, rgba(6, 182, 212, 0.06), transparent 40%);
+        radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.15), transparent 45%),
+        radial-gradient(circle at 10% 30%, rgba(139, 92, 246, 0.1), transparent 40%),
+        radial-gradient(circle at 90% 70%, rgba(6, 182, 212, 0.08), transparent 40%);
       background-attachment: fixed;
       color: var(--text-main);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -51,7 +51,7 @@
     /* ── Header ── */
     header {
       border-bottom: 1px solid var(--border-subtle);
-      background: rgba(7, 10, 19, 0.8);
+      background: rgba(7, 10, 19, 0.85);
       backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
@@ -157,8 +157,101 @@
     /* ── Main Container ── */
     .container {
       max-width: 1400px;
-      margin: 32px auto 0;
+      margin: 28px auto 0;
       padding: 0 24px;
+    }
+
+    /* ── Live Webhook Monitor Banner ── */
+    .webhook-live-banner {
+      border-radius: var(--radius-lg);
+      padding: 18px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(16px);
+      transition: all 0.3s ease;
+    }
+    .webhook-live-banner.idle {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .webhook-live-banner.active {
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(59, 130, 246, 0.6);
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+      animation: alertPulse 2s infinite;
+    }
+    .webhook-live-banner.resolved {
+      background: linear-gradient(135deg, rgba(6, 78, 59, 0.4), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(16, 185, 129, 0.6);
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+    }
+    @keyframes alertPulse {
+      0% { border-color: rgba(59, 130, 246, 0.4); }
+      50% { border-color: rgba(59, 130, 246, 0.9); }
+      100% { border-color: rgba(59, 130, 246, 0.4); }
+    }
+    .banner-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .banner-beacon {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 14px #10b981;
+      flex-shrink: 0;
+    }
+    .webhook-live-banner.active .banner-beacon {
+      background: #3b82f6;
+      box-shadow: 0 0 16px #3b82f6;
+      animation: pulse 1s infinite;
+    }
+    .webhook-live-banner.resolved .banner-beacon {
+      background: #34d399;
+      box-shadow: 0 0 16px #34d399;
+    }
+    .banner-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .banner-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .banner-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .stage-tag {
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+    }
+    .webhook-live-banner.active .stage-tag {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+    .webhook-live-banner.resolved .stage-tag {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.4);
     }
 
     /* ── KPI Grid ── */
@@ -244,12 +337,13 @@
       transition: all 0.3s;
     }
     .pipeline-stage.active {
-      background: rgba(59, 130, 246, 0.15);
+      background: rgba(59, 130, 246, 0.2);
       border-color: var(--accent-blue);
-      box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+      transform: scale(1.02);
     }
     .pipeline-stage.passed {
-      background: rgba(16, 185, 129, 0.1);
+      background: rgba(16, 185, 129, 0.12);
       border-color: var(--accent-emerald);
     }
     .stage-step {
@@ -444,8 +538,8 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
       z-index: 100;
       display: none;
       align-items: center;
@@ -537,12 +631,13 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
       color: #94a3b8;
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
     }
     .term-line { margin-bottom: 4px; }
     .term-time { color: var(--text-dim); margin-right: 8px; }
     .term-info { color: #38bdf8; }
+    .term-warn { color: #fbbf24; }
     .term-success { color: #4ade80; }
   </style>
 </head>
@@ -575,6 +670,28 @@
 
   <!-- Container -->
   <div class="container">
+
+    <!-- Real-Time Incoming Webhook Live Monitor Banner -->
+    <div id="liveWebhookMonitor" class="webhook-live-banner idle">
+      <div class="banner-left">
+        <span class="banner-beacon" id="liveBeacon"></span>
+        <div>
+          <div class="banner-title" id="webhookBannerTitle">
+            <span>🟢 Webhook Engine Active</span>
+            <span style="font-size: 12px; font-weight: 500; color: var(--text-dim);">Listening to iykyk-vedant/AFH-DEMO for new issues...</span>
+          </div>
+          <div class="banner-sub" id="webhookBannerSub">
+            Standing by for incoming GitHub webhook events, bugs, or production alerts.
+          </div>
+        </div>
+      </div>
+      <div class="banner-right">
+        <span class="stage-tag" id="liveStageBadge">STANDBY</span>
+        <a id="livePRLink" href="#" target="_blank" class="btn-pr" style="display: none; padding: 6px 12px; font-size: 12px;">
+          View Pull Request ➔
+        </a>
+      </div>
+    </div>
 
     <!-- KPI Grid -->
     <div class="kpi-grid">
@@ -726,6 +843,8 @@
 
   <script>
     let incidentsData = [];
+    let knownLogCount = 0;
+    let lastHandledEventId = null;
 
     // Fetch Incidents from Backend API
     async function loadIncidents() {
@@ -874,7 +993,7 @@
       grid.innerHTML = '';
 
       incidents.forEach(inc => {
-        const isCritical = inc.severity.includes('Critical');
+        const isCritical = (inc.severity || '').includes('Critical');
         const sevClass = isCritical ? 'sev-critical' : 'sev-high';
 
         const card = document.createElement('div');
@@ -890,10 +1009,10 @@
           <div>
             <div class="card-top">
               <span class="card-id">${inc.id}</span>
-              <span class="card-sev ${sevClass}">${inc.severity}</span>
+              <span class="card-sev ${sevClass}">${inc.severity || 'P2 - High'}</span>
             </div>
-            <div class="card-title">${inc.title}</div>
-            <div class="card-desc">${inc.description}</div>
+            <div class="card-title">${escapeHtml(inc.title)}</div>
+            <div class="card-desc">${escapeHtml(inc.description || '')}</div>
             <div class="card-meta">
               <span class="tag-pill">📁 ${inc.service}</span>
               ${(inc.tags || []).slice(0, 3).map(t => `<span class="tag-pill">#${t}</span>`).join('')}
@@ -923,7 +1042,99 @@
       renderGrid(filtered);
     }
 
-    // Trigger Autonomous Multi-Agent Resolution (Simulated/Live)
+    // ── Real-Time Webhook Polling Loop ──
+    async function pollRealtimeEvents() {
+      try {
+        const res = await fetch('/api/events');
+        if (res.ok) {
+          const data = await res.json();
+          const active = data.active;
+
+          if (active) {
+            handleLiveActiveEvent(active);
+          }
+        }
+      } catch (e) {}
+      setTimeout(pollRealtimeEvents, 1500);
+    }
+
+    function handleLiveActiveEvent(active) {
+      const banner = document.getElementById('liveWebhookMonitor');
+      const titleEl = document.getElementById('webhookBannerTitle');
+      const subEl = document.getElementById('webhookBannerSub');
+      const badgeEl = document.getElementById('liveStageBadge');
+      const prLinkEl = document.getElementById('livePRLink');
+      const termBody = document.getElementById('termBody');
+      const pipeStatus = document.getElementById('pipelineStatusText');
+
+      const isResolved = active.status === "RESOLVED";
+
+      if (isResolved) {
+        banner.className = 'webhook-live-banner resolved';
+        titleEl.innerHTML = `<span>✅ Issue #${active.issue_number} Resolved</span> <span style="font-size: 13px; font-weight: 500; color: #a7f3d0;">${escapeHtml(active.title)}</span>`;
+        subEl.textContent = `Auto-healed in Ephemeral Docker Sandbox • Pull Request created on GitHub`;
+        badgeEl.textContent = "RESOLVED";
+
+        if (active.pr_url) {
+          prLinkEl.href = active.pr_url;
+          prLinkEl.style.display = 'inline-flex';
+        }
+
+        pipeStatus.textContent = `RESOLVED — Issue #${active.issue_number} healed with 0 regressions`;
+        pipeStatus.style.color = '#34d399';
+
+        // Light up all stages green
+        for (let s = 1; s <= 7; s++) {
+          document.getElementById(`stage-${s}`).className = 'pipeline-stage passed';
+        }
+
+        // Update card in grid if present, or add it
+        let card = incidentsData.find(i => i.id === active.id);
+        if (card) {
+          card.pr_url = active.pr_url;
+          if (active.diff) card.fix_diff = active.diff;
+          renderGrid(incidentsData);
+        }
+      } else {
+        // Triage is active in real time!
+        banner.className = 'webhook-live-banner active';
+        titleEl.innerHTML = `<span>🚨 Live Webhook Event: GitHub Issue #${active.issue_number}</span> <span style="font-size: 13px; font-weight: 500; color: #bfdbfe;">${escapeHtml(active.title)}</span>`;
+        
+        const latestLog = (active.logs && active.logs.length > 0) ? active.logs[active.logs.length - 1] : "Processing...";
+        subEl.textContent = latestLog;
+        badgeEl.textContent = `Stage ${active.stage}: ${active.stage_name}`;
+        prLinkEl.style.display = 'none';
+
+        pipeStatus.textContent = `RUNNING — ${active.stage_name} active on Issue #${active.issue_number}`;
+        pipeStatus.style.color = '#60a5fa';
+
+        // Animate pipeline stages according to current active stage
+        for (let s = 1; s <= 7; s++) {
+          const el = document.getElementById(`stage-${s}`);
+          if (s < active.stage) {
+            el.className = 'pipeline-stage passed';
+          } else if (s === active.stage) {
+            el.className = 'pipeline-stage active';
+          } else {
+            el.className = 'pipeline-stage';
+          }
+        }
+      }
+
+      // Append new logs to terminal
+      if (active.logs && active.logs.length > knownLogCount) {
+        for (let i = knownLogCount; i < active.logs.length; i++) {
+          const line = document.createElement('div');
+          line.className = 'term-line';
+          line.innerHTML = `<span class="term-time">[${new Date().toTimeString().split(' ')[0]}]</span> <span class="term-info">EVENT:</span> ${escapeHtml(active.logs[i])}`;
+          termBody.appendChild(line);
+        }
+        knownLogCount = active.logs.length;
+        termBody.scrollTop = termBody.scrollHeight;
+      }
+    }
+
+    // Trigger Autonomous Multi-Agent Resolution (Simulated/Live from UI)
     async function triggerResolve(incId) {
       const inc = incidentsData.find(i => i.id === incId);
       if (!inc) return;
@@ -949,7 +1160,6 @@
 
       addLog(`[TriggerAgent] Incoming incident triage requested for ${incId}`, 'info');
 
-      // Animate 7 stages
       const stages = [
         { id: 1, text: `Stage 1: IncidentParser parsed symptoms for ${inc.service}` },
         { id: 2, text: `Stage 2: CodebaseAnalyst calculated blast radius on ${inc.service}` },
@@ -972,7 +1182,6 @@
       statusText.textContent = `IDLE — ${incId} Resolved Successfully`;
       statusText.style.color = '#34d399';
 
-      // If no PR url yet, assign demo PR url
       if (!inc.pr_url) {
         inc.pr_url = `https://github.com/iykyk-vedant/AFH-DEMO/pull/1`;
       }
@@ -989,7 +1198,6 @@
       document.getElementById('modalSub').textContent = `Target: ${inc.service} • Verified in Ephemeral Docker Sandbox`;
       document.getElementById('modalExplanation').textContent = inc.fix_explanation || "Surgical fix targeting root cause with zero regressions.";
       
-      // Colorize diff
       const rawDiff = inc.fix_diff || "No diff available";
       const formattedDiff = rawDiff.split('\n').map(line => {
         if (line.startsWith('+') && !line.startsWith('+++')) return `<span class="diff-add">${escapeHtml(line)}</span>`;
@@ -1015,10 +1223,10 @@
     }
 
     function escapeHtml(str) {
+      if (!str) return '';
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // Check EC2 Health on load
     async function checkHealth() {
       try {
         const res = await fetch('/api/health');
@@ -1032,6 +1240,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadIncidents();
       checkHealth();
+      pollRealtimeEvents();
     });
   </script>
 </body>

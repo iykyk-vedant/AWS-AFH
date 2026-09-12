@@ -125,6 +125,15 @@ if HAS_FASTAPI:
             })
         return catalog
 
+    @app.get("/api/events")
+    async def get_realtime_events():
+        """Returns the real-time active triage event and recent history for the dashboard."""
+        try:
+            from src.api.event_stream import get_current_event_state
+            return get_current_event_state()
+        except Exception as e:
+            return {"active": None, "recent": []}
+
     @app.get("/api/health")
     async def health_check():
         """Health check endpoint."""
