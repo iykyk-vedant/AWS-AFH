@@ -1349,6 +1349,10 @@
           <span>View Pull Request</span>
           <svg class="icon icon-sm"><use href="#icon-pr"/></svg>
         </a>
+        <button id="drawerHealBtn" onclick="dispatchAutoHeal()" class="btn-primary" style="flex: 1; justify-content: center; background: linear-gradient(135deg, #7C3AED, #9333EA); display: none;">
+          <svg class="icon icon-sm"><use href="#icon-zap"/></svg>
+          <span>Auto-Heal Issue</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1691,17 +1695,51 @@
       ghBtn.href = inc.html_url || `https://github.com/iykyk-vedant/AFH-DEMO/issues/${inc.issue_number || ''}`;
 
       const prBtn = document.getElementById('drawerPrBtn');
+      const healBtn = document.getElementById('drawerHealBtn');
       if (inc.pr_url) {
         const prMatch = inc.pr_url.match(/pull\/(\d+)/);
         const prNum = prMatch ? `#${prMatch[1]}` : '';
         prBtn.href = inc.pr_url;
         prBtn.innerHTML = `<span>View Pull Request ${prNum}</span><svg class="icon icon-sm"><use href="#icon-pr"/></svg>`;
         prBtn.style.display = 'inline-flex';
+        if (healBtn) healBtn.style.display = 'none';
       } else {
         prBtn.style.display = 'none';
+        if (healBtn) healBtn.style.display = 'inline-flex';
       }
 
       document.getElementById('drawerBackdrop').classList.add('open');
+    }
+
+    async function dispatchAutoHeal() {
+      if (!selectedIssueId) return;
+      const inc = incidentsData.find(i => i.id === selectedIssueId);
+      if (!inc || !inc.issue_number) return;
+      const btn = document.getElementById('drawerHealBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<span>Dispatching Triage...</span>`;
+      try {
+        const res = await fetch(`/api/issues/${inc.issue_number}/triage`, { method: 'POST' });
+        if (res.ok) {
+          showToast(`✓ Autonomous triage dispatched for #${inc.issue_number}`, 'success');
+          const pill = document.getElementById('pipelineStatusPill');
+          if (pill) pill.className = 'pipeline-status-pill running';
+          const txt = document.getElementById('pipelineStatusText');
+          if (txt) txt.textContent = `◉ TRIAGE IN PROGRESS · STAGE 01`;
+          const st1 = document.getElementById('stage-1');
+          if (st1) st1.className = 'pipeline-node running';
+          const st1t = document.getElementById('stage-status-1');
+          if (st1t) st1t.textContent = '◉ RUNNING';
+          setTimeout(loadIncidents, 1200);
+        } else {
+          showToast('Triage dispatch failed', 'error');
+        }
+      } catch (e) {
+        showToast(`Error: ${e.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<svg class="icon icon-sm"><use href="#icon-zap"/></svg><span>Auto-Heal Issue</span>`;
+      }
     }
 
     function closeDrawer() {

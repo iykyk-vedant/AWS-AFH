@@ -5,23 +5,23 @@
     {
       "candidate_id": "c1_primary",
       "fix_plan": {
-        "description": "Minimal surgical fix for Double discount deduction applied during checkout calculation",
+        "description": "Fixes double discount deduction by applying the discount only once to the subtotal.",
         "files_to_modify": [
           {
             "file_path": "app/services/payment_service.py",
-            "original_code": "    discounted_subtotal = max(0.0, (subtotal - discount) - discount)",
-            "fixed_code": "    discounted_subtotal = max(0.0, subtotal - discount)",
-            "rationale": "Discount was subtracted twice from subtotal in process_order_total"
+            "original_code": "    # BUG (INC-002): Discount is mistakenly subtracted twice from subtotal\n    discounted_subtotal = max(0.0, (subtotal - discount) - discount)",
+            "fixed_code": "    # BUG (INC-002): Discount is mistakenly subtracted twice from subtotal\n    discounted_subtotal = max(0.0, subtotal - discount)",
+            "rationale": "Replacing the erroneous expression with a single subtraction ensures the discount is applied only once, correcting the total calculation."
           }
         ],
-        "patch": "--- a/app/services/payment_service.py\n+++ b/app/services/payment_service.py\n@@ -23,7 +23,7 @@\n     \"\"\"Calculate the final total including discount and tax.\"\"\"\n     discount = calculate_discount(subtotal, discount_code)\n     # BUG (INC-002): Discount is mistakenly subtracted twice from subtotal\n-    discounted_subtotal = max(0.0, (subtotal - discount) - discount)\n+    discounted_subtotal = max(0.0, subtotal - discount)\n     tax = round(discounted_subtotal * tax_rate, 2)\n     total = round(discounted_subtotal + tax, 2)\n     return {",
-        "rationale": "Discount was subtracted twice from subtotal in process_order_total",
+        "patch": "--- a/app/services/payment_service.py\n+++ b/app/services/payment_service.py\n@@ -23,7 +23,7 @@\n     \"\"\"Calculate the final total including discount and tax.\"\"\"\n     discount = calculate_discount(subtotal, discount_code)\n     # BUG (INC-002): Discount is mistakenly subtracted twice from subtotal\n-    discounted_subtotal = max(0.0, (subtotal - discount) - discount)\n+    discounted_subtotal = max(0.0, subtotal - discount)\n     tax = round(discounted_subtotal * tax_rate, 2)\n     total = round(discounted_subtotal + tax, 2)\n     return {\n",
+        "rationale": "The double subtraction of the discount caused the subtotal to be reduced incorrectly, leading to undercharged orders. By correcting the expression to subtract the discount only once, the checkout total aligns with expected values.",
         "characterization_test": null,
         "change_size": 2
       },
-      "score": 95,
+      "score": 0,
       "rank": 1,
-      "verdict": "FIX_CONFIRMED"
+      "verdict": "UNKNOWN"
     }
   ]
 }

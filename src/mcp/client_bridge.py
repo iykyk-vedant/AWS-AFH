@@ -547,6 +547,21 @@ class MCPClientBridge:
                             pr_url = pr_item.get("html_url", "")
                             pr_number = pr_item.get("number", 0)
                             logger.info(f"Existing PR #{pr_number} found: {pr_url}")
+                            # Append closing statement to existing PR body if not present
+                            if close_block and pr_number:
+                                try:
+                                    curr_body = pr_item.get("body", "") or ""
+                                    if issue_num_str and issue_num_str not in curr_body:
+                                        new_body = (curr_body + "\n" + close_block)[:65000]
+                                        httpx.patch(
+                                            f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}",
+                                            headers=headers,
+                                            json={"body": new_body},
+                                            timeout=10,
+                                        )
+                                        logger.info(f"Updated PR #{pr_number} with closing statement for {issue_num_str}")
+                                except Exception as ue:
+                                    logger.warning(f"Could not append close_block to existing PR #{pr_number}: {ue}")
                     except Exception as fe:
                         logger.warning(f"Could not fetch existing PR: {fe}")
                 else:

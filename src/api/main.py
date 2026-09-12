@@ -380,6 +380,22 @@ if HAS_FASTAPI:
         except Exception as e:
             logger.error(f"Failed to record event in stream: {e}")
 
+        # Launch autonomous triage immediately
+        try:
+            from src.agents.trigger_agent import TriggerAgent
+            agent = TriggerAgent()
+            agent.handle_github_issue(
+                issue_number=issue_number,
+                title=payload.title,
+                body=payload.description,
+                labels=["Amaze on Work-ai", payload.severity.lower().split(" ")[0]],
+                repo_owner=owner,
+                repo_name=repo,
+            )
+            logger.info(f"[MainAPI] Triage dispatched directly for Issue #{issue_number}")
+        except Exception as te:
+            logger.error(f"[MainAPI] Failed to dispatch TriggerAgent: {te}")
+
         return JSONResponse(content={
             "success": True,
             "issue_number": issue_number,
@@ -387,6 +403,117 @@ if HAS_FASTAPI:
             "title": payload.title,
             "message": "Incident reported. Autonomous triage initialized.",
         })
+
+    @app.post("/api/issues/{issue_number}/triage")
+    async def trigger_issue_triage(issue_number: int):
+        """Dispatches autonomous multi-agent self-healing triage for a GitHub issue."""
+        import httpx
+        owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
+        repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
+        token = os.getenv("GITHUB_TOKEN", "")
+        headers = {"Accept": "application/vnd.github.v3+json"}
+        if token:
+            headers["Authorization"] = f"token {token}"
+        
+        async with httpx.AsyncClient(timeout=10) as client:
+            r = await client.get(
+                f"https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}",
+                headers=headers,
+            )
+            if r.status_code != 200:
+                raise HTTPException(status_code=404, detail=f"GitHub Issue #{issue_number} not found")
+            issue_data = r.json()
+            title = issue_data.get("title", "")
+            body = issue_data.get("body", "") or ""
+            labels = [l.get("name", "") for l in issue_data.get("labels", [])]
+
+        from src.agents.trigger_agent import TriggerAgent
+        agent = TriggerAgent()
+        res = agent.handle_github_issue(
+            issue_number=issue_number,
+            title=title,
+            body=body,
+            labels=labels,
+            repo_owner=owner,
+            repo_name=repo,
+        )
+        return JSONResponse({
+            "success": True,
+            "status": "queued",
+            "issue_number": issue_number,
+            "incident_id": res.get("incident_id"),
+            "message": f"Autonomous triage started for Issue #{issue_number}",
+        })
+
+    _POLLED_ISSUES = set()
+
+    async def _auto_poll_issues_worker():
+        """Continuously checks for open GitHub issues that lack a PR and auto-triages them."""
+        import asyncio
+        import httpx
+        import re
+        await asyncio.sleep(6)
+        while True:
+            try:
+                owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
+                repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
+                token = os.getenv("GITHUB_TOKEN", "")
+                headers = {"Accept": "application/vnd.github.v3+json"}
+                if token:
+                    headers["Authorization"] = f"token {token}"
+                
+                async with httpx.AsyncClient(timeout=12) as client:
+                    # Check active PRs
+                    r_pulls = await client.get(
+                        f"https://api.github.com/repos/{owner}/{repo}/pulls",
+                        params={"state": "all", "per_page": 40},
+                        headers=headers,
+                    )
+                    addressed = set()
+                    if r_pulls.status_code == 200:
+                        for p in r_pulls.json():
+                            ref = (p.get("head") or {}).get("ref") or ""
+                            txt = f"{ref} {p.get('title', '')} {p.get('body', '')}"
+                            nums = re.findall(r'(?:#close\s*#?|closes\s*#?|fixes\s*#?|inc-0*|issue-#?0*)(\d+)', txt, re.I)
+                            for n in nums:
+                                try:
+                                    addressed.add(int(n))
+                                except ValueError:
+                                    pass
+
+                    # Fetch open issues
+                    r_issues = await client.get(
+                        f"https://api.github.com/repos/{owner}/{repo}/issues",
+                        params={"state": "open", "per_page": 20},
+                        headers=headers,
+                    )
+                    if r_issues.status_code == 200:
+                        for iss in r_issues.json():
+                            if "pull_request" in iss:
+                                continue
+                            inum = iss.get("number")
+                            if inum and inum not in addressed and inum not in _POLLED_ISSUES:
+                                _POLLED_ISSUES.add(inum)
+                                logger.info(f"[AutoPoller] Auto-triaging unaddressed GitHub Issue #{inum}: {iss.get('title')}")
+                                from src.agents.trigger_agent import TriggerAgent
+                                agent = TriggerAgent()
+                                labels = [l.get("name", "") for l in iss.get("labels", [])]
+                                agent.handle_github_issue(
+                                    issue_number=inum,
+                                    title=iss.get("title", ""),
+                                    body=iss.get("body", "") or "",
+                                    labels=labels,
+                                    repo_owner=owner,
+                                    repo_name=repo,
+                                )
+            except Exception as pe:
+                logger.debug(f"[AutoPoller] Loop notice: {pe}")
+            await asyncio.sleep(20)
+
+    @app.on_event("startup")
+    async def startup_event():
+        import asyncio
+        asyncio.create_task(_auto_poll_issues_worker())
 
 
 def _check_llm() -> dict:
