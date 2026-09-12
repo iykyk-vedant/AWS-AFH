@@ -1,0 +1,63 @@
+{
+  "incident_id": "INC-0041",
+  "repo_url": "https://github.com/RonakAjwani/shopstack-platform.git",
+  "candidates": [
+    {
+      "candidate_id": "c2_defensive",
+      "fix_plan": {
+        "description": "Add idempotency check to prevent duplicate discount application by tracking discount IDs already applied.",
+        "files_to_modify": [
+          {
+            "file_path": "python-service/app/services/payment_service.py",
+            "original_code": "def apply_discount(amount, discount):\n    if discount.type == 'percentage':\n        return amount * (1 - discount.value / 100)\n    elif discount.type == 'flat':\n        return amount - discount.value",
+            "fixed_code": "def apply_discount(amount, discount, applied_discount_ids=None):\n    if applied_discount_ids is not None:\n        if discount.id in applied_discount_ids:\n            return amount\n        applied_discount_ids.add(discount.id)\n    if discount.type == 'percentage':\n        return amount * (1 - discount.value / 100)\n    elif discount.type == 'flat':\n        return amount - discount.value",
+            "rationale": "Prevents repeated application of the same discount by checking if the discount ID has already been processed, ensuring idempotency in the payment pipeline."
+          }
+        ],
+        "patch": ""
+      },
+      "patch": "",
+      "score": 78.06,
+      "rank": 1,
+      "verdict": "FIX_APPLIED_NO_TESTS"
+    },
+    {
+      "candidate_id": "c3_restructured",
+      "fix_plan": {
+        "description": "Prevent duplicate discount application by tracking applied discounts using a unique identifier within the payment service.",
+        "files_to_modify": [
+          {
+            "file_path": "python-service/app/services/payment_service.py",
+            "original_code": "def apply_discount(amount, discount):\n    if discount.type == 'percentage':\n        return amount * (1 - discount.value / 100)\n    elif discount.type == 'flat':\n        return amount - discount.value",
+            "fixed_code": "def apply_discount(amount, discount, applied_discount_ids=None):\n    if applied_discount_ids is None:\n        applied_discount_ids = set()\n    if discount.id in applied_discount_ids:\n        return amount  # Discount already applied\n    applied_discount_ids.add(discount.id)\n    if discount.type == 'percentage':\n        return amount * (1 - discount.value / 100)\n    elif discount.type == 'flat':\n        return amount - discount.value",
+            "rationale": "The original function had no mechanism to detect repeated calls with the same discount. By introducing a set of applied discount IDs, we ensure each discount is applied only once per transaction flow."
+          }
+        ],
+        "patch": ""
+      },
+      "patch": "",
+      "score": 77.82,
+      "rank": 2,
+      "verdict": "FIX_APPLIED_NO_TESTS"
+    },
+    {
+      "candidate_id": "c1_minimal",
+      "fix_plan": {
+        "description": "Prevent duplicate discount application by tracking applied discounts with a unique key.",
+        "files_to_modify": [
+          {
+            "file_path": "python-service/app/services/payment_service.py",
+            "original_code": "def apply_discount(amount, discount):\n    if discount.type == 'percentage':\n        return amount * (1 - discount.value / 100)\n    elif discount.type == 'flat':\n        return amount - discount.value",
+            "fixed_code": "def apply_discount(amount, discount, applied_discounts=None):\n    if applied_discounts is None:\n        applied_discounts = set()\n    discount_key = (discount.type, discount.value)\n    if discount_key in applied_discounts:\n        return amount\n    applied_discounts.add(discount_key)\n    if discount.type == 'percentage':\n        return amount * (1 - discount.value / 100)\n    elif discount.type == 'flat':\n        return amount - discount.value",
+            "rationale": "Adds a guard against repeated application of the same discount by using a set to track already applied discount types and values, preventing the double discount issue at the function level."
+          }
+        ],
+        "patch": ""
+      },
+      "patch": "",
+      "score": 77.77,
+      "rank": 3,
+      "verdict": "FIX_APPLIED_NO_TESTS"
+    }
+  ]
+}
