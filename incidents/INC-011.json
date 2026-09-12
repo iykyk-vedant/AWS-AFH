@@ -1,0 +1,15 @@
+{
+  "id": "INC-011",
+  "title": "ValueError: Cart subtotal mismatch on floating-point precision sum",
+  "severity": "P2 - High",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "Checkout Experience Team",
+  "timestamp": "2026-09-12T16:05:00Z",
+  "description": "Carts containing certain combinations of prices (e.g., $10.10 and $20.20) fail validation with ValueError because the sum of floats produces 30.299999999999997, causing a mismatch against the reported subtotal 30.30.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/cart_service.py', line 13, in validate_cart_totals\n    raise ValueError(f\"Cart subtotal mismatch: computed sum {computed_sum} does not match reported subtotal {reported_subtotal}\")\nValueError: Cart subtotal mismatch: computed sum 30.299999999999997 does not match reported subtotal 30.30",
+  "tags": ["cart", "math", "precision", "rounding", "float"],
+  "recent_changes": "Commit a3911f: Added subtotal integrity validation check prior to payment capture",
+  "expected_behavior": "Should compare rounded values: round(computed_sum, 2) == round(reported_subtotal, 2)",
+  "actual_behavior": "Strict float comparison fails due to binary representation discrepancies"
+}

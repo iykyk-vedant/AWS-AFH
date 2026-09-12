@@ -1,0 +1,15 @@
+{
+  "id": "INC-009",
+  "title": "ValueError: invalid literal for int() on empty analytics query parameter",
+  "severity": "P3 - Moderate",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "BI & Analytics Dashboard Team",
+  "timestamp": "2026-09-12T15:20:00Z",
+  "description": "When dashboard filters submit an empty query string 'GET /api/analytics/orders?days=', the backend crashes with a 500 error instead of defaulting to 30 days.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/analytics_service.py', line 13, in parse_date_range_days\n    return int(raw_param)\nValueError: invalid literal for int() with base 10: ''",
+  "tags": ["analytics", "parsing", "queryparams", "valueerror"],
+  "recent_changes": "Commit f1029c: Added custom date filtering on sales analytics",
+  "expected_behavior": "Empty string or whitespace should fall back to default_days",
+  "actual_behavior": "Throws ValueError: invalid literal for int() with base 10: ''"
+}

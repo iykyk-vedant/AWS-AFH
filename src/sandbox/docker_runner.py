@@ -757,10 +757,16 @@ class DockerSandbox:
     def clone_repo(self, repo_url: str, branch: str = "master") -> str:
         """Clone a repo to a temp dir and return its path."""
         tmp = tempfile.mkdtemp(prefix="amaze_repo_")
+        # Support authenticated clone if token is in environment
+        clone_url = repo_url
+        token = os.getenv("GITHUB_TOKEN") or os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
+        if token and clone_url.startswith("https://github.com/") and "@" not in clone_url:
+            clone_url = clone_url.replace("https://github.com/", f"https://{token}@github.com/")
+
         logger.info(f"[DockerSandbox] Cloning {repo_url} → {tmp}")
         try:
             subprocess.run(
-                ["git", "clone", "--depth", "1", "--branch", branch, repo_url, tmp],
+                ["git", "clone", "--depth", "1", "--branch", branch, clone_url, tmp],
                 check=True, capture_output=True, timeout=60,
             )
         except subprocess.CalledProcessError:
@@ -769,7 +775,7 @@ class DockerSandbox:
                 shutil.rmtree(tmp, ignore_errors=True)
                 tmp = tempfile.mkdtemp(prefix="amaze_repo_")
                 subprocess.run(
-                    ["git", "clone", "--depth", "1", "--branch", "main", repo_url, tmp],
+                    ["git", "clone", "--depth", "1", "--branch", "main", clone_url, tmp],
                     check=True, capture_output=True, timeout=60,
                 )
             except subprocess.CalledProcessError as e:

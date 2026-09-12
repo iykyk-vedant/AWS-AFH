@@ -1,0 +1,15 @@
+{
+  "id": "INC-001",
+  "title": "Server returns 500 error on POST /api/auth/login after latest deployment",
+  "severity": "P1 - Critical",
+  "affected_service": "python-service",
+  "environment": "staging",
+  "reported_by": "Frontend QA Team",
+  "timestamp": "2026-09-12T10:00:00Z",
+  "description": "After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials.",
+  "error_log": "Traceback (most recent call last):\n  File \"fastapi/routing.py\", line 274, in app\n    raw_response = await run_endpoint_function(...)\n  File \"app/routes/auth.py\", line 42, in login\n    is_valid = bcrypt.checkpw(payload.password.encode('utf-8'), user.password_hash)\nTypeError: a bytes-like object is required, not 'str'",
+  "tags": ["authentication", "login", "auth", "security"],
+  "recent_changes": "Commit e48a12: Migrated user models to support hashed password storage",
+  "expected_behavior": "Valid credentials should return HTTP 200 with authentication token",
+  "actual_behavior": "HTTP 500 Internal Server Error with TypeError: a bytes-like object is required, not 'str'"
+}

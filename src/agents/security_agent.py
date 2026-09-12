@@ -396,12 +396,11 @@ Return JSON array of CRITICAL/HIGH issues only (max 3, empty array [] if fix is 
 }}]"""
 
         try:
-            from src.llm.base_client import Message
             messages = [
-                Message(role="system", content="You are a Principal Application Security Engineer reviewing production code fixes."),
-                Message(role="user", content=prompt)
+                {"role": "system", "content": "You are a Principal Application Security Engineer reviewing production code fixes."},
+                {"role": "user", "content": prompt}
             ]
-            response = self.llm.complete(messages)
+            response = self.llm.chat(messages)
             content = response.content if hasattr(response, 'content') else str(response)
             start = content.find("[")
             end = content.rfind("]") + 1

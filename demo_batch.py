@@ -115,8 +115,9 @@ def resolve_one(incident_id, owner, repo, llm, bridge, gh):
 
 def main():
     import argparse
+    default_repo = os.getenv("GITHUB_REPO_FULL") or f"{os.getenv('GITHUB_OWNER', 'iykyk-vedant')}/{os.getenv('GITHUB_REPO', 'AFH-DEMO')}"
     parser = argparse.ArgumentParser(description="Amaze on Work Batch Demo")
-    parser.add_argument("--repo", default="Rezinix-AI/shopstack-platform")
+    parser.add_argument("--repo", default=default_repo)
     parser.add_argument("--slack-channel", default="", help="Slack channel ID")
     args = parser.parse_args()
 
@@ -125,8 +126,8 @@ def main():
 
     console.print()
     console.print(Panel.fit(
-        "[bold cyan]Amaze on Work -- Batch Resolution[/bold cyan]\n"
-        "[dim]Resolving all incidents from shopstack-platform[/dim]",
+        f"[bold cyan]Amaze on Work -- Batch Resolution[/bold cyan]\n"
+        f"[dim]Resolving all incidents from {owner}/{repo_name}[/dim]",
         border_style="cyan", padding=(1, 4),
     ))
     console.print()

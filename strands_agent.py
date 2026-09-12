@@ -20,6 +20,12 @@ from typing import Optional, Dict, Any
 # Ensure project root is on sys.path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 os.environ["PYTHONIOENCODING"] = "utf-8"
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 # ─── Strands SDK Import with Graceful Fallback ────────────────────────────────
 try:
@@ -56,10 +62,13 @@ def get_supervisor():
     return _supervisor
 
 
+# ─── Default Target Repo ──────────────────────────────────────────────────────
+DEFAULT_REPO = os.getenv("GITHUB_REPO_FULL") or f"{os.getenv('GITHUB_OWNER', 'iykyk-vedant')}/{os.getenv('GITHUB_REPO', 'AFH-DEMO')}"
+
 # ─── Strands Tools ────────────────────────────────────────────────────────────
 
 @tool
-def parse_incident_ticket(incident_id: str, repo: str = "Rezinix-AI/shopstack-platform") -> str:
+def parse_incident_ticket(incident_id: str, repo: str = DEFAULT_REPO) -> str:
     """
     Parses a raw incident ticket or GitHub issue and extracts structured context
     including error symptoms, affected services, stack traces, and severity.
@@ -79,7 +88,7 @@ def parse_incident_ticket(incident_id: str, repo: str = "Rezinix-AI/shopstack-pl
 
 
 @tool
-def analyze_codebase_and_blast_radius(file_path: str, repo: str = "Rezinix-AI/shopstack-platform") -> str:
+def analyze_codebase_and_blast_radius(file_path: str, repo: str = DEFAULT_REPO) -> str:
     """
     Performs code property graph analysis and blast-radius tracing for a suspect file
     to determine all caller functions and dependencies that could be affected by a fix.
@@ -116,7 +125,7 @@ def validate_fix_in_sandbox(service: str, patch_diff: str = "") -> str:
 
 
 @tool
-def resolve_incident_end_to_end(incident_id: str, repo: str = "Rezinix-AI/shopstack-platform") -> str:
+def resolve_incident_end_to_end(incident_id: str, repo: str = DEFAULT_REPO) -> str:
     """
     Executes the full end-to-end incident resolution lifecycle:
     parsing -> graph analysis -> critic review -> minimal fix -> sandbox validation -> PR report.
@@ -125,7 +134,8 @@ def resolve_incident_end_to_end(incident_id: str, repo: str = "Rezinix-AI/shopst
     engine = get_supervisor()
     parser = engine.agents["incident_parser"]
     incident = parser.parse_from_github(owner, repo_name, incident_id)
-    result = engine.resolve_incident(incident)
+    repo_url = f"https://github.com/{owner}/{repo_name}"
+    result = engine.resolve_incident(incident, repo_url=repo_url)
     
     return result.get("formatted_markdown") or json.dumps(result.get("resolution_report", {}), indent=2)
 
@@ -154,7 +164,7 @@ def main():
         description="Amaze on Work — Strands Agents SDK Autonomous Incident Resolver"
     )
     parser.add_argument("--incident", default=None, help="Incident ID (e.g., INC-001, INC-004)")
-    parser.add_argument("--repo", default="Rezinix-AI/shopstack-platform", help="Target repository (owner/name)")
+    parser.add_argument("--repo", default=DEFAULT_REPO, help="Target repository (owner/name)")
     parser.add_argument("--prompt", default=None, help="Natural language incident prompt")
 
     args = parser.parse_args()

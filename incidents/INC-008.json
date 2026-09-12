@@ -1,0 +1,15 @@
+{
+  "id": "INC-008",
+  "title": "ValueError: No scheme supplied in webhook notification target URL",
+  "severity": "P2 - High",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "Partner Integrations Team",
+  "timestamp": "2026-09-12T15:00:00Z",
+  "description": "Third-party merchant webhooks fail to dispatch when registered without an explicit protocol prefix (e.g. 'hooks.slack.com/...'). The system throws a ValueError instead of prepending https://.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/webhook_service.py', line 12, in prepare_webhook_target\n    raise ValueError(f\"Invalid URL '{target_url}': No scheme supplied. Perhaps you meant https://{target_url}?\")\nValueError: Invalid URL 'api.partner.com/events': No scheme supplied.",
+  "tags": ["webhook", "http", "url", "validation"],
+  "recent_changes": "Commit d820aa: Strict URL parsing validation on partner webhooks",
+  "expected_behavior": "Should automatically default to https:// if no scheme is provided",
+  "actual_behavior": "Throws unhandled ValueError on schemeless target URLs"
+}

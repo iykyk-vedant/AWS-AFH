@@ -56,11 +56,16 @@ class BaseAgent(ABC):
         max_tokens: int = 4096,
     ) -> str:
         """Make an LLM call with system + user prompts."""
+        if len(user_prompt) > 8000:
+            user_prompt = user_prompt[:8000] + "\n... (truncated to fit model payload)"
+
+        sys_content = system_prompt or self.get_system_prompt()
+        if sys_content and len(sys_content) > 4000:
+            sys_content = sys_content[:4000]
+
         messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        else:
-            messages.append({"role": "system", "content": self.get_system_prompt()})
+        if sys_content:
+            messages.append({"role": "system", "content": sys_content})
         messages.append({"role": "user", "content": user_prompt})
 
         response = self.llm.chat(messages, temperature=temperature, max_tokens=max_tokens)
@@ -74,11 +79,16 @@ class BaseAgent(ABC):
         max_tokens: int = 4096,
     ) -> str:
         """Async LLM call."""
+        if len(user_prompt) > 8000:
+            user_prompt = user_prompt[:8000] + "\n... (truncated to fit model payload)"
+
+        sys_content = system_prompt or self.get_system_prompt()
+        if sys_content and len(sys_content) > 4000:
+            sys_content = sys_content[:4000]
+
         messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        else:
-            messages.append({"role": "system", "content": self.get_system_prompt()})
+        if sys_content:
+            messages.append({"role": "system", "content": sys_content})
         messages.append({"role": "user", "content": user_prompt})
 
         response = await self.llm.achat(messages, temperature=temperature, max_tokens=max_tokens)

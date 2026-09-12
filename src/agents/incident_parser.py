@@ -101,12 +101,31 @@ class IncidentParserAgent(BaseAgent):
     def parse_from_github(
         self, owner: str, repo: str, incident_id: str
     ) -> IncidentContext:
-        """Fetch and parse an incident from GitHub."""
+        """Fetch and parse an incident from GitHub with local cache fallback."""
         if not self.github:
             raise ValueError("GitHub tools not configured")
 
-        json_data = self.github.get_incident(owner, repo, incident_id)
-        return self.parse_from_json(json_data)
+        try:
+            json_data = self.github.get_incident(owner, repo, incident_id)
+            return self.parse_from_json(json_data)
+        except Exception as e:
+            logger.warning(f"Could not fetch {incident_id} from GitHub ({e}), checking local fallback...")
+            import json
+            from pathlib import Path
+            inc_file = Path("incidents.json")
+            if inc_file.exists():
+                try:
+                    data = json.loads(inc_file.read_text(encoding="utf-8"))
+                    for k, v in data.get("incidents", {}).items():
+                        text = v.get("text", "")
+                        if incident_id.upper() in k.upper() or incident_id in text:
+                            start = text.find("{")
+                            end = text.rfind("}") + 1
+                            if start >= 0 and end > start:
+                                return self.parse_from_json(json.loads(text[start:end]))
+                except Exception:
+                    pass
+            raise
 
     def list_incidents(self, owner: str, repo: str) -> list[str]:
         """List all incident IDs from the GitHub repo."""

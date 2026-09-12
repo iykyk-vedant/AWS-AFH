@@ -1,0 +1,15 @@
+{
+  "id": "INC-004",
+  "title": "Unhandled KeyError in inventory reservation when item ID is not in catalog",
+  "severity": "P1 - Critical",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "Warehouse Automation System",
+  "timestamp": "2026-09-12T13:00:00Z",
+  "description": "When orders are placed for discontinued or external vendor items, the cart reservation endpoint crashes with a 500 error due to an unhandled KeyError in the inventory lookup.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/inventory_service.py', line 20, in reserve_stock\n    available = STOCK_CATALOG[item_id]\nKeyError: 'ITEM-999_UNKNOWN'",
+  "tags": ["inventory", "reservation", "keyerror", "catalog"],
+  "recent_changes": "Commit 82d109: Added rapid checkout reservation caching",
+  "expected_behavior": "Should check if item exists via get() and return {'success': False, 'reason': 'Item not found'} without crashing",
+  "actual_behavior": "Throws unhandled KeyError causing 500 Internal Server Error"
+}

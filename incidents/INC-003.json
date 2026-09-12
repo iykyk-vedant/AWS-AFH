@@ -1,0 +1,15 @@
+{
+  "id": "INC-003",
+  "title": "ZeroDivisionError in shipping rate calculation for digital orders",
+  "severity": "P2 - High",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "Logistics & Fulfillment Team",
+  "timestamp": "2026-09-12T12:15:00Z",
+  "description": "When users purchase digital-only products (such as eBooks or virtual gift cards) with zero shipping weight, the checkout fails with HTTP 500. The stack trace shows a ZeroDivisionError in the shipping rate calculation function.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/shipping_service.py', line 14, in calculate_shipping_rate\n    cost_per_kg = 15.0 / weight_kg\nZeroDivisionError: float division by zero",
+  "tags": ["shipping", "checkout", "zerodivision", "logistics"],
+  "recent_changes": "Commit 4b92c1: Updated variable parcel shipping tariff calculations",
+  "expected_behavior": "Zero-weight digital items should incur $0 weight charge without throwing ZeroDivisionError",
+  "actual_behavior": "Unhandled ZeroDivisionError when weight_kg is 0.0"
+}

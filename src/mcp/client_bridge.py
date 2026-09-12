@@ -276,7 +276,7 @@ class MCPClientBridge:
         import httpx
         import base64
 
-        branch = f"Amaze on Work/{incident_id.lower().replace(' ', '-').replace('/', '-')}"
+        branch = f"amaze-on-work/{incident_id.lower().replace(' ', '-').replace('/', '-')}"
         files_committed = []
         token = os.getenv("GITHUB_TOKEN", "")
 
@@ -316,13 +316,19 @@ class MCPClientBridge:
             except Exception as e:
                 logger.warning(f"[PR] Could not detect default branch: {e}")
 
-            # 2. Create fix branch from default branch
+            # 2. Create fix branch from default branch (idempotent)
             try:
                 self.create_branch(owner, repo, branch, from_branch=default_branch)
                 logger.info(f"Branch created: {branch} from {default_branch}")
             except Exception as e:
-                logger.error(f"Branch creation failed: {e}")
-                return {"error": f"Branch creation failed (check GITHUB_TOKEN permissions): {e}"}
+                err_text = str(e)
+                if hasattr(e, "response") and hasattr(e.response, "text"):
+                    err_text += " " + e.response.text
+                if "already exists" in err_text.lower():
+                    logger.info(f"Branch {branch} already exists — reusing existing branch")
+                else:
+                    logger.error(f"Branch creation failed: {e}")
+                    return {"error": f"Branch creation failed (check GITHUB_TOKEN permissions): {e}"}
 
             # 2. Commit each modified file (using sanitizer + smart matching)
             for change in fix_plan.get("files_to_modify", []):
@@ -390,17 +396,45 @@ class MCPClientBridge:
             if not files_committed:
                 logger.warning("No files committed -- fix_plan may have no files_to_modify")
 
-            # 3. Create PR
+            # 3. Create PR (or reuse existing PR if already open)
             pr_title = title
             pr_body = report_body[:65000]  # GitHub body limit
-            pr = self.create_pull_request(
-                owner, repo, pr_title, pr_body,
-                head=branch, base=default_branch,
-                labels=labels,
-            )
-            pr_url = pr.get("html_url") or pr.get("pr_url") or pr.get("url") or ""
-            pr_number = pr.get("number") or pr.get("pr_number", 0)
-            logger.info(f"PR #{pr_number} created: {pr_url} [labels: {labels}]")
+            pr_url = ""
+            pr_number = 0
+            try:
+                pr = self.create_pull_request(
+                    owner, repo, pr_title, pr_body,
+                    head=branch, base=default_branch,
+                    labels=labels,
+                )
+                pr_url = pr.get("html_url") or pr.get("pr_url") or pr.get("url") or ""
+                pr_number = pr.get("number") or pr.get("pr_number", 0)
+                logger.info(f"PR #{pr_number} created: {pr_url} [labels: {labels}]")
+            except Exception as e:
+                err_text = str(e)
+                if hasattr(e, "response") and hasattr(e.response, "text"):
+                    err_text += " " + e.response.text
+                if "already exists" in err_text.lower() or "pull request already exists" in err_text.lower():
+                    logger.info(f"PR for {branch} already exists, fetching existing PR...")
+                    try:
+                        headers = {"Accept": "application/vnd.github.v3+json", "User-Agent": "Amaze on Work-AI"}
+                        if token:
+                            headers["Authorization"] = f"token {token}"
+                        resp = httpx.get(
+                            f"https://api.github.com/repos/{owner}/{repo}/pulls",
+                            headers=headers,
+                            params={"head": f"{owner}:{branch}", "state": "open"},
+                            timeout=10,
+                        )
+                        if resp.status_code == 200 and resp.json():
+                            pr_item = resp.json()[0]
+                            pr_url = pr_item.get("html_url", "")
+                            pr_number = pr_item.get("number", 0)
+                            logger.info(f"Existing PR #{pr_number} found: {pr_url}")
+                    except Exception as fe:
+                        logger.warning(f"Could not fetch existing PR: {fe}")
+                else:
+                    raise
 
             return {
                 "pr_url": pr_url,

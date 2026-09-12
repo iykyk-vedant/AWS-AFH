@@ -1,0 +1,15 @@
+{
+  "id": "INC-007",
+  "title": "TypeError: Object of type UUID is not JSON serializable in audit logging",
+  "severity": "P2 - High",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "Compliance & Security Team",
+  "timestamp": "2026-09-12T14:35:00Z",
+  "description": "Order creation events fail to write to the security audit trail. The json.dumps call throws TypeError when attempting to serialize native Python UUID objects.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/audit_service.py', line 16, in format_audit_log\n    return json.dumps(event_payload)\n  File 'json/__init__.py', line 231, in dumps\n    return _default_encoder.encode(obj)\nTypeError: Object of type UUID is not JSON serializable",
+  "tags": ["audit", "logging", "json", "serialization"],
+  "recent_changes": "Commit 70f901: Migrated internal identifiers to UUIDv4",
+  "expected_behavior": "UUID should be cast to string or serialized using default=str",
+  "actual_behavior": "Raises TypeError: Object of type UUID is not JSON serializable"
+}

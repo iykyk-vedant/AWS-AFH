@@ -1,0 +1,15 @@
+{
+  "id": "INC-010",
+  "title": "KeyError: 'x-forwarded-for' when extracting client IP from internal service requests",
+  "severity": "P2 - High",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "API Gateway Reliability Team",
+  "timestamp": "2026-09-12T15:45:00Z",
+  "description": "Direct internal traffic and VPC private subnet calls that bypass the public CloudFront proxy do not supply the 'x-forwarded-for' header, causing the rate limiter to crash with an unhandled KeyError.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/rate_limiter.py', line 11, in extract_client_ip\n    forwarded_for = headers['x-forwarded-for']\nKeyError: 'x-forwarded-for'",
+  "tags": ["ratelimit", "headers", "keyerror", "networking"],
+  "recent_changes": "Commit e710aa: Implemented IP-based token bucket rate limiting",
+  "expected_behavior": "Should use headers.get('x-forwarded-for') and fallback to '127.0.0.1' when missing",
+  "actual_behavior": "Throws unhandled KeyError: 'x-forwarded-for'"
+}

@@ -1,0 +1,15 @@
+{
+  "id": "INC-005",
+  "title": "IndexError on pagination past catalog boundary",
+  "severity": "P2 - High",
+  "affected_service": "python-service",
+  "environment": "staging",
+  "reported_by": "Frontend QA Team",
+  "timestamp": "2026-09-12T13:45:00Z",
+  "description": "Navigating to deep inventory catalog pages (such as page 10 when only 34 items exist) raises IndexError: list index out of range instead of returning an empty array.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/inventory_service.py', line 36, in list_inventory_page\n    return CATALOG_ITEMS[start]\nIndexError: list index out of range",
+  "tags": ["pagination", "inventory", "indexerror", "catalog"],
+  "recent_changes": "Commit c51b0a: Updated paginated product browsing logic",
+  "expected_behavior": "Should return empty list [] when requested page is out of bounds",
+  "actual_behavior": "Raises IndexError: list index out of range"
+}

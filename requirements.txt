@@ -23,7 +23,7 @@ fastapi
 uvicorn
 
 # MCP SDK
-mcp[cli]
+mcp[cli]<2
 
 # Slack Integration
 slack-sdk

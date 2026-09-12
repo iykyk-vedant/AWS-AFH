@@ -1,385 +1,82 @@
 {
-  "counter": 41,
+  "counter": 11,
   "incidents": {
-    "INC-0001": {
-      "source": "test"
+    "INC-001": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "Server returns 500 error on POST /api/auth/login after latest deployment",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-001\", \"title\": \"Server returns 500 error on POST /api/auth/login after latest deployment\", \"severity\": \"P1 - Critical\", \"affected_service\": \"python-service\", \"environment\": \"staging\", \"reported_by\": \"Frontend QA Team\", \"timestamp\": \"2026-09-12T10:00:00Z\", \"description\": \"After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials.\", \"error_log\": \"Traceback (most recent call last):\\n  File \\\"fastapi/routing.py\\\", line 274, in app\\n    raw_response = await run_endpoint_function(...)\\n  File \\\"app/routes/auth.py\\\", line 42, in login\\n    is_valid = bcrypt.checkpw(payload.password.encode('utf-8'), user.password_hash)\\nTypeError: a bytes-like object is required, not 'str'\", \"tags\": [\"authentication\", \"login\", \"auth\", \"security\"], \"recent_changes\": \"Commit e48a12: Migrated user models to support hashed password storage\", \"expected_behavior\": \"Valid credentials should return HTTP 200 with authentication token\", \"actual_behavior\": \"HTTP 500 Internal Server Error with TypeError: a bytes-like object is required, not 'str'\"}"
     },
-    "INC-0002": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773733191.305659",
-      "text": "{\n  \"incident_id\": \"INC-001\",\n  \"title\": \"Server returns 500 error on POST /api/auth/login after latest deployment\",\n  \"severity\": \"P1 - Critical\",\n  \"service\": \"python-service\",\n  \"reported_by\": \"Frontend Team\",\n  \"environment\": \"staging\",\n  \"timestamp\": \"2026-02-28T14:23:00Z\",\n  \"description\": \"After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials. This was wo",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773733191.305659"
+    "INC-002": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "Double discount deduction applied during checkout calculation",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-002\", \"title\": \"Double discount deduction applied during checkout calculation\", \"severity\": \"P1 - Critical\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"Finance & Billing Team\", \"timestamp\": \"2026-09-12T11:30:00Z\", \"description\": \"Customers are being undercharged during checkout when promotional discount codes are applied. For example, a $100 cart with SAVE20 (20% off) results in a total of $64.80 instead of the expected $86.40 (including 8% tax). Analysis indicates the discount deduction is being applied twice to the subtotal.\", \"error_log\": \"AssertionError: assert 4.8 == 6.4\\nFile 'app/services/payment_service.py', line 26, in process_order_total\\n    discounted_subtotal = max(0.0, (subtotal - discount) - discount)\\nTotal mismatch: expected $86.40, received $64.80\", \"tags\": [\"billing\", \"checkout\", \"discount\", \"finance\", \"payment\"], \"recent_changes\": \"Commit 38a19f: Refactored promotional coupon calculations in checkout workflow\", \"expected_behavior\": \"A $100 cart with 20% discount and 8% tax should have subtotal $80.00, tax $6.40, and total $86.40\", \"actual_behavior\": \"Discount is deducted twice from subtotal resulting in $60.00 base, $4.80 tax, and $64.80 total\"}"
     },
-    "INC-0003": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773733191.305659",
-      "text": "{\n  \"incident_id\": \"INC-001\",\n  \"title\": \"Server returns 500 error on POST /api/auth/login after latest deployment\",\n  \"severity\": \"P1 - Critical\",\n  \"service\": \"python-service\",\n  \"reported_by\": \"Frontend Team\",\n  \"environment\": \"staging\",\n  \"timestamp\": \"2026-02-28T14:23:00Z\",\n  \"description\": \"After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials. This was wo",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773733191.305659"
+    "INC-003": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "ZeroDivisionError in shipping rate calculation for digital orders",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-003\", \"title\": \"ZeroDivisionError in shipping rate calculation for digital orders\", \"severity\": \"P2 - High\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"Logistics & Fulfillment Team\", \"timestamp\": \"2026-09-12T12:15:00Z\", \"description\": \"When users purchase digital-only products (such as eBooks or virtual gift cards) with zero shipping weight, the checkout fails with HTTP 500. The stack trace shows a ZeroDivisionError in the shipping rate calculation function.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/shipping_service.py', line 14, in calculate_shipping_rate\\n    cost_per_kg = 15.0 / weight_kg\\nZeroDivisionError: float division by zero\", \"tags\": [\"shipping\", \"checkout\", \"zerodivision\", \"logistics\"], \"recent_changes\": \"Commit 4b92c1: Updated variable parcel shipping tariff calculations\", \"expected_behavior\": \"Zero-weight digital items should incur $0 weight charge without throwing ZeroDivisionError\", \"actual_behavior\": \"Unhandled ZeroDivisionError when weight_kg is 0.0\"}"
     },
-    "INC-0004": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773733580.846539",
-      "text": "{\n  \"incident_id\": \"INC-001\",\n  \"title\": \"Server returns 500 error on POST /api/auth/login after latest deployment\",\n  \"severity\": \"P1 - Critical\",\n  \"service\": \"python-service\",\n  \"reported_by\": \"Frontend Team\",\n  \"environment\": \"staging\",\n  \"timestamp\": \"2026-02-28T14:23:00Z\",\n  \"description\": \"After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials. This was wo",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773733580.846539"
+    "INC-004": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "Unhandled KeyError in inventory reservation when item ID is not in catalog",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-004\", \"title\": \"Unhandled KeyError in inventory reservation when item ID is not in catalog\", \"severity\": \"P1 - Critical\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"Warehouse Automation System\", \"timestamp\": \"2026-09-12T13:00:00Z\", \"description\": \"When orders are placed for discontinued or external vendor items, the cart reservation endpoint crashes with a 500 error due to an unhandled KeyError in the inventory lookup.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/inventory_service.py', line 20, in reserve_stock\\n    available = STOCK_CATALOG[item_id]\\nKeyError: 'ITEM-999_UNKNOWN'\", \"tags\": [\"inventory\", \"reservation\", \"keyerror\", \"catalog\"], \"recent_changes\": \"Commit 82d109: Added rapid checkout reservation caching\", \"expected_behavior\": \"Should check if item exists via get() and return {'success': False, 'reason': 'Item not found'} without crashing\", \"actual_behavior\": \"Throws unhandled KeyError causing 500 Internal Server Error\"}"
     },
-    "INC-0005": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773740261.232739",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773740261.232739"
+    "INC-005": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "IndexError on pagination past catalog boundary",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-005\", \"title\": \"IndexError on pagination past catalog boundary\", \"severity\": \"P2 - High\", \"affected_service\": \"python-service\", \"environment\": \"staging\", \"reported_by\": \"Frontend QA Team\", \"timestamp\": \"2026-09-12T13:45:00Z\", \"description\": \"Navigating to deep inventory catalog pages (such as page 10 when only 34 items exist) raises IndexError: list index out of range instead of returning an empty array.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/inventory_service.py', line 36, in list_inventory_page\\n    return CATALOG_ITEMS[start]\\nIndexError: list index out of range\", \"tags\": [\"pagination\", \"inventory\", \"indexerror\", \"catalog\"], \"recent_changes\": \"Commit c51b0a: Updated paginated product browsing logic\", \"expected_behavior\": \"Should return empty list [] when requested page is out of bounds\", \"actual_behavior\": \"Raises IndexError: list index out of range\"}"
     },
-    "INC-0006": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773742058.614129",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773742058.614129"
+    "INC-006": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "AttributeError: 'NoneType' object has no attribute 'strip' on user profile update",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-006\", \"title\": \"AttributeError: 'NoneType' object has no attribute 'strip' on user profile update\", \"severity\": \"P2 - High\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"Mobile Client Team\", \"timestamp\": \"2026-09-12T14:10:00Z\", \"description\": \"Mobile users who leave the optional phone number blank encounter a 500 error when saving their profile settings. The backend fails when calling strip() on a None value.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/user_service.py', line 22, in update_user_profile\\n    user['phone'] = updates['phone'].strip()\\nAttributeError: 'NoneType' object has no attribute 'strip'\", \"tags\": [\"user\", \"profile\", \"attributeerror\", \"validation\"], \"recent_changes\": \"Commit e19a22: Added whitespace trimming on user contact inputs\", \"expected_behavior\": \"Should check if phone is a non-empty string before calling strip()\", \"actual_behavior\": \"Crashes with AttributeError when phone is None\"}"
     },
-    "INC-0007": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773742058.614129",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773742058.614129"
+    "INC-007": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "TypeError: Object of type UUID is not JSON serializable in audit logging",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-007\", \"title\": \"TypeError: Object of type UUID is not JSON serializable in audit logging\", \"severity\": \"P2 - High\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"Compliance & Security Team\", \"timestamp\": \"2026-09-12T14:35:00Z\", \"description\": \"Order creation events fail to write to the security audit trail. The json.dumps call throws TypeError when attempting to serialize native Python UUID objects.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/audit_service.py', line 16, in format_audit_log\\n    return json.dumps(event_payload)\\n  File 'json/__init__.py', line 231, in dumps\\n    return _default_encoder.encode(obj)\\nTypeError: Object of type UUID is not JSON serializable\", \"tags\": [\"audit\", \"logging\", \"json\", \"serialization\"], \"recent_changes\": \"Commit 70f901: Migrated internal identifiers to UUIDv4\", \"expected_behavior\": \"UUID should be cast to string or serialized using default=str\", \"actual_behavior\": \"Raises TypeError: Object of type UUID is not JSON serializable\"}"
     },
-    "INC-0008": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773743434.005309",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773743434.005309"
+    "INC-008": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "ValueError: No scheme supplied in webhook notification target URL",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-008\", \"title\": \"ValueError: No scheme supplied in webhook notification target URL\", \"severity\": \"P2 - High\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"Partner Integrations Team\", \"timestamp\": \"2026-09-12T15:00:00Z\", \"description\": \"Third-party merchant webhooks fail to dispatch when registered without an explicit protocol prefix (e.g. 'hooks.slack.com/...'). The system throws a ValueError instead of prepending https://.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/webhook_service.py', line 12, in prepare_webhook_target\\n    raise ValueError(f\\\"Invalid URL '{target_url}': No scheme supplied. Perhaps you meant https://{target_url}?\\\")\\nValueError: Invalid URL 'api.partner.com/events': No scheme supplied.\", \"tags\": [\"webhook\", \"http\", \"url\", \"validation\"], \"recent_changes\": \"Commit d820aa: Strict URL parsing validation on partner webhooks\", \"expected_behavior\": \"Should automatically default to https:// if no scheme is provided\", \"actual_behavior\": \"Throws unhandled ValueError on schemeless target URLs\"}"
     },
-    "INC-0009": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773744510.256859",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773744510.256859"
+    "INC-009": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "ValueError: invalid literal for int() on empty analytics query parameter",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-009\", \"title\": \"ValueError: invalid literal for int() on empty analytics query parameter\", \"severity\": \"P3 - Moderate\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"BI & Analytics Dashboard Team\", \"timestamp\": \"2026-09-12T15:20:00Z\", \"description\": \"When dashboard filters submit an empty query string 'GET /api/analytics/orders?days=', the backend crashes with a 500 error instead of defaulting to 30 days.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/analytics_service.py', line 13, in parse_date_range_days\\n    return int(raw_param)\\nValueError: invalid literal for int() with base 10: ''\", \"tags\": [\"analytics\", \"parsing\", \"queryparams\", \"valueerror\"], \"recent_changes\": \"Commit f1029c: Added custom date filtering on sales analytics\", \"expected_behavior\": \"Empty string or whitespace should fall back to default_days\", \"actual_behavior\": \"Throws ValueError: invalid literal for int() with base 10: ''\"}"
     },
-    "INC-0010": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773744510.256859",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773744510.256859"
+    "INC-010": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "KeyError: 'x-forwarded-for' when extracting client IP from internal service requests",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-010\", \"title\": \"KeyError: 'x-forwarded-for' when extracting client IP from internal service requests\", \"severity\": \"P2 - High\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"API Gateway Reliability Team\", \"timestamp\": \"2026-09-12T15:45:00Z\", \"description\": \"Direct internal traffic and VPC private subnet calls that bypass the public CloudFront proxy do not supply the 'x-forwarded-for' header, causing the rate limiter to crash with an unhandled KeyError.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/rate_limiter.py', line 11, in extract_client_ip\\n    forwarded_for = headers['x-forwarded-for']\\nKeyError: 'x-forwarded-for'\", \"tags\": [\"ratelimit\", \"headers\", \"keyerror\", \"networking\"], \"recent_changes\": \"Commit e710aa: Implemented IP-based token bucket rate limiting\", \"expected_behavior\": \"Should use headers.get('x-forwarded-for') and fallback to '127.0.0.1' when missing\", \"actual_behavior\": \"Throws unhandled KeyError: 'x-forwarded-for'\"}"
     },
-    "INC-0011": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773744566.356009",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773744566.356009"
-    },
-    "INC-0012": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773753828.095049",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773753828.095049"
-    },
-    "INC-0013": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773753828.095049",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773753828.095049"
-    },
-    "INC-0014": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773756338.116509",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773756338.116509"
-    },
-    "INC-0015": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773758146.352169",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773758146.352169"
-    },
-    "INC-0016": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773758146.352169",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773758146.352169"
-    },
-    "INC-0017": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773758146.352169",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773758146.352169"
-    },
-    "INC-0018": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773759443.954649",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773759443.954649"
-    },
-    "INC-0019": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773759443.954649",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773759443.954649"
-    },
-    "INC-0020": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773761008.659749",
-      "text": "Our CI pipeline has been consistently failing since the last merge, and the QA Team flagged it as a P2 issue. The `test_payment_flow` test suite in our Python service is breaking on two specific tests \u2014 `test_calculate_total_with_tax` and `test_checkout_flow_complete`. The root symptom is that tax calculation is returning zero for any order subtotal under $100. For example, a $49.99 order should come out to $54.24 after applying 8.5% tax, but the test is getting $49.99 back \u2014 meaning no tax is b",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773761008.659749"
-    },
-    "INC-0021": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773761008.659749",
-      "text": "Our CI pipeline has been consistently failing since the last merge, and the QA Team flagged it as a P2 issue. The `test_payment_flow` test suite in our Python service is breaking on two specific tests \u2014 `test_calculate_total_with_tax` and `test_checkout_flow_complete`. The root symptom is that tax calculation is returning zero for any order subtotal under $100. For example, a $49.99 order should come out to $54.24 after applying 8.5% tax, but the test is getting $49.99 back \u2014 meaning no tax is b",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773761008.659749"
-    },
-    "INC-0022": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773762818.328769",
-      "text": "Our CI pipeline has been consistently failing since the last merge, and the QA Team flagged it as a P2 issue. The `test_payment_flow` test suite in our Python service is breaking on two specific tests \u2014 `test_calculate_total_with_tax` and `test_checkout_flow_complete`. The root symptom is that tax calculation is returning zero for any order subtotal under $100. For example, a $49.99 order should come out to $54.24 after applying 8.5% tax, but the test is getting $49.99 back \u2014 meaning no tax is b",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773762818.328769"
-    },
-    "INC-0023": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773765959.711719",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773765959.711719"
-    },
-    "INC-0024": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773809171.617909",
-      "text": "We have a critical production issue in our Python service reported by the Finance Team. Customers are being double-charged discounts during checkout. When a customer applies the discount code 'SAVE20' (20% off) to a $100 cart, the final total is coming out to $64 instead of the expected $80. It looks like the discount is being applied twice \u2014 first reducing $100 to $80, then mistakenly applying 20% again to get $64. There are no errors in the logs, so the system thinks everything is fine. This s",
-      "user": "U0ALTPHFE3E",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773809171.617909"
-    },
-    "INC-0025": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773812366.243229",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773812366.243229"
-    },
-    "INC-0026": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773812563.014289",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773812563.014289"
-    },
-    "INC-0027": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773813173.170149",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773813173.170149"
-    },
-    "INC-0028": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773819874.744079",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773819874.744079"
-    },
-    "INC-0029": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773820691.582299",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773820691.582299"
-    },
-    "INC-0030": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773821054.346889",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773821054.346889"
-    },
-    "INC-0031": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773821809.708979",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773821809.708979"
-    },
-    "INC-0032": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773821798.167749",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773821798.167749"
-    },
-    "INC-0033": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773821926.312099",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773821926.312099"
-    },
-    "INC-0034": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773822349.067359",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773822349.067359"
-    },
-    "INC-0035": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773822742.852069",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773822742.852069"
-    },
-    "INC-0036": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773823369.971879",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773823369.971879"
-    },
-    "INC-0037": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773823654.201229",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773823654.201229"
-    },
-    "INC-0038": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773824694.500189",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773824694.500189"
-    },
-    "INC-0039": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773825306.103869",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773825306.103869"
-    },
-    "INC-0040": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773825592.484629",
-      "text": "Discount is being applied twice.",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/Rezinix-AI/shopstack-platform",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773825592.484629"
-    },
-    "INC-0041": {
-      "source": "slack",
-      "channel": "C0ALKQVBN87",
-      "thread_ts": "1773825934.821419",
-      "text": "There is a problem with Discount is being applied twice. repo: <https://github.com/RonakAjwani/shopstack-platform.git>",
-      "user": "U0ALTPHFE3E",
-      "repo_url": "https://github.com/RonakAjwani/shopstack-platform.git",
-      "slack_channel": "C0ALKQVBN87",
-      "slack_thread_ts": "1773825934.821419"
+    "INC-011": {
+      "source": "github",
+      "repo": "iykyk-vedant/AFH-DEMO",
+      "title": "ValueError: Cart subtotal mismatch on floating-point precision sum",
+      "service": "python-service",
+      "text": "{\"id\": \"INC-011\", \"title\": \"ValueError: Cart subtotal mismatch on floating-point precision sum\", \"severity\": \"P2 - High\", \"affected_service\": \"python-service\", \"environment\": \"production\", \"reported_by\": \"Checkout Experience Team\", \"timestamp\": \"2026-09-12T16:05:00Z\", \"description\": \"Carts containing certain combinations of prices (e.g., $10.10 and $20.20) fail validation with ValueError because the sum of floats produces 30.299999999999997, causing a mismatch against the reported subtotal 30.30.\", \"error_log\": \"Traceback (most recent call last):\\n  File 'app/services/cart_service.py', line 13, in validate_cart_totals\\n    raise ValueError(f\\\"Cart subtotal mismatch: computed sum {computed_sum} does not match reported subtotal {reported_subtotal}\\\")\\nValueError: Cart subtotal mismatch: computed sum 30.299999999999997 does not match reported subtotal 30.30\", \"tags\": [\"cart\", \"math\", \"precision\", \"rounding\", \"float\"], \"recent_changes\": \"Commit a3911f: Added subtotal integrity validation check prior to payment capture\", \"expected_behavior\": \"Should compare rounded values: round(computed_sum, 2) == round(reported_subtotal, 2)\", \"actual_behavior\": \"Strict float comparison fails due to binary representation discrepancies\"}"
     }
   }
 }

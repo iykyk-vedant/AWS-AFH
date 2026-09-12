@@ -1,0 +1,15 @@
+{
+  "id": "INC-006",
+  "title": "AttributeError: 'NoneType' object has no attribute 'strip' on user profile update",
+  "severity": "P2 - High",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "Mobile Client Team",
+  "timestamp": "2026-09-12T14:10:00Z",
+  "description": "Mobile users who leave the optional phone number blank encounter a 500 error when saving their profile settings. The backend fails when calling strip() on a None value.",
+  "error_log": "Traceback (most recent call last):\n  File 'app/services/user_service.py', line 22, in update_user_profile\n    user['phone'] = updates['phone'].strip()\nAttributeError: 'NoneType' object has no attribute 'strip'",
+  "tags": ["user", "profile", "attributeerror", "validation"],
+  "recent_changes": "Commit e19a22: Added whitespace trimming on user contact inputs",
+  "expected_behavior": "Should check if phone is a non-empty string before calling strip()",
+  "actual_behavior": "Crashes with AttributeError when phone is None"
+}

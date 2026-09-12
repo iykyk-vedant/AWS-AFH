@@ -1,4 +1,5 @@
 import os
+import logging
 import httpx
 from typing import Optional
 from dotenv import load_dotenv
@@ -6,6 +7,7 @@ from dotenv import load_dotenv
 from src.llm.base_client import BaseLLMClient, LLMResponse
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 
 class CerebrasClient(BaseLLMClient):
@@ -66,13 +68,22 @@ class CerebrasClient(BaseLLMClient):
         temperature: float = 0.7,
         max_tokens: int = 4096,
     ) -> LLMResponse:
+        import time
         url = f"{self._base_url}/chat/completions"
         body = self._build_request_body(messages, temperature, max_tokens)
 
-        with httpx.Client(timeout=self._timeout) as client:
-            response = client.post(url, headers=self._get_headers(), json=body)
-            response.raise_for_status()
-            return self._parse_response(response.json())
+        max_retries = 6
+        for attempt in range(max_retries):
+            with httpx.Client(timeout=self._timeout) as client:
+                response = client.post(url, headers=self._get_headers(), json=body)
+                if response.status_code == 429 and attempt < max_retries - 1:
+                    retry_after = response.headers.get("retry-after")
+                    wait_time = float(retry_after) if retry_after else (3.0 * (attempt + 1))
+                    logger.warning(f"[LLM] Rate limit hit (429), waiting {wait_time:.1f}s (attempt {attempt+1}/{max_retries})...")
+                    time.sleep(min(wait_time, 20.0))
+                    continue
+                response.raise_for_status()
+                return self._parse_response(response.json())
 
     async def achat(
         self,
@@ -80,15 +91,24 @@ class CerebrasClient(BaseLLMClient):
         temperature: float = 0.7,
         max_tokens: int = 4096,
     ) -> LLMResponse:
+        import asyncio
         url = f"{self._base_url}/chat/completions"
         body = self._build_request_body(messages, temperature, max_tokens)
 
-        async with httpx.AsyncClient(timeout=self._timeout) as client:
-            response = await client.post(
-                url, headers=self._get_headers(), json=body
-            )
-            response.raise_for_status()
-            return self._parse_response(response.json())
+        max_retries = 6
+        for attempt in range(max_retries):
+            async with httpx.AsyncClient(timeout=self._timeout) as client:
+                response = await client.post(
+                    url, headers=self._get_headers(), json=body
+                )
+                if response.status_code == 429 and attempt < max_retries - 1:
+                    retry_after = response.headers.get("retry-after")
+                    wait_time = float(retry_after) if retry_after else (3.0 * (attempt + 1))
+                    logger.warning(f"[LLM] Async rate limit hit (429), waiting {wait_time:.1f}s (attempt {attempt+1}/{max_retries})...")
+                    await asyncio.sleep(min(wait_time, 20.0))
+                    continue
+                response.raise_for_status()
+                return self._parse_response(response.json())
 
     def is_available(self) -> bool:
         try:

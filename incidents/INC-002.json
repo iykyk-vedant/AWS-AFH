@@ -1,0 +1,15 @@
+{
+  "id": "INC-002",
+  "title": "Double discount deduction applied during checkout calculation",
+  "severity": "P1 - Critical",
+  "affected_service": "python-service",
+  "environment": "production",
+  "reported_by": "Finance & Billing Team",
+  "timestamp": "2026-09-12T11:30:00Z",
+  "description": "Customers are being undercharged during checkout when promotional discount codes are applied. For example, a $100 cart with SAVE20 (20% off) results in a total of $64.80 instead of the expected $86.40 (including 8% tax). Analysis indicates the discount deduction is being applied twice to the subtotal.",
+  "error_log": "AssertionError: assert 4.8 == 6.4\nFile 'app/services/payment_service.py', line 26, in process_order_total\n    discounted_subtotal = max(0.0, (subtotal - discount) - discount)\nTotal mismatch: expected $86.40, received $64.80",
+  "tags": ["billing", "checkout", "discount", "finance", "payment"],
+  "recent_changes": "Commit 38a19f: Refactored promotional coupon calculations in checkout workflow",
+  "expected_behavior": "A $100 cart with 20% discount and 8% tax should have subtotal $80.00, tax $6.40, and total $86.40",
+  "actual_behavior": "Discount is deducted twice from subtotal resulting in $60.00 base, $4.80 tax, and $64.80 total"
+}

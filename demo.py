@@ -26,6 +26,12 @@ import argparse
 
 sys.path.insert(0, ".")
 os.environ["PYTHONIOENCODING"] = "utf-8"
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -62,8 +68,9 @@ def step_header(num, title, subtitle=""):
 
 def main():
     parser = argparse.ArgumentParser(description="Amaze on Work Demo")
+    default_repo = os.getenv("GITHUB_REPO_FULL") or f"{os.getenv('GITHUB_OWNER', 'iykyk-vedant')}/{os.getenv('GITHUB_REPO', 'AFH-DEMO')}"
     parser.add_argument("--incident", default="INC-001", help="Incident ID")
-    parser.add_argument("--repo", default="Rezinix-AI/shopstack-platform")
+    parser.add_argument("--repo", default=default_repo)
     parser.add_argument("--slack-channel", default="", help="Slack channel name or ID")
     args = parser.parse_args()
 

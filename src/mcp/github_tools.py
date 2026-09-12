@@ -71,7 +71,14 @@ class GitHubMCPTools:
             dict with 'content' (decoded string), 'sha', 'size', 'path'
         """
         url = f"{BASE_URL}/repos/{owner}/{repo}/contents/{path}"
-        data = self._get(url, params={"ref": ref})
+        try:
+            data = self._get(url, params={"ref": ref} if ref else None)
+        except Exception:
+            alt_ref = "main" if ref == "master" else ("master" if ref == "main" else None)
+            if alt_ref:
+                data = self._get(url, params={"ref": alt_ref})
+            else:
+                raise
 
         if isinstance(data, list):
             # It's a directory listing
@@ -100,7 +107,15 @@ class GitHubMCPTools:
         """
         url = f"{BASE_URL}/repos/{owner}/{repo}/git/trees/{ref}"
         params = {"recursive": "1"} if recursive else {}
-        data = self._get(url, params=params)
+        try:
+            data = self._get(url, params=params)
+        except Exception:
+            alt_ref = "main" if ref == "master" else ("master" if ref == "main" else None)
+            if alt_ref:
+                url = f"{BASE_URL}/repos/{owner}/{repo}/git/trees/{alt_ref}"
+                data = self._get(url, params=params)
+            else:
+                raise
         return data.get("tree", [])
 
     def search_code(
@@ -167,19 +182,36 @@ class GitHubMCPTools:
         return data.get("default_branch", "master")
 
     def get_branch_sha(self, owner: str, repo: str, branch: str) -> str:
-        """Get the SHA of a branch HEAD."""
+        """Get the SHA of a branch HEAD with fallback between master and main."""
         url = f"{BASE_URL}/repos/{owner}/{repo}/git/refs/heads/{branch}"
-        data = self._get(url)
-        return data.get("object", {}).get("sha", "")
+        try:
+            data = self._get(url)
+            return data.get("object", {}).get("sha", "")
+        except Exception:
+            alt_branch = "main" if branch == "master" else ("master" if branch == "main" else None)
+            if alt_branch:
+                try:
+                    url = f"{BASE_URL}/repos/{owner}/{repo}/git/refs/heads/{alt_branch}"
+                    data = self._get(url)
+                    return data.get("object", {}).get("sha", "")
+                except Exception:
+                    pass
+            raise
 
     def create_branch(
-        self, owner: str, repo: str, branch_name: str, from_sha: str
+        self, owner: str, repo: str, branch_name: str, from_sha: str = "", from_branch: str = ""
     ) -> dict:
-        """Create a new branch from a commit SHA."""
+        """Create a new branch from a commit SHA or existing branch name."""
+        target_sha = from_sha or ""
+        # If target_sha is not a 40-char commit SHA, treat it as a branch name
+        if not target_sha or len(target_sha) != 40:
+            branch_to_lookup = from_branch or target_sha or self.get_default_branch(owner, repo)
+            target_sha = self.get_branch_sha(owner, repo, branch_to_lookup)
+
         url = f"{BASE_URL}/repos/{owner}/{repo}/git/refs"
         return self._post(url, {
             "ref": f"refs/heads/{branch_name}",
-            "sha": from_sha,
+            "sha": target_sha,
         })
 
     def commit_file(
@@ -212,15 +244,37 @@ class GitHubMCPTools:
         body: str,
         head: str,
         base: str = "master",
+        labels: list[str] | None = None,
     ) -> dict:
-        """Open a pull request."""
+        """Open a pull request with base fallback and optional labels."""
         url = f"{BASE_URL}/repos/{owner}/{repo}/pulls"
-        return self._post(url, {
-            "title": title,
-            "body": body,
-            "head": head,
-            "base": base,
-        })
+        try:
+            result = self._post(url, {
+                "title": title,
+                "body": body,
+                "head": head,
+                "base": base,
+            })
+        except Exception:
+            alt_base = "main" if base == "master" else ("master" if base == "main" else None)
+            if alt_base:
+                result = self._post(url, {
+                    "title": title,
+                    "body": body,
+                    "head": head,
+                    "base": alt_base,
+                })
+            else:
+                raise
+
+        if labels and isinstance(result, dict) and result.get("number"):
+            try:
+                label_url = f"{BASE_URL}/repos/{owner}/{repo}/issues/{result['number']}/labels"
+                self._post(label_url, {"labels": labels})
+            except Exception as e:
+                logger.warning(f"Could not add labels to PR: {e}")
+
+        return result
 
     # ─── Incident File Access ─────────────────────────────────────
 
@@ -244,7 +298,8 @@ class GitHubMCPTools:
     ) -> dict:
         """Fetch a specific incident JSON file."""
         import json
-        path = f"incidents/{incident_id}.json"
+        clean_id = incident_id[:-5] if incident_id.endswith(".json") else incident_id
+        path = f"incidents/{clean_id}.json"
         file_data = self.get_file_content(owner, repo, path, ref)
         content = file_data.get("content", "{}")
         return json.loads(content)

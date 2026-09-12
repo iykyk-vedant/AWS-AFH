@@ -337,7 +337,7 @@ class SupervisorAgent:
         fix_plan = state.get("fix_plan", {}) or {}
         has_fix = bool(fix_plan.get("files_to_modify") or fix_plan.get("patch"))
 
-        fix_worked = verdict in ("FIX_CONFIRMED", "UNRELATED_FAILURE", "FIX_APPLIED_NO_TESTS")
+        fix_worked = verdict in ("FIX_CONFIRMED", "UNRELATED_FAILURE", "FIX_APPLIED_NO_TESTS", "SKIPPED")
 
         # Get risk assessment for deployment routing
         risk_assessment = state.get("risk_assessment", {}) or {}
@@ -420,18 +420,32 @@ class SupervisorAgent:
                 )
 
             elif deployment_action == "options_only":
-                # HIGH RISK: No PR, only Slack notification with fix options
+                # HIGH RISK: Post fix options to Slack if available
+                has_slack = bool(slack_channel or os.getenv("SLACK_BOT_TOKEN"))
+                if not has_slack:
+                    # Headless / CLI execution without Slack — create review PR so human can review on GitHub
+                    logger.info("[Supervisor] Headless mode without Slack: opening PR for human review on GitHub")
+                    pr_url = self._create_pr(
+                        incident_id=incident_id,
+                        fix_plan=fix_plan,
+                        report_body=state.get("formatted_markdown", ""),
+                        repo_url=repo_url,
+                        risk_level=risk_level,
+                        problem_summary=f"[HIGH RISK REVIEW] {problem_summary}",
+                    )
+                    result["pr_url"] = pr_url
+
                 self._post_fix_options(
                     incident_id=incident_id,
                     all_candidates=all_candidates,
                     risk_level=risk_level,
                     risk_assessment=risk_assessment,
-                    current_pr_url="",
+                    current_pr_url=pr_url,
                     slack_channel=slack_channel,
                     slack_thread_ts=slack_thread_ts,
                 )
                 self._post_final_success(
-                    incident_id=incident_id, state=state, pr_url="",
+                    incident_id=incident_id, state=state, pr_url=pr_url,
                     slack_channel=slack_channel, slack_thread_ts=slack_thread_ts,
                     jira_ticket_id=jira_ticket_id, resolution_time=resolution_time,
                 )

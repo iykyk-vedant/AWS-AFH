@@ -382,10 +382,15 @@ class CodebaseAnalystAgent(BaseAgent):
 
         # Build code context — truncate large files but retain structure
         code_context = ""
+        total_len = 0
         for path, content in code_snippets.items():
-            if len(content) > 4000:
-                content = content[:4000] + "\n... (truncated for context window)"
-            code_context += f"\n### File: {path}\n```\n{content}\n```\n"
+            if total_len > 8000:
+                break
+            if len(content) > 2000:
+                content = content[:2000] + "\n... (truncated for context window)"
+            snippet = f"\n### File: {path}\n```\n{content}\n```\n"
+            code_context += snippet
+            total_len += len(snippet)
 
         if not code_context:
             code_context = "(No source code could be fetched — base analysis on incident data only)"
@@ -394,7 +399,7 @@ class CodebaseAnalystAgent(BaseAgent):
         if graph_context:
             graph_section = f"""
 === KNOWLEDGE GRAPH CONTEXT (pre-built AST analysis of this repo) ===
-{graph_context}
+{graph_context[:2000]}
 
 The graph has identified the above files and functions as matching the incident keywords.
 Prioritize these when forming your hypothesis.
@@ -403,15 +408,14 @@ Prioritize these when forming your hypothesis.
         # Build strict file allowlist so LLM cannot invent paths
         file_allowlist_section = ""
         if repo_file_manifest:
-            manifest_str = "\n".join(f"  - {p}" for p in repo_file_manifest)
+            manifest_str = "\n".join(f"  - {p}" for p in repo_file_manifest[:60])
             file_allowlist_section = f"""
-=== FILE ALLOWLIST (Complete list of EVERY file in this repository) ===
+=== FILE ALLOWLIST (Key files in this repository) ===
 {manifest_str}
 
-CRITICAL: The above list contains EVERY file that exists in this repository.
+CRITICAL: The above list contains files in this repository.
 You MUST ONLY reference file paths from this list in your suspect_files output.
 Do NOT invent, assume, or fabricate any file path that is not in this list.
-If a file you expect does not appear in this list, it DOES NOT EXIST.
 """
 
         prompt = f"""You are a **Senior Site Reliability Engineer (SRE) and Principal Software Engineer** with 15 years of

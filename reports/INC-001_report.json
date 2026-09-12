@@ -1,0 +1,260 @@
+{
+  "incident": {
+    "id": "INC-001",
+    "title": "Server returns 500 error on POST /api/auth/login after latest deployment",
+    "description": "After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials.",
+    "stack_traces": [
+      {
+        "file": "fastapi/routing.py",
+        "line": 274,
+        "function": "app"
+      },
+      {
+        "file": "app/routes/auth.py",
+        "line": 42,
+        "function": "login"
+      }
+    ],
+    "affected_service": "",
+    "environment": "staging",
+    "severity": "P1 - Critical",
+    "failure_type": "security",
+    "error_log": "Traceback (most recent call last):\n  File \"fastapi/routing.py\", line 274, in app\n    raw_response = await run_endpoint_function(...)\n  File \"app/routes/auth.py\", line 42, in login\n    is_valid = bcrypt.checkpw(payload.password.encode('utf-8'), user.password_hash)\nTypeError: a bytes-like object is required, not 'str'",
+    "tags": [
+      "authentication",
+      "login",
+      "auth",
+      "security"
+    ],
+    "steps_to_reproduce": [],
+    "expected_behavior": "Valid credentials should return HTTP 200 with authentication token",
+    "actual_behavior": "HTTP 500 Internal Server Error with TypeError: a bytes-like object is required, not 'str'",
+    "recent_changes": "Commit e48a12: Migrated user models to support hashed password storage",
+    "linked_commits": [],
+    "linked_issue_url": "",
+    "reported_by": "Frontend QA Team",
+    "timestamp": "2026-09-12T10:00:00Z"
+  },
+  "root_cause": {
+    "hypothesis": "The bcrypt.checkpw call receives a string for the stored password hash (user.password_hash) instead of a bytes-like object, causing a TypeError.",
+    "confidence": 0.9,
+    "suspect_files": [
+      "app/routes/auth.py"
+    ],
+    "suspect_functions": [
+      "login"
+    ],
+    "suspect_lines": [
+      {
+        "file": "app/routes/auth.py",
+        "line": 42,
+        "issue": "bcrypt.checkpw is called with user.password_hash (str) instead of bytes, triggering a TypeError."
+      }
+    ],
+    "failure_type": "runtime_crash",
+    "reasoning": "Stack trace points to app/routes/auth.py line 42 where bcrypt.checkpw is invoked. The function expects both arguments as bytes; payload.password is correctly encoded, but user.password_hash is stored as a string, leading to the TypeError and 500 response.",
+    "code_snippets": {
+      "app/main.py": "\"\"\"\nAFH-DEMO FastAPI Application Entrypoint.\n\"\"\"\n\nfrom fastapi import FastAPI\nfrom app.routes.auth import router as auth_router\n\napp = FastAPI(\n    title=\"AFH-DEMO Service\",\n    description=\"E-Commerce Core Microservice for AFH Testing\",\n    version=\"1.0.0\"\n)\n\napp.include_router(auth_router)\n\n\n@app.get(\"/health\")\ndef health_check():\n    return {\"status\": \"healthy\", \"service\": \"afh-demo\"}\n",
+      "README.md": "# AFH-DEMO \u2014 E-Commerce Core Microservice\n\nA Python FastAPI microservice handling authentication, user sessions, and checkout payment processing.\nUsed as the target testing repository for the **Amaze on Work** Autonomous SRE & Incident Healing Agent.\n\n## Architecture\n- `app/routes/auth.py`: User authentication and JWT session validation\n- `app/services/payment_service.py`: Checkout pricing and discount calculations\n- `tests/`: Pytest unit test suites\n- `incidents/`: Production incident alerts an",
+      "app/__init__.py": "\"\"\"AFH-DEMO application package.\"\"\"\n",
+      "app/routes/auth.py": "\"\"\"\nAuthentication router for user login and token issuance.\n\"\"\"\n\nimport bcrypt\nfrom fastapi import APIRouter, HTTPException, status\nfrom pydantic import BaseModel\n\nrouter = APIRouter(prefix=\"/api/auth\", tags=[\"auth\"])\n\n\nclass LoginRequest(BaseModel):\n    email: str\n    password: str\n\n\nclass MockUser:\n    def __init__(self, user_id: str, email: str, password_hash: str):\n        self.id = user_id\n        self.email = email\n        self.password_hash = password_hash  # Stored as string in database",
+      "incidents/INC-001.json": "{\n  \"id\": \"INC-001\",\n  \"title\": \"Server returns 500 error on POST /api/auth/login after latest deployment\",\n  \"severity\": \"P1 - Critical\",\n  \"affected_service\": \"python-service\",\n  \"environment\": \"staging\",\n  \"reported_by\": \"Frontend QA Team\",\n  \"timestamp\": \"2026-09-12T10:00:00Z\",\n  \"description\": \"After the latest deployment to staging, users are unable to log in. The POST /api/auth/login endpoint returns a 500 Internal Server Error for all login attempts, even with valid credentials.\",\n  \"err",
+      "tests/test_auth.py": "\"\"\"\nUnit tests for authentication service.\n\"\"\"\n\nimport pytest\nfrom fastapi.testclient import TestClient\nfrom app.main import app\n\nclient = TestClient(app)\n\n\ndef test_health_check():\n    response = client.get(\"/health\")\n    assert response.status_code == 200\n    assert response.json()[\"status\"] == \"healthy\"\n\n\ndef test_login_success():\n    \"\"\"\n    Test login with valid credentials.\n    This test will FAIL with TypeError until the bcrypt bug is fixed.\n    \"\"\"\n    payload = {\n        \"email\": \"alex@"
+    }
+  },
+  "fix_plan": {
+    "description": "Converted stored password hash to bytes for bcrypt.checkpw, preventing TypeError.",
+    "files_to_modify": [
+      {
+        "file_path": "app/routes/auth.py",
+        "original_code": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash\n    )",
+        "fixed_code": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash.encode(\"utf-8\")\n    )",
+        "rationale": "bcrypt.checkpw requires both arguments to be bytes; encoding the stored hash to bytes aligns its type with the function's expectations, eliminating the TypeError."
+      }
+    ],
+    "patch": "--- a/app/routes/auth.py\n+++ b/app/routes/auth.py\n@@ -49,7 +49,7 @@\n     # causing a TypeError: a bytes-like object is required, not 'str'\n     is_valid = bcrypt.checkpw(\n         payload.password.encode(\"utf-8\"),\n-        user.password_hash\n+        user.password_hash.encode(\"utf-8\")\n     )\n \n     if not is_valid:\n",
+    "rationale": "The login endpoint failed because the stored password hash was a string. By encoding the hash to bytes at the point of comparison, the bcrypt library receives the correct input types, allowing successful password verification and eliminating the 500 error.",
+    "characterization_test": null,
+    "change_size": 2
+  },
+  "validation": {
+    "verdict": "SKIPPED",
+    "before": {},
+    "after": {},
+    "regressions": [],
+    "fixes_confirmed": [],
+    "unrelated_failures": [],
+    "attempt_logs": []
+  },
+  "risk": {
+    "level": "MEDIUM",
+    "composite_score": 25,
+    "blast_radius": 0,
+    "coupling_score": 0,
+    "cyclomatic_delta": 0,
+    "file_churn": 0,
+    "has_tests": false,
+    "change_size": 2,
+    "environment": "staging",
+    "severity": "P1 - Critical",
+    "policy": "MEDIUM RISK \u2014 Auto-PR created with optimal fix. Slack notification shows all alternatives. User can select a different fix to replace the PR.",
+    "deployment_action": "pr_with_options",
+    "all_candidates": [
+      {
+        "candidate_id": "c1_primary",
+        "fix_plan": {
+          "description": "Converted stored password hash to bytes for bcrypt.checkpw, preventing TypeError.",
+          "files_to_modify": [
+            {
+              "file_path": "app/routes/auth.py",
+              "original_code": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash\n    )",
+              "fixed_code": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash.encode(\"utf-8\")\n    )",
+              "rationale": "bcrypt.checkpw requires both arguments to be bytes; encoding the stored hash to bytes aligns its type with the function's expectations, eliminating the TypeError."
+            }
+          ],
+          "patch": "--- a/app/routes/auth.py\n+++ b/app/routes/auth.py\n@@ -49,7 +49,7 @@\n     # causing a TypeError: a bytes-like object is required, not 'str'\n     is_valid = bcrypt.checkpw(\n         payload.password.encode(\"utf-8\"),\n-        user.password_hash\n+        user.password_hash.encode(\"utf-8\")\n     )\n \n     if not is_valid:\n",
+          "rationale": "The login endpoint failed because the stored password hash was a string. By encoding the hash to bytes at the point of comparison, the bcrypt library receives the correct input types, allowing successful password verification and eliminating the 500 error.",
+          "characterization_test": null,
+          "change_size": 2
+        },
+        "score": 0,
+        "rank": 1,
+        "verdict": "UNKNOWN"
+      }
+    ],
+    "best_candidate_id": "c1_primary",
+    "breakdown": {
+      "blast_radius": {
+        "value": 0,
+        "score": 0,
+        "max": 30
+      },
+      "test_coverage": {
+        "has_tests": false,
+        "score": 20,
+        "max": 20
+      },
+      "coupling": {
+        "value": 0,
+        "score": 0,
+        "max": 15
+      },
+      "change_size": {
+        "value": 2,
+        "score": 0,
+        "max": 15
+      },
+      "environment": {
+        "value": "staging",
+        "score": 5,
+        "max": 10
+      },
+      "cyclomatic_delta": {
+        "value": 0,
+        "score": 0,
+        "max": 10
+      }
+    }
+  },
+  "report": {
+    "incident_id": "INC-001",
+    "title": "Server returns 500 error on POST /api/auth/login after latest deployment",
+    "root_cause": "The bcrypt.checkpw call receives a string for the stored password hash (user.password_hash) instead of a bytes-like object, causing a TypeError.",
+    "changes_made": [
+      {
+        "file": "app/routes/auth.py",
+        "change": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash.",
+        "rationale": "bcrypt.checkpw requires both arguments to be bytes; encoding the stored hash to bytes aligns its type with the function's expectations, eliminating the TypeError."
+      }
+    ],
+    "diff": "--- a/app/routes/auth.py\n+++ b/app/routes/auth.py\n@@ -49,7 +49,7 @@\n     # causing a TypeError: a bytes-like object is required, not 'str'\n     is_valid = bcrypt.checkpw(\n         payload.password.encode(\"utf-8\"),\n-        user.password_hash\n+        user.password_hash.encode(\"utf-8\")\n     )\n \n     if not is_valid:\n",
+    "validation": {
+      "verdict": "SKIPPED",
+      "before": {},
+      "after": {},
+      "regressions": [],
+      "fixes_confirmed": [],
+      "unrelated_failures": [],
+      "attempt_logs": []
+    },
+    "risk": {
+      "level": "MEDIUM",
+      "composite_score": 25,
+      "blast_radius": 0,
+      "coupling_score": 0,
+      "cyclomatic_delta": 0,
+      "file_churn": 0,
+      "has_tests": false,
+      "change_size": 2,
+      "environment": "staging",
+      "severity": "P1 - Critical",
+      "policy": "MEDIUM RISK \u2014 Auto-PR created with optimal fix. Slack notification shows all alternatives. User can select a different fix to replace the PR.",
+      "deployment_action": "pr_with_options",
+      "all_candidates": [
+        {
+          "candidate_id": "c1_primary",
+          "fix_plan": {
+            "description": "Converted stored password hash to bytes for bcrypt.checkpw, preventing TypeError.",
+            "files_to_modify": [
+              {
+                "file_path": "app/routes/auth.py",
+                "original_code": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash\n    )",
+                "fixed_code": "    is_valid = bcrypt.checkpw(\n        payload.password.encode(\"utf-8\"),\n        user.password_hash.encode(\"utf-8\")\n    )",
+                "rationale": "bcrypt.checkpw requires both arguments to be bytes; encoding the stored hash to bytes aligns its type with the function's expectations, eliminating the TypeError."
+              }
+            ],
+            "patch": "--- a/app/routes/auth.py\n+++ b/app/routes/auth.py\n@@ -49,7 +49,7 @@\n     # causing a TypeError: a bytes-like object is required, not 'str'\n     is_valid = bcrypt.checkpw(\n         payload.password.encode(\"utf-8\"),\n-        user.password_hash\n+        user.password_hash.encode(\"utf-8\")\n     )\n \n     if not is_valid:\n",
+            "rationale": "The login endpoint failed because the stored password hash was a string. By encoding the hash to bytes at the point of comparison, the bcrypt library receives the correct input types, allowing successful password verification and eliminating the 500 error.",
+            "characterization_test": null,
+            "change_size": 2
+          },
+          "score": 0,
+          "rank": 1,
+          "verdict": "UNKNOWN"
+        }
+      ],
+      "best_candidate_id": "c1_primary",
+      "breakdown": {
+        "blast_radius": {
+          "value": 0,
+          "score": 0,
+          "max": 30
+        },
+        "test_coverage": {
+          "has_tests": false,
+          "score": 20,
+          "max": 20
+        },
+        "coupling": {
+          "value": 0,
+          "score": 0,
+          "max": 15
+        },
+        "change_size": {
+          "value": 2,
+          "score": 0,
+          "max": 15
+        },
+        "environment": {
+          "value": "staging",
+          "score": 5,
+          "max": 10
+        },
+        "cyclomatic_delta": {
+          "value": 0,
+          "score": 0,
+          "max": 10
+        }
+      }
+    },
+    "confidence_score": 0.36,
+    "reasoning_chain": [
+      "Incident INC-001 parsed: 'Server returns 500 error on POST /api/auth/login after latest deployment' -- service: , type: security",
+      "Stack trace analysis -> suspect files: ['app/routes/auth.py']",
+      "Root cause: The bcrypt.checkpw call receives a string for the stored password hash (user.password_hash) instead of a bytes-like object, causing a TypeError.",
+      "Fix applied: Converted stored password hash to bytes for bcrypt.checkpw, preventing TypeError.",
+      "Validation: SKIPPED -- before: 0/0 passed, after: 0/0 passed"
+    ],
+    "resolution_time_seconds": 38.13163113594055
+  }
+}
