@@ -25,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger("Amaze on Work")
 
 try:
-    from fastapi import FastAPI, HTTPException
+    from fastapi import FastAPI, HTTPException, Request
     from fastapi.responses import JSONResponse, HTMLResponse
     from pydantic import BaseModel
     from pathlib import Path
@@ -191,6 +191,23 @@ if HAS_FASTAPI:
                 "docker": docker_health,
             },
         }
+
+    @app.post("/api/agentcore/invoke")
+    async def agentcore_invoke(request: Request):
+        """Amazon Bedrock AgentCore Serverless Invocation Gateway.
+        
+        Conforms to standard Bedrock AgentCore payload specification.
+        Receives incident parameters, dispatches via AgentCore runtime adapter,
+        and returns structured resolution report.
+        """
+        try:
+            from agentcore_app import agent_invocation
+            body = await request.json()
+            result = agent_invocation(body, {"source": "bedrock_agentcore_gateway"})
+            return JSONResponse(content=result)
+        except Exception as e:
+            logger.error(f"[AgentCore] Invocation failed: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
 
     @app.post("/api/incidents/resolve")
     async def resolve_incident(request: IncidentRequest):
