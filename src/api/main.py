@@ -5,6 +5,7 @@ Provides REST API for incident resolution, webhook handlers,
 and health check endpoints.
 """
 
+import os
 import json
 import logging
 import sys
