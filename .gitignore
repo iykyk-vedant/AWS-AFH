@@ -37,3 +37,14 @@ reports/output/
 
 Previous_PROJECT_DOCUMENTATION.md
 PROJECT_DOCUMENTATION.md
+
+# AgentCore CLI Artifacts & Caches
+*.zip
+.cli/
+scratch/
+staging/
+**/staging/
+node_modules/
+app/amazeagent/src/
+app/amazeagent/src
+
