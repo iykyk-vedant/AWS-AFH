@@ -1,6 +1,12 @@
 """
 Supervisor Agent — Orchestrator for Amaze on Work.
 
+NOTE: For the Strands Agents SDK multi-agent graph orchestrator, see
+      strands_orchestrator.py (primary path using GraphBuilder DAG).
+      This SupervisorAgent is kept as a battle-tested fallback engine
+      and is invoked when Strands graph execution fails or when
+      --fallback is specified.
+
 Coordinates the multi-agent pipeline, handles retries, fires live progress
 updates to Slack and Jira at each stage, and triggers GitHub Auto-PR creation
 after successful validation.
