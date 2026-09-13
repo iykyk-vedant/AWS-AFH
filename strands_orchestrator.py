@@ -39,6 +39,10 @@ from strands_tools import (
     generate_fix_tool,
     run_sandbox_tests_tool,
     assess_risk_and_report_tool,
+    knowledge_retriever_tool,
+    security_review_tool,
+    web_research_tool,
+    create_pr_tool,
 )
 
 logger = logging.getLogger(__name__)
@@ -92,10 +96,12 @@ def get_strands_model():
 # ─── Specialist Agent Definitions ─────────────────────────────────────────────
 
 def _create_specialist_agents(model=None):
-    """Create the 6 specialist Strands Agents for the graph pipeline.
+    """Create the 9 specialist Strands Agents for the graph pipeline.
 
     Each agent has a focused system prompt and domain-specific tools.
     The model parameter allows switching between Bedrock and other providers.
+
+    Agents: parse, retrieve, analyze, review, fix, validate, secure, score, web_research
     """
     common_kwargs = {}
     if model is not None:
@@ -118,6 +124,26 @@ def _create_specialist_agents(model=None):
         **common_kwargs,
     )
 
+    knowledge_retriever_agent = Agent(
+        name="knowledge_retriever",
+        description="Queries knowledge graph for historical incident context and fix patterns",
+        system_prompt=(
+            "You are the Knowledge Retriever agent in Amaze on Work. "
+            "Your job is to query the Neo4j/NetworkX Code Property Graph for "
+            "historical context BEFORE the codebase analysis begins.\n\n"
+            "Use knowledge_retriever_tool with the incident context and repo URL. "
+            "This returns:\n"
+            "- Similar past incidents for the same file/service\n"
+            "- Fix patterns that worked previously\n"
+            "- Blast radius for suspect functions\n"
+            "- Related functions and file churn metrics\n\n"
+            "Pass all findings to the next agent so the Codebase Analyst has "
+            "historical grounding for root cause diagnosis."
+        ),
+        tools=[knowledge_retriever_tool, query_blast_radius_tool],
+        **common_kwargs,
+    )
+
     codebase_analyst_agent = Agent(
         name="codebase_analyst",
         description="Analyzes codebase to identify root cause using knowledge graph",
@@ -129,6 +155,8 @@ def _create_specialist_agents(model=None):
             "Use the analyze_codebase_tool with the incident context from the previous "
             "step and the repo URL. Also use query_blast_radius_tool to trace "
             "downstream callers of suspect files.\n\n"
+            "Incorporate any historical context from the Knowledge Retriever "
+            "(similar incidents, past fix patterns) into your analysis.\n\n"
             "Output a detailed root cause analysis with specific file paths, "
             "function names, and the exact bug pattern."
         ),
@@ -193,6 +221,25 @@ def _create_specialist_agents(model=None):
         **common_kwargs,
     )
 
+    security_agent = Agent(
+        name="security",
+        description="STRIDE/OWASP security gatekeeper reviewing fix for vulnerabilities",
+        system_prompt=(
+            "You are the Security Agent in Amaze on Work. "
+            "Your job is to act as a security gatekeeper, reviewing the proposed "
+            "code fix for potential security vulnerabilities BEFORE it is deployed.\n\n"
+            "Use security_review_tool with the incident context, patch diff, and "
+            "repo URL. This runs:\n"
+            "- OWASP Top 10 pattern detection\n"
+            "- STRIDE threat analysis\n"
+            "- CWE classification of findings\n\n"
+            "Report the verdict (PASS or REVIEW_REQUIRED) and any critical or "
+            "high severity issues that must be addressed."
+        ),
+        tools=[security_review_tool],
+        **common_kwargs,
+    )
+
     risk_scorer_agent = Agent(
         name="risk_scorer",
         description="Evaluates deployment risk and generates resolution report",
@@ -202,21 +249,25 @@ def _create_specialist_agents(model=None):
             "and generate the final resolution report.\n\n"
             "Use assess_risk_and_report_tool with all the accumulated pipeline context: "
             "incident context, root cause analysis, patch diff, and validation results.\n\n"
+            "After scoring, if risk is LOW or MEDIUM, use create_pr_tool to "
+            "automatically create a GitHub Pull Request with the fix.\n\n"
             "The risk score determines the deployment action:\n"
             "- LOW (0-24): Auto-create PR with the fix\n"
             "- MEDIUM (25-49): PR with options, notify on Slack\n"
-            "- HIGH (50-100): Slack notification only, human reviews"
+            "- HIGH (50-100): Report only, human reviews"
         ),
-        tools=[assess_risk_and_report_tool],
+        tools=[assess_risk_and_report_tool, create_pr_tool],
         **common_kwargs,
     )
 
     return {
         "parse": incident_parser_agent,
+        "retrieve": knowledge_retriever_agent,
         "analyze": codebase_analyst_agent,
         "review": critic_agent,
         "fix": fix_writer_agent,
         "validate": validation_agent,
+        "secure": security_agent,
         "score": risk_scorer_agent,
     }
 
@@ -331,8 +382,10 @@ def run_incident_pipeline(
     print(f"  Incident:  {incident_id}")
     print(f"  Repo:      {owner}/{repo}")
     print(f"  Repo URL:  {repo_url}")
-    print(f"  Pipeline:  parse → analyze → review → fix → validate → score")
-    print(f"  Retry:     validate → fix (on regression, max 3 attempts)")
+    print(f"  Pipeline:  parse -> retrieve -> analyze -> review -> fix -> validate -> secure -> score")
+    print(f"  Agents:    9 specialist agents (knowledge retriever, security gate, web research fallback)")
+    print(f"  Retry:     validate -> fix (on regression, max 3 attempts)")
+    print(f"  Post-ops:  Auto-PR creation, Slack notifications, Jira updates")
     print("=" * 65)
 
     model = get_strands_model()
@@ -352,12 +405,15 @@ def run_incident_pipeline(
         f"- Incident ID: {incident_id}\n\n"
         f"Execute the full incident resolution pipeline:\n"
         f"1. Parse the incident ticket from GitHub Issues\n"
-        f"2. Analyze the codebase for root cause using the knowledge graph\n"
-        f"3. Review the root cause analysis (adversarial critic)\n"
-        f"4. Generate a minimal, targeted code fix\n"
-        f"5. Validate the fix in Docker sandbox (real tests)\n"
-        f"6. Score deployment risk and generate resolution report\n\n"
-        f"Pass all context between steps. If validation fails, retry with feedback."
+        f"2. Query knowledge graph for historical incidents and fix patterns\n"
+        f"3. Analyze the codebase for root cause using the knowledge graph\n"
+        f"4. Review the root cause analysis (adversarial critic)\n"
+        f"5. Generate a minimal, targeted code fix\n"
+        f"6. Validate the fix in Docker sandbox (real tests)\n"
+        f"7. Run STRIDE/OWASP security review on the fix\n"
+        f"8. Score deployment risk, generate report, and create PR if safe\n\n"
+        f"Pass all context between steps. If validation fails, retry with feedback.\n"
+        f"After risk scoring, if risk is LOW or MEDIUM, create a GitHub PR automatically."
     )
 
     start_time = time.time()
@@ -397,6 +453,16 @@ def run_incident_pipeline(
             except Exception:
                 node_results[node_id] = {"status": "unknown"}
 
+        # ── Post-pipeline ops: Slack + Jira notifications ─────────────
+        _post_pipeline_notifications(
+            incident_id=incident_id,
+            owner=owner,
+            repo=repo,
+            elapsed=elapsed,
+            node_results=node_results,
+            result=result,
+        )
+
         return {
             "status": str(result.status),
             "incident_id": incident_id,
@@ -418,6 +484,76 @@ def run_incident_pipeline(
             "error": str(e),
             "elapsed_seconds": round(elapsed, 1),
         }
+
+
+# ─── Post-Pipeline Notifications ─────────────────────────────────────────────
+
+def _post_pipeline_notifications(
+    incident_id: str,
+    owner: str,
+    repo: str,
+    elapsed: float,
+    node_results: dict,
+    result: Any,
+) -> None:
+    """Post Slack and Jira notifications after pipeline completes.
+
+    This brings the Strands path to parity with the SupervisorAgent
+    for ops delivery. Non-fatal — all errors are caught and logged.
+    """
+    try:
+        from src.mcp.client_bridge import get_mcp_bridge
+        bridge = get_mcp_bridge()
+
+        slack_channel = os.getenv("SLACK_INCIDENTS_CHANNEL_ID", "")
+
+        # Extract score node result for risk/PR info
+        score_text = ""
+        try:
+            score_result = result.results.get("score")
+            if score_result:
+                score_text = str(score_result.result)
+        except Exception:
+            pass
+
+        # Build summary message
+        summary = (
+            f"[Strands Pipeline] {incident_id} resolved in {elapsed:.1f}s\n"
+            f"Nodes executed: {', '.join(node_results.keys())}\n"
+        )
+
+        # Try to extract PR URL from score result
+        pr_url = ""
+        if "pr_url" in score_text:
+            try:
+                import re
+                match = re.search(r'"pr_url":\s*"([^"]+)"', score_text)
+                if match:
+                    pr_url = match.group(1)
+                    summary += f"PR: {pr_url}\n"
+            except Exception:
+                pass
+
+        # Post to Slack
+        if slack_channel:
+            try:
+                bridge.post_slack_message(channel=slack_channel, text=summary)
+                logger.info(f"[Pipeline] Slack notification sent for {incident_id}")
+            except Exception as e:
+                logger.debug(f"Slack notification failed (non-fatal): {e}")
+
+        # Update Jira if configured
+        jira_ticket = os.getenv("JIRA_TICKET_ID", "")
+        if jira_ticket:
+            try:
+                bridge.jira_update_status(jira_ticket, "Resolved")
+                bridge.jira_add_comment(jira_ticket, summary[:5000])
+                logger.info(f"[Pipeline] Jira ticket {jira_ticket} updated for {incident_id}")
+            except Exception as e:
+                logger.debug(f"Jira update failed (non-fatal): {e}")
+
+    except Exception as e:
+        logger.debug(f"Post-pipeline notifications failed (non-fatal): {e}")
 
 
 # ─── Agents-as-Tools Pattern for Natural Language Mode ────────────────────────
@@ -450,13 +586,15 @@ def create_orchestrator_agent(model=None):
             "You are Amaze on Work, an autonomous DevOps and software engineering agent.\n\n"
             "You have access to specialist agents as tools:\n"
             "- incident_parser: Parse incident tickets\n"
+            "- knowledge_retriever: Query historical incidents from knowledge graph\n"
             "- codebase_analyst: Analyze code for root cause\n"
             "- critic: Review root cause analysis\n"
             "- fix_writer: Generate code patches\n"
             "- validation: Run tests in Docker sandbox\n"
-            "- risk_scorer: Assess deployment risk\n\n"
+            "- security: STRIDE/OWASP security review\n"
+            "- risk_scorer: Assess deployment risk and create PR\n\n"
             "For a full incident resolution, invoke them in order:\n"
-            "parse → analyze → review → fix → validate → score\n\n"
+            "parse -> retrieve -> analyze -> review -> fix -> validate -> secure -> score\n\n"
             "If validation fails, retry fix_writer with feedback from validation."
         ),
         tools=agent_tools,

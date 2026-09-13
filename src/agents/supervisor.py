@@ -187,6 +187,7 @@ class SupervisorAgent:
         # Define execution order
         pipeline = [
             AgentType.INCIDENT_PARSER.value,
+            AgentType.KNOWLEDGE_RETRIEVER.value,  # Query past incidents before analysis
             AgentType.CODEBASE_ANALYST.value,
             AgentType.CRITIC.value,
             AgentType.FIX_WRITER.value,

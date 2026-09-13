@@ -57,6 +57,10 @@ from strands_tools import (
     generate_fix_tool,
     run_sandbox_tests_tool,
     assess_risk_and_report_tool,
+    knowledge_retriever_tool,
+    security_review_tool,
+    web_research_tool,
+    create_pr_tool,
 )
 
 logger = logging.getLogger(__name__)

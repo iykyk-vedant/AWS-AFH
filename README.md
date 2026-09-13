@@ -69,21 +69,24 @@ graph TD
     end
 
     subgraph AgentCoreRuntime ["2. Amazon Bedrock AgentCore Runtime"]
-        GW_Slack --> StrandsCoordinator["Strands Agents SDK Coordinator\n(strands_agent.py)"]
+        GW_Slack --> StrandsCoordinator["Strands GraphBuilder DAG\n(strands_orchestrator.py)"]
         GW_GH --> StrandsCoordinator
         GW_Jira --> StrandsCoordinator
 
         StrandsCoordinator --> Parser["Incident Parser Agent"]
+        StrandsCoordinator --> Retriever["Knowledge Retriever Agent"]
         StrandsCoordinator --> Analyst["Codebase Analyst Agent"]
         StrandsCoordinator --> Critic["Adversarial Critic Agent"]
         StrandsCoordinator --> FixWriter["Fix Writer Agent"]
         StrandsCoordinator --> Validator["Validation Agent"]
+        StrandsCoordinator --> Security["Security Agent"]
         StrandsCoordinator --> Scorer["Risk Scorer Agent"]
     end
 
     subgraph MemoryLayer ["3. AgentCore Memory & GraphRAG"]
-        Analyst <--> Neo4j["Neo4j Code Property Graph\n(Blast Radius Tracing)"]
-        Analyst <--> History["Historical Incidents Graph"]
+        Retriever <--> Neo4j["Neo4j Code Property Graph\n(Blast Radius Tracing)"]
+        Analyst <--> Neo4j
+        Retriever <--> History["Historical Incidents Graph"]
     end
 
     subgraph SandboxLayer ["4. Isolated Sandbox Execution"]
@@ -163,14 +166,17 @@ agentcore deploy
 |------|------|----------------|
 | Supervisor | src/agents/supervisor.py | Controls orchestration and retry routing |
 | Incident Parser | src/agents/incident_parser.py | Converts raw incident text to structured context |
-| Codebase Analyst | src/agents/codebase_analyst.py | Performs code-level investigation |
-| Knowledge Retriever | src/agents/knowledge_retriever.py | Pulls historical and graph context |
-| Critic | src/agents/critic.py | Reviews plans and catches weak reasoning |
-| Fix Writer | src/agents/fix_writer.py | Generates focused remediation patches |
-| Validation | src/agents/validation.py | Executes validation and result checks |
-| KG Builder | src/agents/kg_builder.py | Builds and updates graph artifacts |
-| Synthesis | src/agents/synthesis.py | Produces consolidated resolution output |
-| Risk Scorer | src/agents/risk_scorer.py | Determines risk policy for outcomes |
+| Knowledge Retriever | src/agents/knowledge_retriever.py | Pulls historical incidents and fix patterns from graph |
+| Codebase Analyst | src/agents/codebase_analyst.py | Performs graph-first root cause localization |
+| Critic | src/agents/critic.py | Adversarial Tech Lead review of root cause analysis |
+| Fix Writer | src/agents/fix_writer.py | Generates focused, minimal remediation patches |
+| Test Writer | src/agents/test_writer.py | Generates characterization tests for validation |
+| Validation | src/agents/validation.py | Runs before/after test delta in Docker sandbox |
+| Security | src/agents/security_agent.py | STRIDE/OWASP security gate on proposed fixes |
+| KG Builder | src/agents/kg_builder.py | Builds and updates code property graph |
+| Synthesis | src/agents/synthesis.py | Produces consolidated resolution report |
+| Risk Scorer | src/agents/risk_scorer.py | Composite risk scoring and deployment policy |
+| Web Researcher | src/agents/web_researcher.py | StackOverflow fallback after failed LLM retries |
 
 ---
 
@@ -240,7 +246,7 @@ Sample report data can be found in reports/INC-004_report.json.
 
 ---
 
-## 11. Risk Scoring Strategy
+## 12. Risk Scoring Strategy
 
 Risk scoring combines:
 
@@ -257,7 +263,7 @@ Policy examples:
 
 ---
 
-## 12. Quick Start
+## 13. Quick Start
 
 ```bash
 # 1) Create or activate environment
@@ -285,7 +291,7 @@ python demo_batch.py
 
 ---
 
-## 13. Tech Stack
+## 14. Tech Stack
 
 | Component | Technology |
 |-----------|------------|
@@ -300,7 +306,7 @@ python demo_batch.py
 
 ---
 
-## 14. Repository Structure
+## 15. Repository Structure
 
 ```text
 src/

@@ -106,21 +106,27 @@ class SynthesisAgent(BaseAgent):
             f"type: {incident.get('failure_type', '')}"
         )
 
-        # Step 2: Analysis
+        # Step 2: Knowledge Retrieval
+        knowledge = state.get("knowledge_context", {})
+        if knowledge and knowledge.get("similar_incidents"):
+            inc_count = len(knowledge.get("similar_incidents", []))
+            chain.append(f"Knowledge Retrieval: Found {inc_count} similar historical incident(s) for contextual matching")
+
+        # Step 3: Analysis
         if root_cause.get("suspect_files"):
             chain.append(
                 f"Stack trace analysis -> suspect files: {root_cause['suspect_files']}"
             )
 
-        # Step 3: Root cause
+        # Step 4: Root cause
         if root_cause.get("hypothesis"):
             chain.append(f"Root cause: {root_cause['hypothesis']}")
 
-        # Step 4: Fix
+        # Step 5: Fix
         if fix_plan.get("description"):
             chain.append(f"Fix applied: {fix_plan['description']}")
 
-        # Step 5: Validation
+        # Step 6: Validation
         if validation:
             before = validation.get("before", {})
             after = validation.get("after", {})
@@ -129,6 +135,20 @@ class SynthesisAgent(BaseAgent):
                 f"before: {before.get('passed', 0)}/{before.get('total', 0)} passed, "
                 f"after: {after.get('passed', 0)}/{after.get('total', 0)} passed"
             )
+
+        # Step 7: Security Review
+        security = state.get("security_review", {})
+        if security:
+            risk_lvl = security.get("risk_level", "LOW")
+            findings_count = len(security.get("findings", []))
+            chain.append(f"Security Review: {risk_lvl} risk assessment with {findings_count} finding(s)")
+
+        # Step 8: Risk Assessment
+        risk = state.get("risk_assessment", {})
+        if risk:
+            score = risk.get("risk_score", 0)
+            action = risk.get("deployment_action", "options_only")
+            chain.append(f"Risk Assessment: score {score}/100 -> deployment policy: '{action}'")
 
         return chain
 

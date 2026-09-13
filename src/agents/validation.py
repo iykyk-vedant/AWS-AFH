@@ -92,6 +92,7 @@ class ValidationAgent(BaseAgent):
         try:
             generated_test = self.test_writer.generate(incident, root_cause, fix_plan, language)
             if generated_test:
+                state["characterization_test"] = generated_test
                 logger.info(f"[Validation] TestWriter produced {len(generated_test)} chars of test code")
             else:
                 logger.warning("[Validation] TestWriter returned empty — will run existing repo tests only")

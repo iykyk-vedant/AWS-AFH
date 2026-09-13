@@ -419,3 +419,245 @@ def assess_risk_and_report_tool(
         "pr_url": state.get("pr_url", ""),
         "formatted_markdown": state.get("formatted_markdown", ""),
     }, indent=2, default=str)
+
+
+# ─── Knowledge Retriever Tool ────────────────────────────────────────────────
+
+@tool
+def knowledge_retriever_tool(incident_context: str, repo_url: str) -> str:
+    """Query the knowledge graph for historical incident context.
+
+    Searches Neo4j/NetworkX code property graph for:
+    - Similar past incidents for the same file/service
+    - Fix patterns that worked previously
+    - Blast radius for suspect functions
+    - Related functions and file churn metrics
+
+    This is used BEFORE codebase analysis to give the analyst historical
+    context that improves root cause accuracy and fix quality.
+
+    Args:
+        incident_context: JSON string of the parsed incident context.
+        repo_url: Full URL of the target repository.
+
+    Returns:
+        JSON string with historical context including similar_incidents,
+        fix_patterns, blast_radius, and related_functions.
+    """
+    from src.agents.knowledge_retriever import KnowledgeRetrieverAgent
+    from src.agents.state import create_initial_state
+    from src.llm.client_factory import get_llm_client
+    from src.graph.factory import create_graph_backend
+
+    llm = get_llm_client()
+
+    try:
+        graph = create_graph_backend(prefer="auto")
+    except Exception as e:
+        logger.warning(f"[KnowledgeRetriever] Graph backend unavailable: {e}")
+        return json.dumps({
+            "similar_incidents": [],
+            "fix_patterns": [],
+            "blast_radius": {},
+            "note": "Knowledge graph not available — proceeding without historical context",
+        }, indent=2)
+
+    retriever = KnowledgeRetrieverAgent(llm, graph)
+
+    incident = json.loads(incident_context) if isinstance(incident_context, str) else incident_context
+    state = create_initial_state(incident, repo_url)
+    response = retriever.execute(state)
+
+    return json.dumps({
+        "success": response.success,
+        "message": response.message,
+        "similar_incidents": response.data.get("similar_incidents", []) if response.data else [],
+        "fix_patterns": response.data.get("fix_patterns", []) if response.data else [],
+        "blast_radius": response.data.get("blast_radius", {}) if response.data else {},
+        "related_functions": response.data.get("related_functions", []) if response.data else [],
+    }, indent=2, default=str)
+
+
+# ─── Security Review Tool ────────────────────────────────────────────────────
+
+@tool
+def security_review_tool(
+    incident_context: str,
+    patch_diff: str,
+    repo_url: str
+) -> str:
+    """Run STRIDE/OWASP security review on the proposed fix.
+
+    The Security Agent acts as a security gatekeeper to ensure no
+    vulnerabilities are introduced or left unaddressed by the fix.
+    Runs static analysis (bandit patterns) and LLM-based OWASP Top 10 review.
+
+    Args:
+        incident_context: JSON string of the parsed incident context.
+        patch_diff: The unified diff patch to review for security issues.
+        repo_url: Full URL of the target repository.
+
+    Returns:
+        JSON string with security findings including severity counts,
+        individual issues with CWE/OWASP classifications, and a
+        pass/fail verdict.
+    """
+    from src.agents.security_agent import SecurityAgent
+    from src.agents.state import create_initial_state
+    from src.llm.client_factory import get_llm_client
+    from src.sandbox.docker_runner import DockerSandbox
+
+    llm = get_llm_client()
+
+    try:
+        sandbox = DockerSandbox()
+    except Exception:
+        sandbox = None
+
+    security = SecurityAgent(llm, docker_sandbox=sandbox)
+
+    incident = json.loads(incident_context) if isinstance(incident_context, str) else incident_context
+    state = create_initial_state(incident, repo_url)
+    state["patch_diff"] = patch_diff
+
+    # Populate fix_plan from patch_diff so security agent can analyze it
+    fix_plan = state.get("fix_plan", {})
+    if not fix_plan.get("patch"):
+        fix_plan["patch"] = patch_diff
+        state["fix_plan"] = fix_plan
+
+    response = security.execute(state)
+
+    security_result = state.get("security_result", {})
+    summary = security_result.get("summary", {}) if isinstance(security_result, dict) else {}
+
+    return json.dumps({
+        "success": response.success,
+        "message": response.message,
+        "total_issues": summary.get("total", 0),
+        "critical": summary.get("critical", 0),
+        "high": summary.get("high", 0),
+        "medium": summary.get("medium", 0),
+        "low": summary.get("low", 0),
+        "verdict": "PASS" if summary.get("critical", 0) == 0 and summary.get("high", 0) == 0 else "REVIEW_REQUIRED",
+        "issues": security_result.get("issues", [])[:5] if isinstance(security_result, dict) else [],
+    }, indent=2, default=str)
+
+
+# ─── Web Research Tool (StackOverflow Fallback) ──────────────────────────────
+
+@tool
+def web_research_tool(
+    incident_context: str,
+    root_cause_analysis: str,
+    validation_feedback: str,
+    repo_url: str
+) -> str:
+    """Search StackOverflow and the web for real-world fixes.
+
+    Triggered when the LLM-generated fix has failed validation multiple
+    times. Searches StackOverflow API for accepted answers matching the
+    error signature and returns actionable fix hints with code examples.
+
+    Args:
+        incident_context: JSON string of the parsed incident context.
+        root_cause_analysis: The current root cause analysis.
+        validation_feedback: Feedback from the last failed validation attempt.
+        repo_url: Full URL of the target repository.
+
+    Returns:
+        JSON string with fix_hint (actionable guidance), code_example
+        (most relevant snippet), and sources (URLs with scores).
+    """
+    from src.agents.web_researcher import WebResearcherAgent
+    from src.agents.state import create_initial_state
+    from src.llm.client_factory import get_llm_client
+
+    llm = get_llm_client()
+    researcher = WebResearcherAgent(llm)
+
+    incident = json.loads(incident_context) if isinstance(incident_context, str) else incident_context
+    state = create_initial_state(incident, repo_url)
+    state["root_cause"] = {"hypothesis": root_cause_analysis}
+    state["validation_feedback"] = validation_feedback
+    state["last_error_signature"] = validation_feedback[:200]
+
+    response = researcher.execute(state)
+
+    data = response.data or {}
+    return json.dumps({
+        "success": response.success,
+        "fix_hint": data.get("fix_hint", ""),
+        "code_example": data.get("code_example", ""),
+        "sources": data.get("sources", [])[:5],
+        "message": response.message,
+    }, indent=2, default=str)
+
+
+# ─── GitHub PR Creation Tool ─────────────────────────────────────────────────
+
+@tool
+def create_pr_tool(
+    incident_id: str,
+    patch_diff: str,
+    report_body: str,
+    repo_url: str,
+    risk_level: str = "MEDIUM",
+    problem_summary: str = ""
+) -> str:
+    """Create a GitHub Pull Request with the validated fix.
+
+    Creates a new branch (fix/INC-XXXX), commits the patched files,
+    and opens a PR on the target repository. The PR includes the
+    resolution report as the body and risk-based labels.
+
+    Args:
+        incident_id: The incident identifier (e.g., "INC-001").
+        patch_diff: The unified diff patch to commit.
+        report_body: Markdown report body for the PR description.
+        repo_url: Full URL of the target repository.
+        risk_level: Risk level for labeling (LOW/MEDIUM/HIGH).
+        problem_summary: One-line problem description for the PR title.
+
+    Returns:
+        JSON string with pr_url, branch name, and creation status.
+    """
+    from src.mcp.client_bridge import get_mcp_bridge
+
+    bridge = get_mcp_bridge()
+
+    parts = repo_url.rstrip("/").split("/")
+    owner, repo = parts[-2], parts[-1]
+    if repo.endswith(".git"):
+        repo = repo[:-4]
+
+    fix_plan = {
+        "patch": patch_diff,
+        "description": problem_summary or f"Automated fix for {incident_id}",
+    }
+
+    try:
+        result = bridge.create_fix_pr(
+            owner=owner,
+            repo=repo,
+            incident_id=incident_id,
+            fix_plan=fix_plan,
+            report_body=report_body,
+            risk_level=risk_level,
+            problem_summary=problem_summary,
+        )
+        pr_url = result.get("pr_url") or result.get("html_url") or ""
+        return json.dumps({
+            "success": not bool(result.get("error")),
+            "pr_url": pr_url,
+            "branch": result.get("branch", f"fix/{incident_id}"),
+            "labels": result.get("labels", []),
+            "error": result.get("error", ""),
+        }, indent=2, default=str)
+    except Exception as e:
+        logger.error(f"[PR Tool] Failed to create PR: {e}")
+        return json.dumps({
+            "success": False,
+            "pr_url": "",
+            "error": str(e),
+        }, indent=2)
