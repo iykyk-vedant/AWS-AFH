@@ -37,3 +37,21 @@ reports/output/
 
 Previous_PROJECT_DOCUMENTATION.md
 PROJECT_DOCUMENTATION.md
+
+# AgentCore Migration Artifacts & Directories (main branch is EC2-only)
+agentcore/
+app/
+scratch/
+*.zip
+.cli/
+**/.cli/
+staging/
+**/staging/
+cdk.out/
+**/cdk.out/
+node_modules/
+**/node_modules/
+package-lock.json
+**/package-lock.json
+*.log
+server.log
