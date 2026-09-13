@@ -374,6 +374,13 @@ class SupervisorAgent:
         if problem_summary:
             problem_summary = problem_summary.split("\n")[0].strip()[:80]
 
+        incident_ctx = state.get("incident", {}) or {}
+        github_issue_number = (
+            incident_ctx.get("github_issue_number")
+            or incident_ctx.get("issue_number")
+            or state.get("github_issue_number")
+        )
+
         if fix_worked and has_fix:
             if deployment_action == "auto_pr":
                 # LOW RISK: Auto-create PR with best fix + summary
@@ -384,6 +391,7 @@ class SupervisorAgent:
                     repo_url=repo_url,
                     risk_level=risk_level,
                     problem_summary=problem_summary,
+                    github_issue_number=github_issue_number,
                 )
                 result["pr_url"] = pr_url
                 self._post_final_success(
@@ -401,6 +409,7 @@ class SupervisorAgent:
                     repo_url=repo_url,
                     risk_level=risk_level,
                     problem_summary=problem_summary,
+                    github_issue_number=github_issue_number,
                 )
                 result["pr_url"] = pr_url
                 self._post_final_success(
@@ -432,6 +441,7 @@ class SupervisorAgent:
                         repo_url=repo_url,
                         risk_level=risk_level,
                         problem_summary=f"[HIGH RISK REVIEW] {problem_summary}",
+                        github_issue_number=github_issue_number,
                     )
                     result["pr_url"] = pr_url
 
@@ -489,6 +499,7 @@ class SupervisorAgent:
         repo_url: str,
         risk_level: str = "MEDIUM",
         problem_summary: str = "",
+        github_issue_number: Optional[int] = None,
     ) -> str:
         """Create a GitHub PR with the fix.
 
@@ -517,6 +528,7 @@ class SupervisorAgent:
                 report_body=report_body,
                 risk_level=risk_level,
                 problem_summary=problem_summary,
+                github_issue_number=github_issue_number,
             )
             pr_url = result.get("pr_url") or result.get("html_url") or ""
             if result.get("error"):

@@ -334,6 +334,7 @@ class MCPClientBridge:
         report_body: str,
         risk_level: str = "MEDIUM",
         problem_summary: str = "",
+        github_issue_number: Optional[int] = None,
     ) -> dict:
         """Full auto-PR flow: create branch -> commit files -> create PR.
 
@@ -498,10 +499,13 @@ class MCPClientBridge:
                 logger.warning("No files committed -- fix_plan may have no files_to_modify")
 
             # 3. Create PR (or reuse existing PR if already open)
-            # Extract issue number from incident_id (e.g. INC-003 -> 3, ISSUE-#5 -> 5)
-            import re
-            issue_match = re.search(r'\b(?:inc-?|issue-?#?|#)?(\d+)\b', str(incident_id), re.IGNORECASE)
-            issue_num_str = f"#{int(issue_match.group(1))}" if issue_match else ""
+            # Use explicit github_issue_number if provided; otherwise fallback to extracting digits from incident_id
+            if github_issue_number:
+                issue_num_str = f"#{github_issue_number}"
+            else:
+                import re
+                issue_match = re.search(r'\b(?:inc-?|issue-?#?|#)?(\d+)\b', str(incident_id), re.IGNORECASE)
+                issue_num_str = f"#{int(issue_match.group(1))}" if issue_match else ""
 
             close_block = ""
             if issue_num_str:
