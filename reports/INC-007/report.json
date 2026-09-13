@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-007",
+  "title": "TypeError: Object of type UUID is not JSON serializable in audit logging",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P2 - High",
+  "root_cause": "json.dumps lacks default=str handler for native UUID objects",
+  "status": "RESOLVED",
+  "confidence": 0.98,
+  "risk_level": "LOW",
+  "files_changed": [
+    "app/services/audit_service.py"
+  ],
+  "patch_applied": "--- a/app/services/audit_service.py\n+++ b/app/services/audit_service.py\n@@ -13,5 +13,5 @@\n def format_audit_log(event_payload: Dict[str, Any]) -> str:\n     \"\"\"Format audit event into serialized JSON log string.\"\"\"\n-    return json.dumps(event_payload)\n+    return json.dumps(event_payload, default=str)",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-007)\n\n**Incident ID:** `INC-007`\n**Title:** TypeError: Object of type UUID is not JSON serializable in audit logging\n**Service:** `python-service` | **Env:** production | **Severity:** P2 - High\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 98%\n\n---\n\n## Root Cause\njson.dumps lacks default=str handler for native UUID objects\n\n---\n\n## Changes Made\n- Target file: `app/services/audit_service.py`\n\n```diff\n--- a/app/services/audit_service.py\n+++ b/app/services/audit_service.py\n@@ -13,5 +13,5 @@\n def format_audit_log(event_payload: Dict[str, Any]) -> str:\n     \"\"\"Format audit event into serialized JSON log string.\"\"\"\n-    return json.dumps(event_payload)\n+    return json.dumps(event_payload, default=str)\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

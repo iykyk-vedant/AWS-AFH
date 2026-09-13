@@ -1,11 +1,11 @@
 """
 Amaze on Work -- Batch Demo Runner
 
-Resolves ALL incidents from the shopstack-platform repo sequentially,
+Resolves ALL incidents from the target repo sequentially,
 posts results to Slack, and generates a summary table at the end.
 
 Usage:
-    python demo_batch.py --slack-channel C0AL8NG5J79
+    python demo_batch.py --slack-channel <channel_id>
 """
 
 import sys

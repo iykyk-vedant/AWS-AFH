@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-009",
+  "title": "ValueError: invalid literal for int() with base 10: '' in analytics query",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P2 - High",
+  "root_cause": "Attempting int() conversion on empty query string parameters",
+  "status": "RESOLVED",
+  "confidence": 0.97,
+  "risk_level": "LOW",
+  "files_changed": [
+    "app/services/analytics_service.py"
+  ],
+  "patch_applied": "--- a/app/services/analytics_service.py\n+++ b/app/services/analytics_service.py\n@@ -10,6 +10,8 @@\n     \"\"\"Parse integer query parameter with safe default fallback.\"\"\"\n     if raw_val is None:\n         return default\n+    if isinstance(raw_val, str) and not raw_val.strip():\n+        return default\n     return int(raw_val)",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-009)\n\n**Incident ID:** `INC-009`\n**Title:** ValueError: invalid literal for int() with base 10: '' in analytics query\n**Service:** `python-service` | **Env:** production | **Severity:** P2 - High\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 97%\n\n---\n\n## Root Cause\nAttempting int() conversion on empty query string parameters\n\n---\n\n## Changes Made\n- Target file: `app/services/analytics_service.py`\n\n```diff\n--- a/app/services/analytics_service.py\n+++ b/app/services/analytics_service.py\n@@ -10,6 +10,8 @@\n     \"\"\"Parse integer query parameter with safe default fallback.\"\"\"\n     if raw_val is None:\n         return default\n+    if isinstance(raw_val, str) and not raw_val.strip():\n+        return default\n     return int(raw_val)\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

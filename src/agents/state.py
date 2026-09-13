@@ -8,6 +8,7 @@ PipelineState (shared state across all agents in the workflow).
 from typing import Any, Optional, Literal
 from enum import Enum
 
+from src.config import GITHUB_REPO_URL
 
 class AgentType(str, Enum):
     """All agent types in Amaze on Work."""
@@ -221,7 +222,7 @@ class PipelineState(TypedDict, total=False):
 
 def create_initial_state(
     incident: IncidentContext,
-    repo_url: str = "https://github.com/Rezinix-AI/shopstack-platform",
+    repo_url: str = GITHUB_REPO_URL,
 ) -> PipelineState:
     """Create the initial pipeline state from an incident and repo URL."""
     import time

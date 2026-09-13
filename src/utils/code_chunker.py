@@ -3,8 +3,6 @@ Code Chunker for Amaze on Work.
 
 Splits source files by AST boundaries (function/class definitions) so only
 the relevant chunk is sent to the LLM — preventing context overflow on large files.
-
-Ported from the tata-lcr project (src/ingestion/chunker.py).
 """
 
 import logging

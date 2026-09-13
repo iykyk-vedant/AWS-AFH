@@ -1,8 +1,7 @@
 """
 NetworkX in-memory graph backend.
 
-Fallback when Neo4j is unavailable. Mirrors the same interface.
-Adapted from tata-lcr project.
+Fallback when Neo4j is unavailable. Mirrors the same GraphBackend interface.
 """
 
 import logging

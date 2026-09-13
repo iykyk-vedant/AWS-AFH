@@ -38,7 +38,7 @@ def get_test_command(language: str) -> str:
 
 
 def get_service_dir(service_name: str) -> str:
-    """Map service name to directory in shopstack-platform."""
+    """Map service name to directory in the target repository."""
     service_map = {
         "python-service": "python-service",
         "node-service": "node-service",

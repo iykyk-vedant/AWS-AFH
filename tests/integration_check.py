@@ -20,6 +20,8 @@ sys.path.insert(0, ".")
 from dotenv import load_dotenv
 load_dotenv()
 
+from src.config import GITHUB_OWNER, GITHUB_REPO
+
 PASS = "[OK]"
 FAIL = "[FAIL]"
 WARN = "[WARN]"
@@ -75,14 +77,14 @@ check("GitHub API", check_github_api)
 
 def check_github_mcp():
     from src.mcp.github_server import get_file_content
-    content = get_file_content("Rezinix-AI", "shopstack-platform", "README.md")
+    content = get_file_content(GITHUB_OWNER, GITHUB_REPO, "README.md")
     return {"ok": len(content) > 0, "detail": f"README.md: {len(content)} chars"}
 
 check("GitHub MCP Server", check_github_mcp)
 
 def check_github_incidents():
     from src.mcp.github_server import list_incidents
-    result = json.loads(list_incidents("Rezinix-AI", "shopstack-platform"))
+    result = json.loads(list_incidents(GITHUB_OWNER, GITHUB_REPO))
     count = len(result) if isinstance(result, list) else 0
     return {"ok": count > 0, "detail": f"{count} incidents found"}
 
@@ -150,7 +152,7 @@ check("Pipeline imports", check_pipeline_imports)
 def check_mcp_bridge():
     from src.mcp.client_bridge import get_mcp_bridge
     bridge = get_mcp_bridge()
-    incidents = bridge.list_incidents("Rezinix-AI", "shopstack-platform")
+    incidents = bridge.list_incidents(GITHUB_OWNER, GITHUB_REPO)
     count = len(incidents) if isinstance(incidents, list) else 0
     return {"ok": count > 0, "detail": f"MCP Bridge -> {count} incidents via GitHub MCP"}
 

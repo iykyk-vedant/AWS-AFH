@@ -49,6 +49,7 @@ from src.sandbox.docker_runner import DockerSandbox
 from src.graph.factory import create_graph_backend
 from src.graph.base import GraphBackend
 from src.graph.repo_indexer import RepoIndexer
+from src.config import GITHUB_REPO_URL
 
 logger = logging.getLogger(__name__)
 
@@ -152,7 +153,7 @@ class SupervisorAgent:
     def resolve_incident(
         self,
         incident: IncidentContext,
-        repo_url: str = "https://github.com/Rezinix-AI/shopstack-platform",
+        repo_url: str = GITHUB_REPO_URL,
         slack_channel: str = "",
         slack_thread_ts: str = "",
         jira_ticket_id: str = "",
@@ -931,7 +932,7 @@ class SupervisorAgent:
         self,
         owner: str,
         repo: str,
-        repo_url: str = "https://github.com/Rezinix-AI/shopstack-platform",
+        repo_url: str = GITHUB_REPO_URL,
         slack_channel: str = "",
     ) -> list[dict]:
         """Resolve all incidents fetched from the target repo."""

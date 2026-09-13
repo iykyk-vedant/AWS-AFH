@@ -13,7 +13,7 @@ import logging
 import os
 import re
 import threading
-from src.config import GITHUB_REPO_FULL
+from src.config import GITHUB_REPO_FULL, GITHUB_REPO_URL
 from typing import Optional
 
 from src.utils.incident_counter import next_incident_id, _default_counter
@@ -54,7 +54,7 @@ class TriggerAgent:
 
     DEFAULT_REPO = os.getenv(
         "DEFAULT_REPO_URL",
-        "https://github.com/Rezinix-AI/shopstack-platform",
+        GITHUB_REPO_URL,
     )
 
     def __init__(self, repo_url: str = ""):

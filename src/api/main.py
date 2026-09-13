@@ -39,7 +39,7 @@ from src.agents.incident_parser import IncidentParserAgent
 from src.mcp.github_tools import get_github_tools
 from src.sandbox.docker_runner import DockerSandbox
 from src.llm.client_factory import get_llm_client
-from src.config import settings, GITHUB_OWNER, GITHUB_REPO
+from src.config import settings, GITHUB_OWNER, GITHUB_REPO, GITHUB_REPO_URL, GITHUB_REPO_FULL
 
 # Register webhook routers
 try:
@@ -60,15 +60,15 @@ if HAS_FASTAPI:
         """Request body for incident resolution."""
         incident: dict | None = None
         incident_id: str | None = None
-        repo_url: str = "https://github.com/Rezinix-AI/shopstack-platform"
-        repo_owner: str = "Rezinix-AI"
-        repo_name: str = "shopstack-platform"
+        repo_url: str = GITHUB_REPO_URL
+        repo_owner: str = GITHUB_OWNER
+        repo_name: str = GITHUB_REPO
 
     class ResolveAllRequest(BaseModel):
         """Request body for resolving all incidents."""
-        repo_url: str = "https://github.com/Rezinix-AI/shopstack-platform"
-        repo_owner: str = "Rezinix-AI"
-        repo_name: str = "shopstack-platform"
+        repo_url: str = GITHUB_REPO_URL
+        repo_owner: str = GITHUB_OWNER
+        repo_name: str = GITHUB_REPO
 
     class CreateIssueRequest(BaseModel):
         """Request body for creating a new issue from the dashboard."""
@@ -578,13 +578,13 @@ def main():
     # resolve command
     resolve_parser = subparsers.add_parser("resolve", help="Resolve a single incident")
     resolve_parser.add_argument("--incident-id", required=True, help="Incident ID (e.g., INC-001)")
-    resolve_parser.add_argument("--repo", default="Rezinix-AI/shopstack-platform",
+    resolve_parser.add_argument("--repo", default=GITHUB_REPO_FULL,
                                  help="Repository (owner/name)")
     resolve_parser.add_argument("--output", default=None, help="Output file for report")
 
     # resolve-all command
     resolve_all_parser = subparsers.add_parser("resolve-all", help="Resolve all incidents")
-    resolve_all_parser.add_argument("--repo", default="Rezinix-AI/shopstack-platform",
+    resolve_all_parser.add_argument("--repo", default=GITHUB_REPO_FULL,
                                      help="Repository (owner/name)")
     resolve_all_parser.add_argument("--output", default=None, help="Output directory for reports")
 

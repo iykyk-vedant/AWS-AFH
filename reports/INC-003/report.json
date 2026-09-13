@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-003",
+  "title": "ZeroDivisionError in shipping rate calculation for digital orders",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P2 - High",
+  "root_cause": "Division by zero when order weight_kg is 0.0 for digital items",
+  "status": "RESOLVED",
+  "confidence": 0.94,
+  "risk_level": "LOW",
+  "files_changed": [
+    "app/services/shipping_service.py"
+  ],
+  "patch_applied": "--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -11,7 +11,7 @@\n     if distance_km < 0:\n         raise ValueError(\"Distance cannot be negative\")\n\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 0.0 if weight_kg <= 0.0 else 15.0 / weight_kg\n     weight_charge = round(cost_per_kg * weight_kg, 2)\n     distance_charge = round(distance_km * 0.5, 2)\n     total_shipping = round(base_fee + weight_charge + distance_charge, 2)",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-003)\n\n**Incident ID:** `INC-003`\n**Title:** ZeroDivisionError in shipping rate calculation for digital orders\n**Service:** `python-service` | **Env:** production | **Severity:** P2 - High\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 94%\n\n---\n\n## Root Cause\nDivision by zero when order weight_kg is 0.0 for digital items\n\n---\n\n## Changes Made\n- Target file: `app/services/shipping_service.py`\n\n```diff\n--- a/app/services/shipping_service.py\n+++ b/app/services/shipping_service.py\n@@ -11,7 +11,7 @@\n     if distance_km < 0:\n         raise ValueError(\"Distance cannot be negative\")\n\n-    cost_per_kg = 15.0 / weight_kg\n+    cost_per_kg = 0.0 if weight_kg <= 0.0 else 15.0 / weight_kg\n     weight_charge = round(cost_per_kg * weight_kg, 2)\n     distance_charge = round(distance_km * 0.5, 2)\n     total_shipping = round(base_fee + weight_charge + distance_charge, 2)\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

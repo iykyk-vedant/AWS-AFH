@@ -1,8 +1,8 @@
 """
 Neo4j graph backend for Amaze on Work knowledge graph.
 
-Adapted from tata-lcr project with Amaze on Work-specific schema additions
-(Incident, Fix, StackFrame, TestResult nodes and their relationships).
+Provides Code Property Graph (CPG) storage and Cypher-based blast radius
+queries via Neo4j, including Incident, Fix, StackFrame, and TestResult nodes.
 """
 
 import logging

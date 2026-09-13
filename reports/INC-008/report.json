@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-008",
+  "title": "ValueError: No scheme supplied in webhook notification target URL",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P2 - High",
+  "root_cause": "Strict urlparse fails to prepend https:// on schemeless target URLs",
+  "status": "RESOLVED",
+  "confidence": 0.96,
+  "risk_level": "LOW",
+  "files_changed": [
+    "app/services/webhook_service.py"
+  ],
+  "patch_applied": "--- a/app/services/webhook_service.py\n+++ b/app/services/webhook_service.py\n@@ -10,6 +10,8 @@\n     \"\"\"Validate and normalize outbound webhook endpoint URL.\"\"\"\n+    if not target_url.startswith(('http://', 'https://')):\n+        target_url = f\"https://{target_url}\"\n     parsed = urlparse(target_url)\n     if not parsed.scheme:\n         raise ValueError(f\"Invalid URL '{target_url}': No scheme supplied. Perhaps you meant https://{target_url}?\")",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-008)\n\n**Incident ID:** `INC-008`\n**Title:** ValueError: No scheme supplied in webhook notification target URL\n**Service:** `python-service` | **Env:** production | **Severity:** P2 - High\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 96%\n\n---\n\n## Root Cause\nStrict urlparse fails to prepend https:// on schemeless target URLs\n\n---\n\n## Changes Made\n- Target file: `app/services/webhook_service.py`\n\n```diff\n--- a/app/services/webhook_service.py\n+++ b/app/services/webhook_service.py\n@@ -10,6 +10,8 @@\n     \"\"\"Validate and normalize outbound webhook endpoint URL.\"\"\"\n+    if not target_url.startswith(('http://', 'https://')):\n+        target_url = f\"https://{target_url}\"\n     parsed = urlparse(target_url)\n     if not parsed.scheme:\n         raise ValueError(f\"Invalid URL '{target_url}': No scheme supplied. Perhaps you meant https://{target_url}?\")\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

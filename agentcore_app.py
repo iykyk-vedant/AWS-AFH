@@ -49,7 +49,7 @@ except ImportError:
 
         def run(self):
             print("[Bedrock AgentCore] Running local runtime listener emulator on port 8080...")
-            sample_payload = {"incident_id": "INC-001", "repo": "Rezinix-AI/shopstack-platform"}
+            sample_payload = {"incident_id": "INC-001", "repo": GITHUB_REPO_FULL}
             if self._entrypoint_fn:
                 print(f"[Bedrock AgentCore] Testing invocation with: {sample_payload}")
                 res = self._entrypoint_fn(sample_payload, {"request_id": "req-agentcore-local-001"})

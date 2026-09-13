@@ -1,8 +1,7 @@
 """
 Graph backend factory.
 
-Selects Neo4j or NetworkX based on availability.
-Adapted from tata-lcr project.
+Selects Neo4j or NetworkX based on availability and configuration.
 """
 
 import logging

@@ -1,0 +1,23 @@
+{
+  "incident_id": "INC-005",
+  "title": "IndexError on pagination past catalog boundary",
+  "service": "python-service",
+  "environment": "production",
+  "severity": "P2 - High",
+  "root_cause": "Accessing items[start] out of range instead of returning empty slice",
+  "status": "RESOLVED",
+  "confidence": 0.95,
+  "risk_level": "LOW",
+  "files_changed": [
+    "app/services/inventory_service.py"
+  ],
+  "patch_applied": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -37,7 +37,7 @@\n     start = page * limit\n     if start >= len(CATALOG_ITEMS):\n-        return CATALOG_ITEMS[start]\n+        return []\n     return CATALOG_ITEMS[start : start + limit]",
+  "validation": {
+    "verdict": "FIX_CONFIRMED",
+    "tests_run": 1,
+    "passed_before": 0,
+    "passed_after": 1,
+    "regressions": 0
+  },
+  "formatted_markdown": "# Amaze on Work -- Incident Resolution Report (INC-005)\n\n**Incident ID:** `INC-005`\n**Title:** IndexError on pagination past catalog boundary\n**Service:** `python-service` | **Env:** production | **Severity:** P2 - High\n**Verdict:** `FIX_CONFIRMED` | **Confidence:** 95%\n\n---\n\n## Root Cause\nAccessing items[start] out of range instead of returning empty slice\n\n---\n\n## Changes Made\n- Target file: `app/services/inventory_service.py`\n\n```diff\n--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -37,7 +37,7 @@\n     start = page * limit\n     if start >= len(CATALOG_ITEMS):\n-        return CATALOG_ITEMS[start]\n+        return []\n     return CATALOG_ITEMS[start : start + limit]\n```\n\n---\n\n## Validation Results\n- **Verdict:** `FIX_CONFIRMED`\n- **Regressions:** 0 detected\n"
+}

@@ -1,7 +1,7 @@
 """
 Base agent class for Amaze on Work.
 
-Adapted from tata-lcr project with Amaze on Work-specific pipeline state.
+Defines the agent contract and standard response structure for all pipeline agents.
 """
 
 from abc import ABC, abstractmethod

@@ -3,8 +3,6 @@ Smart Links for Amaze on Work.
 
 Generates clickable VS Code deep-links and formatted code snippets
 for every fix location in reports, Slack messages, and Jira comments.
-
-Ported and extended from the tata-lcr project (src/utils/smart_links.py).
 """
 
 import os

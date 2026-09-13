@@ -10,7 +10,7 @@ Provides semantic methods for incident resolution:
 - get_fix_patterns(): How were similar bugs resolved?
 - find_entry_points(): API endpoints and main functions
 
-Adapted from tata-lcr project with Amaze on Work-specific incident queries.
+Provides semantic GraphRAG methods for incident-driven code analysis.
 """
 
 import logging
