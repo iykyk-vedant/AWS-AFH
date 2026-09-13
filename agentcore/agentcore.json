@@ -18,50 +18,12 @@
       "protocol": "HTTP"
     }
   ],
-  "memories": [
-    {
-      "name": "amazememory",
-      "eventExpiryDuration": 30,
-      "strategies": [
-        {
-          "type": "SEMANTIC",
-          "namespaceTemplates": [
-            "/users/{actorId}/facts"
-          ]
-        },
-        {
-          "type": "SUMMARIZATION",
-          "namespaceTemplates": [
-            "/summaries/{actorId}/{sessionId}"
-          ]
-        },
-        {
-          "type": "EPISODIC",
-          "namespaceTemplates": [
-            "/episodes/{actorId}/{sessionId}"
-          ],
-          "reflectionNamespaceTemplates": [
-            "/episodes/{actorId}"
-          ]
-        }
-      ]
-    }
-  ],
+  "memories": [],
   "knowledgeBases": [],
   "credentials": [],
   "evaluators": [],
   "onlineEvalConfigs": [],
-  "agentCoreGateways": [
-    {
-      "name": "amazegateway",
-      "protocolType": "MCP",
-      "description": "Gateway for amazegateway",
-      "targets": [],
-      "authorizerType": "NONE",
-      "enableSemanticSearch": true,
-      "exceptionLevel": "NONE"
-    }
-  ],
+  "agentCoreGateways": [],
   "policyEngines": [],
   "configBundles": [],
   "abTests": [],

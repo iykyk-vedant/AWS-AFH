@@ -38,13 +38,23 @@ reports/output/
 Previous_PROJECT_DOCUMENTATION.md
 PROJECT_DOCUMENTATION.md
 
-# AgentCore CLI Artifacts & Caches
+# AgentCore CLI Artifacts, Targets, and Build Caches
 *.zip
 .cli/
+**/.cli/
 scratch/
 staging/
 **/staging/
+cdk.out/
+**/cdk.out/
 node_modules/
+**/node_modules/
+package-lock.json
+**/package-lock.json
+agentcore/aws-targets.json
+agentcore/.llm-context/
 app/amazeagent/src/
 app/amazeagent/src
+*.log
+
 
