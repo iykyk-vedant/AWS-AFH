@@ -39,7 +39,7 @@ from src.agents.incident_parser import IncidentParserAgent
 from src.mcp.github_tools import get_github_tools
 from src.sandbox.docker_runner import DockerSandbox
 from src.llm.client_factory import get_llm_client
-from src.config import settings
+from src.config import settings, GITHUB_OWNER, GITHUB_REPO
 
 # Register webhook routers
 try:
@@ -125,12 +125,12 @@ if HAS_FASTAPI:
 
     @app.get("/api/incidents")
     async def list_github_issues():
-        """Returns real issues dynamically fetched from the GitHub repository iykyk-vedant/AFH-DEMO
+        """Returns real issues dynamically fetched from the configured GitHub repository
         with live cross-referenced Pull Requests raised by the autonomous agent system."""
         import httpx
         import re
-        owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
-        repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
+        owner = GITHUB_OWNER
+        repo = GITHUB_REPO
         token = os.getenv("GITHUB_TOKEN", "")
 
         headers = {"Accept": "application/vnd.github.v3+json"}
@@ -349,8 +349,8 @@ if HAS_FASTAPI:
     async def create_github_issue(payload: CreateIssueRequest):
         """Create a new issue on GitHub and kick off autonomous multi-agent triage."""
         import httpx
-        owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
-        repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
+        owner = GITHUB_OWNER
+        repo = GITHUB_REPO
         token = os.getenv("GITHUB_TOKEN", "")
 
         issue_number = None
@@ -431,8 +431,8 @@ if HAS_FASTAPI:
     async def trigger_issue_triage(issue_number: int):
         """Dispatches autonomous multi-agent self-healing triage for a GitHub issue."""
         import httpx
-        owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
-        repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
+        owner = GITHUB_OWNER
+        repo = GITHUB_REPO
         token = os.getenv("GITHUB_TOKEN", "")
         headers = {"Accept": "application/vnd.github.v3+json"}
         if token:
@@ -478,8 +478,8 @@ if HAS_FASTAPI:
         await asyncio.sleep(6)
         while True:
             try:
-                owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
-                repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
+                owner = GITHUB_OWNER
+                repo = GITHUB_REPO
                 token = os.getenv("GITHUB_TOKEN", "")
                 headers = {"Accept": "application/vnd.github.v3+json"}
                 if token:

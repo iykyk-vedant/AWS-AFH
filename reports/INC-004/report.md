@@ -3,12 +3,12 @@
 **Incident ID:** `INC-004`
 **Title:** Unhandled KeyError in inventory reservation when item ID is not in catalog
 **Service:** `` | **Env:** production | **Severity:** P1 - Critical
-**Resolution Time:** 254.1s | **Confidence:** 37%
+**Resolution Time:** 57.1s | **Confidence:** 37%
 
 ---
 
 ## Root Cause
-Direct dictionary access on STOCK_CATALOG without verifying item existence
+By verifying the presence of the requested item in STOCK_CATALOG before accessing it, the function now handles unknown item IDs gracefully, eliminating the crash and providing a clear error payload.
 
 ---
 
@@ -16,20 +16,19 @@ Direct dictionary access on STOCK_CATALOG without verifying item existence
 
 | File | Rationale |
 |------|-----------|
-| `app/services/inventory_service.py` | The added existence check returns a controlled error response when the item is absent, avoiding the KeyError that occurs from direct dictionary indexing. |
+| `app/services/inventory_service.py` | Checks for the presence of item_id in STOCK_CATALOG before indexing; if absent, returns a structured error instead of raising KeyError. |
 
 
 **Patch:**
 ```diff
 --- a/app/services/inventory_service.py
 +++ b/app/services/inventory_service.py
-@@ -19,7 +19,8 @@
-     if quantity <= 0:
+@@ -20,6 +20,8 @@
          raise ValueError("Reservation quantity must be positive")
  
--    # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items
+     # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items
 +    if item_id not in STOCK_CATALOG:
-+        return {"success": False, "reason": "Item not found in catalog", "item_id": item_id}
++        return {"success": False, "reason": "Item not found", "item_id": item_id, "available": 0}
      available = STOCK_CATALOG[item_id]
  
      if available < quantity:
@@ -63,6 +62,6 @@ Direct dictionary access on STOCK_CATALOG without verifying item existence
 ## Reasoning Chain
 1. Incident INC-004 parsed: 'Unhandled KeyError in inventory reservation when item ID is not in catalog' -- service: , type: logical_error
 2. Stack trace analysis -> suspect files: ['app/services/inventory_service.py']
-3. Root cause: Direct dictionary access on STOCK_CATALOG without verifying item existence
-4. Fix applied: Added a guard for missing item IDs to prevent an unhandled KeyError in reserve_stock.
+3. Root cause: By verifying the presence of the requested item in STOCK_CATALOG before accessing it, the function now handles unknown item IDs gracefully, eliminating the crash and providing a clear error payload.
+4. Fix applied: Unhandled KeyError when reserving stock for unknown item IDs; added existence check and error response.
 5. Validation: SKIPPED -- before: 0/0 passed, after: 0/0 passed

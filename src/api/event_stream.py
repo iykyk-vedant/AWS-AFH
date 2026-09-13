@@ -19,10 +19,13 @@ def record_event_start(
     issue_number: int,
     title: str,
     body: str = "",
-    repo: str = "iykyk-vedant/AFH-DEMO"
+    repo: str = ""
 ) -> Dict[str, Any]:
     """Register a new incoming incident issue from GitHub webhook."""
     global _CURRENT_EVENT
+    if not repo:
+        from src.config import GITHUB_REPO_FULL
+        repo = GITHUB_REPO_FULL
     now_str = time.strftime("%H:%M:%S")
     event = {
         "id": incident_id,

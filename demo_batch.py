@@ -13,6 +13,8 @@ import os
 import json
 import time
 
+from src.config import GITHUB_REPO_FULL
+
 sys.path.insert(0, ".")
 os.environ["PYTHONIOENCODING"] = "utf-8"
 
@@ -115,7 +117,7 @@ def resolve_one(incident_id, owner, repo, llm, bridge, gh):
 
 def main():
     import argparse
-    default_repo = os.getenv("GITHUB_REPO_FULL") or f"{os.getenv('GITHUB_OWNER', 'iykyk-vedant')}/{os.getenv('GITHUB_REPO', 'AFH-DEMO')}"
+    default_repo = GITHUB_REPO_FULL
     parser = argparse.ArgumentParser(description="Amaze on Work Batch Demo")
     parser.add_argument("--repo", default=default_repo)
     parser.add_argument("--slack-channel", default="", help="Slack channel ID")

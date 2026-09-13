@@ -38,10 +38,10 @@ print("=" * 70)
 
 # ─── 1. Environment & Config ──────────────────────────────────────────
 try:
-    from src.config import settings
-    owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
-    repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
-    model = os.getenv("CEREBRAS_MODEL", "groq/compound-mini")
+    from src.config import settings, GITHUB_OWNER as _owner, GITHUB_REPO as _repo
+    owner = _owner
+    repo = _repo
+    model = os.getenv("CEREBRAS_MODEL", "llama-3.3-70b")
     has_token = bool(os.getenv("GITHUB_TOKEN"))
     has_groq = bool(os.getenv("CEREBRAS_API_KEY"))
     report("1. Environment & Config", "OK", {
@@ -76,8 +76,8 @@ except Exception as e:
 try:
     from src.mcp.github_tools import get_github_tools
     gh = get_github_tools()
-    owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
-    repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
+    owner = _owner
+    repo = _repo
     
     import httpx
     rate_resp = httpx.get("https://api.github.com/rate_limit", headers=gh._headers())

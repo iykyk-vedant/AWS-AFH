@@ -30,7 +30,7 @@ mcp = FastMCP(
     instructions="GitHub integration tools for Amaze on Work incident resolution",
 )
 
-BASE_URL = "https://api.github.com"
+from src.config import GITHUB_API_BASE_URL as BASE_URL
 TOKEN = os.getenv("GITHUB_TOKEN", "")
 
 

@@ -2,6 +2,7 @@
 Verification script to test Bedrock Model Access and Strands integration.
 """
 import sys
+import os
 import boto3
 
 MODELS_TO_TEST = [
@@ -14,11 +15,12 @@ MODELS_TO_TEST = [
 ]
 
 def test_bedrock():
+    region = os.getenv("AWS_DEFAULT_REGION", "us-east-1")
     print("=" * 60)
-    print("Testing AWS Bedrock Model Access in us-east-1...")
+    print(f"Testing AWS Bedrock Model Access in {region}...")
     print("=" * 60)
     
-    client = boto3.client("bedrock-runtime", region_name="us-east-1")
+    client = boto3.client("bedrock-runtime", region_name=region)
     available_models = []
 
     for name, model_id in MODELS_TO_TEST:

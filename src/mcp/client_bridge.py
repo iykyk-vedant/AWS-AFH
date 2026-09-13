@@ -14,6 +14,7 @@ import logging
 import os
 import asyncio
 from typing import Optional, Any
+from src.config import GITHUB_API_BASE_URL
 
 logger = logging.getLogger(__name__)
 
@@ -240,7 +241,7 @@ class MCPClientBridge:
     def get_file_sha(self, owner: str, repo: str, path: str, ref: str = "master") -> str:
         """Get the current SHA of a file (needed for updates via GitHub API)."""
         import httpx
-        url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+        url = f"{GITHUB_API_BASE_URL}/repos/{owner}/{repo}/contents/{path}"
         token = os.getenv("GITHUB_TOKEN", "")
         headers = {
             "Accept": "application/vnd.github.v3+json",
@@ -377,7 +378,7 @@ class MCPClientBridge:
                 if token:
                     _headers["Authorization"] = f"token {token}"
                 repo_resp = _httpx.get(
-                    f"https://api.github.com/repos/{owner}/{repo}",
+                    f"{GITHUB_API_BASE_URL}/repos/{owner}/{repo}",
                     headers=_headers, timeout=10,
                 )
                 if repo_resp.status_code == 200:
@@ -457,7 +458,7 @@ class MCPClientBridge:
                     if token:
                         headers["Authorization"] = f"token {token}"
                     resp = httpx.get(
-                        f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}",
+                        f"{GITHUB_API_BASE_URL}/repos/{owner}/{repo}/contents/{file_path}",
                         headers=headers,
                         params={"ref": branch},
                         timeout=15,
@@ -541,7 +542,7 @@ class MCPClientBridge:
                         if token:
                             headers["Authorization"] = f"token {token}"
                         resp = httpx.get(
-                            f"https://api.github.com/repos/{owner}/{repo}/pulls",
+                            f"{GITHUB_API_BASE_URL}/repos/{owner}/{repo}/pulls",
                             headers=headers,
                             params={"head": f"{owner}:{branch}", "state": "open"},
                             timeout=10,
@@ -558,7 +559,7 @@ class MCPClientBridge:
                                     if issue_num_str and issue_num_str not in curr_body:
                                         new_body = (curr_body + "\n" + close_block)[:65000]
                                         httpx.patch(
-                                            f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}",
+                                            f"{GITHUB_API_BASE_URL}/repos/{owner}/{repo}/pulls/{pr_number}",
                                             headers=headers,
                                             json={"body": new_body},
                                             timeout=10,

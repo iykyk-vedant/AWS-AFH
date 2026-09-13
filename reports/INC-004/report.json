@@ -1,15 +1,15 @@
 {
   "incident_id": "INC-004",
   "title": "Unhandled KeyError in inventory reservation when item ID is not in catalog",
-  "root_cause": "Direct dictionary access on STOCK_CATALOG without verifying item existence",
+  "root_cause": "By verifying the presence of the requested item in STOCK_CATALOG before accessing it, the function now handles unknown item IDs gracefully, eliminating the crash and providing a clear error payload.",
   "changes_made": [
     {
       "file": "app/services/inventory_service.py",
-      "change": "    if item_id not in STOCK_CATALOG:\n        return {\"success\": False, \"reason\": \"Item not found in ",
-      "rationale": "The added existence check returns a controlled error response when the item is absent, avoiding the KeyError that occurs from direct dictionary indexing."
+      "change": "    # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n    i",
+      "rationale": "Checks for the presence of item_id in STOCK_CATALOG before indexing; if absent, returns a structured error instead of raising KeyError."
     }
   ],
-  "diff": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -19,7 +19,8 @@\n     if quantity <= 0:\n         raise ValueError(\"Reservation quantity must be positive\")\n \n-    # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n     available = STOCK_CATALOG[item_id]\n \n     if available < quantity:\n",
+  "diff": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -20,6 +20,8 @@\n         raise ValueError(\"Reservation quantity must be positive\")\n \n     # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found\", \"item_id\": item_id, \"available\": 0}\n     available = STOCK_CATALOG[item_id]\n \n     if available < quantity:\n",
   "validation": {
     "verdict": "SKIPPED",
     "before": {},
@@ -24,9 +24,9 @@
   "reasoning_chain": [
     "Incident INC-004 parsed: 'Unhandled KeyError in inventory reservation when item ID is not in catalog' -- service: , type: logical_error",
     "Stack trace analysis -> suspect files: ['app/services/inventory_service.py']",
-    "Root cause: Direct dictionary access on STOCK_CATALOG without verifying item existence",
-    "Fix applied: Added a guard for missing item IDs to prevent an unhandled KeyError in reserve_stock.",
+    "Root cause: By verifying the presence of the requested item in STOCK_CATALOG before accessing it, the function now handles unknown item IDs gracefully, eliminating the crash and providing a clear error payload.",
+    "Fix applied: Unhandled KeyError when reserving stock for unknown item IDs; added existence check and error response.",
     "Validation: SKIPPED -- before: 0/0 passed, after: 0/0 passed"
   ],
-  "resolution_time_seconds": 254.13242554664612
+  "resolution_time_seconds": 57.11361908912659
 }

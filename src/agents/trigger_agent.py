@@ -13,6 +13,7 @@ import logging
 import os
 import re
 import threading
+from src.config import GITHUB_REPO_FULL
 from typing import Optional
 
 from src.utils.incident_counter import next_incident_id, _default_counter
@@ -288,7 +289,7 @@ class TriggerAgent:
                 issue_number=issue_number,
                 title=title,
                 body=body,
-                repo=f"{repo_owner}/{repo_name}" if repo_owner and repo_name else "iykyk-vedant/AFH-DEMO",
+                repo=f"{repo_owner}/{repo_name}" if repo_owner and repo_name else GITHUB_REPO_FULL,
             )
         except Exception:
             pass

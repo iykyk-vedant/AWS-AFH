@@ -29,7 +29,7 @@ mcp = FastMCP(
 )
 
 BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN", "")
-REPORTS_CHANNEL_ID = os.getenv("SLACK_REPORTS_CHANNEL_ID", "C0AM6A3DKRS")
+REPORTS_CHANNEL_ID = os.getenv("SLACK_REPORTS_CHANNEL_ID", "")
 
 
 def _get_client():

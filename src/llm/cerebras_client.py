@@ -5,6 +5,7 @@ from typing import Optional
 from dotenv import load_dotenv
 
 from src.llm.base_client import BaseLLMClient, LLMResponse
+from src.config import LLM_FALLBACK_MODELS
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -73,7 +74,7 @@ class CerebrasClient(BaseLLMClient):
         body = self._build_request_body(messages, temperature, max_tokens)
 
         max_retries = 6
-        fallback_models = ["groq/compound-mini", "openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        fallback_models = LLM_FALLBACK_MODELS
         for attempt in range(max_retries):
             with httpx.Client(timeout=self._timeout) as client:
                 response = client.post(url, headers=self._get_headers(), json=body)
@@ -105,7 +106,7 @@ class CerebrasClient(BaseLLMClient):
         body = self._build_request_body(messages, temperature, max_tokens)
 
         max_retries = 6
-        fallback_models = ["groq/compound-mini", "openai/gpt-oss-120b", "openai/gpt-oss-20b"]
+        fallback_models = LLM_FALLBACK_MODELS
         for attempt in range(max_retries):
             async with httpx.AsyncClient(timeout=self._timeout) as client:
                 response = await client.post(

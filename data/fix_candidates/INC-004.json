@@ -5,19 +5,19 @@
     {
       "candidate_id": "c1_primary",
       "fix_plan": {
-        "description": "Added a guard for missing item IDs to prevent an unhandled KeyError in reserve_stock.",
+        "description": "Unhandled KeyError when reserving stock for unknown item IDs; added existence check and error response.",
         "files_to_modify": [
           {
             "file_path": "app/services/inventory_service.py",
             "original_code": "    # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n    available = STOCK_CATALOG[item_id]",
-            "fixed_code": "    if item_id not in STOCK_CATALOG:\n        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n    available = STOCK_CATALOG[item_id]",
-            "rationale": "The added existence check returns a controlled error response when the item is absent, avoiding the KeyError that occurs from direct dictionary indexing."
+            "fixed_code": "    # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n    if item_id not in STOCK_CATALOG:\n        return {\"success\": False, \"reason\": \"Item not found\", \"item_id\": item_id, \"available\": 0}\n    available = STOCK_CATALOG[item_id]",
+            "rationale": "Checks for the presence of item_id in STOCK_CATALOG before indexing; if absent, returns a structured error instead of raising KeyError."
           }
         ],
-        "patch": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -19,7 +19,8 @@\n     if quantity <= 0:\n         raise ValueError(\"Reservation quantity must be positive\")\n \n-    # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found in catalog\", \"item_id\": item_id}\n     available = STOCK_CATALOG[item_id]\n \n     if available < quantity:\n",
-        "rationale": "By verifying the presence of the requested item in STOCK_CATALOG before accessing it, the function now handles unknown item IDs gracefully, eliminating the crash and providing a clear error payload.",
+        "patch": "--- a/app/services/inventory_service.py\n+++ b/app/services/inventory_service.py\n@@ -20,6 +20,8 @@\n         raise ValueError(\"Reservation quantity must be positive\")\n \n     # BUG (INC-004): Directly indexing dictionary throws unhandled KeyError for unlisted items\n+    if item_id not in STOCK_CATALOG:\n+        return {\"success\": False, \"reason\": \"Item not found\", \"item_id\": item_id, \"available\": 0}\n     available = STOCK_CATALOG[item_id]\n \n     if available < quantity:\n",
+        "rationale": "By validating the key existence, the function no longer crashes on unknown item IDs and provides a clear error payload, restoring stability for inventory reservations.",
         "characterization_test": null,
-        "change_size": 3
+        "change_size": 2
       },
       "score": 0,
       "rank": 1,

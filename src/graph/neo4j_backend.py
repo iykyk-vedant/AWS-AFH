@@ -35,7 +35,7 @@ class Neo4jBackend(GraphBackend):
         return cls(
             uri=os.getenv("NEO4J_URI", "bolt://localhost:7687"),
             username=os.getenv("NEO4J_USER", "neo4j"),
-            password=os.getenv("NEO4J_PASSWORD", "amaze_2026"),
+            password=os.getenv("NEO4J_PASSWORD", ""),
         )
 
     def add_node(self, node: Node) -> str:

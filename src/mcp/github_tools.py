@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://api.github.com"
+from src.config import GITHUB_API_BASE_URL as BASE_URL
 
 
 class GitHubMCPTools:

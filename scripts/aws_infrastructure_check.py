@@ -58,7 +58,7 @@ def check_neo4j():
     """Check Neo4j database daemon."""
     uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
     user = os.getenv("NEO4J_USER", "neo4j")
-    password = os.getenv("NEO4J_PASSWORD", "amaze_2026")
+    password = os.getenv("NEO4J_PASSWORD", "")
     
     parsed = urllib.parse.urlparse(uri)
     host = parsed.hostname or "localhost"
@@ -134,7 +134,7 @@ def check_cloud_llm():
     from src.llm.client_factory import get_llm_client
 
     base_url = os.getenv("CEREBRAS_BASE_URL", "https://api.groq.com/openai/v1")
-    model = os.getenv("CEREBRAS_MODEL", "groq/compound")
+    model = os.getenv("CEREBRAS_MODEL", "llama-3.3-70b")
     api_key = os.getenv("CEREBRAS_API_KEY", "")
 
     details = {
@@ -164,8 +164,9 @@ def check_github():
     """Check GitHub Cloud API & Repository."""
     import httpx
     token = os.getenv("GITHUB_TOKEN", "")
-    owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
-    repo = os.getenv("GITHUB_REPO", "AFH-DEMO")
+    from src.config import GITHUB_OWNER as _gh_owner, GITHUB_REPO as _gh_repo
+    owner = _gh_owner
+    repo = _gh_repo
 
     details = {
         "Repository": f"{owner}/{repo}",

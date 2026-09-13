@@ -19,6 +19,8 @@ Usage:
 import os
 import sys
 import json
+import logging
+from src.config import GITHUB_OWNER, GITHUB_REPO, GITHUB_REPO_FULL
 from typing import Dict, Any
 
 # Ensure project root is in sys.path
@@ -104,8 +106,8 @@ def agent_invocation(payload: Dict[str, Any], context: Any) -> Dict[str, Any]:
     executes the Amaze on Work multi-agent resolution loop, and returns structured outputs.
     """
     # Parse payload
-    owner = os.getenv("GITHUB_OWNER", "iykyk-vedant")
-    repo_name = os.getenv("GITHUB_REPO", "AFH-DEMO")
+    owner = GITHUB_OWNER
+    repo_name = GITHUB_REPO
     incident_id = payload.get("incident_id", "")
     repo = payload.get("repo", f"{owner}/{repo_name}")
 
@@ -174,7 +176,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Amaze on Work — Amazon Bedrock AgentCore Deployment Entrypoint"
     )
-    default_repo = os.getenv("GITHUB_REPO_FULL") or f"{os.getenv('GITHUB_OWNER', 'iykyk-vedant')}/{os.getenv('GITHUB_REPO', 'AFH-DEMO')}"
+    default_repo = GITHUB_REPO_FULL
     parser.add_argument("--incident", default=None, help="Incident ID to resolve (e.g., INC-001)")
     parser.add_argument("--repo", default=default_repo, help="Target repository")
     parser.add_argument("--port", type=int, default=8090, help="Port to run AgentCore runtime (default: 8090)")

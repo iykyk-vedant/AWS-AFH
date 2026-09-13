@@ -8,7 +8,7 @@ from slack_sdk.errors import SlackApiError
 token = os.getenv("SLACK_BOT_TOKEN")
 c = WebClient(token=token)
 
-channel_id = "C0AL8NG5J79"
+channel_id = os.getenv("SLACK_TEST_CHANNEL_ID", "")
 
 # Try joining
 print("1. Trying to join channel...")

@@ -34,6 +34,7 @@ htmlcov/
 
 # Reports
 reports/output/
+reports/*_report.json
 
 Previous_PROJECT_DOCUMENTATION.md
 PROJECT_DOCUMENTATION.md

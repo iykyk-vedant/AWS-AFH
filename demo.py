@@ -24,6 +24,8 @@ import json
 import time
 import argparse
 
+from src.config import GITHUB_REPO_FULL
+
 sys.path.insert(0, ".")
 os.environ["PYTHONIOENCODING"] = "utf-8"
 if sys.platform == "win32":
@@ -118,7 +120,7 @@ def prompt_incident_selection() -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Amaze on Work Demo")
-    default_repo = os.getenv("GITHUB_REPO_FULL") or f"{os.getenv('GITHUB_OWNER', 'iykyk-vedant')}/{os.getenv('GITHUB_REPO', 'AFH-DEMO')}"
+    default_repo = GITHUB_REPO_FULL
     parser.add_argument("--incident", default=None, help="Incident ID (e.g. INC-001, INC-002... INC-011)")
     parser.add_argument("--repo", default=default_repo)
     parser.add_argument("--slack-channel", default="", help="Slack channel name or ID")

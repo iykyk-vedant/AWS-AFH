@@ -4,6 +4,20 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# ─── Centralized Constants ────────────────────────────────────────────────────
+# All modules should import these instead of duplicating os.getenv() calls.
+
+GITHUB_OWNER = os.getenv("GITHUB_OWNER", "iykyk-vedant")
+GITHUB_REPO = os.getenv("GITHUB_REPO", "AFH-DEMO")
+GITHUB_REPO_FULL = os.getenv("GITHUB_REPO_FULL") or f"{GITHUB_OWNER}/{GITHUB_REPO}"
+GITHUB_REPO_URL = f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPO}"
+GITHUB_API_BASE_URL = os.getenv("GITHUB_API_BASE_URL", "https://api.github.com")
+
+# LLM fallback model list (used by cerebras_client on rate-limit failover)
+LLM_FALLBACK_MODELS = os.getenv(
+    "LLM_FALLBACK_MODELS", "groq/compound-mini,openai/gpt-oss-120b,openai/gpt-oss-20b"
+).split(",")
+
 
 @dataclass
 class CerebrasSettings:
@@ -57,7 +71,7 @@ class Neo4jSettings:
         return cls(
             uri=os.getenv("NEO4J_URI", "bolt://localhost:7687"),
             username=os.getenv("NEO4J_USER", "neo4j"),
-            password=os.getenv("NEO4J_PASSWORD", "amaze_2026"),
+            password=os.getenv("NEO4J_PASSWORD", ""),
         )
 
 
