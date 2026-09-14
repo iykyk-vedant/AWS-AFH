@@ -31,12 +31,11 @@
 8. [Docker Sandbox Validation (Zero Regressions)](#8-docker-sandbox-validation)
 9. [Enterprise FastMCP Integrations](#9-enterprise-fastmcp-integrations)
 10. [Target Demo Application (`AFH-DEMO`)](#10-target-demo-application-afh-demo)
-11. [Judging Criteria Alignment](#11-judging-criteria-alignment)
-12. [Quick Start & Local Setup](#12-quick-start--local-setup)
-13. [Verification & Automated Test Suite](#13-verification--automated-test-suite)
-14. [Tech Stack](#14-tech-stack)
-15. [Repository Structure](#15-repository-structure)
-16. [License](#16-license)
+11. [Quick Start & Local Setup](#11-quick-start--local-setup)
+12. [Verification & Automated Test Suite](#12-verification--automated-test-suite)
+13. [Tech Stack](#13-tech-stack)
+14. [Repository Structure](#14-repository-structure)
+15. [License](#15-license)
 
 ---
 
@@ -194,19 +193,7 @@ When an issue is opened on `AFH-DEMO`, Amaze on Work's live webhook catches the 
 
 ---
 
-## 11. Judging Criteria Alignment
-
-| Judging Criteria | How Amaze on Work Delivers |
-| :--- | :--- |
-| **Technological Implementation** | Deep, idiomatic implementation using **Strands Agents SDK** (`strands-agents`) and **Amazon Bedrock AgentCore**. Includes a 9-agent DAG, GraphRAG with Neo4j, FastMCP tool servers, and Docker container sandboxes. Full test suite with **53 automated tests** passing. |
-| **Design** | A complete, responsive web application with real-time SSE telemetry, interactive Knowledge Graph visualizer (`/graph`), incident drawer with diff viewers, and filter pills (All, Open, Triaging, Resolved, PRs). |
-| **Potential Impact** | Solves the highest-cost problem in professional engineering: on-call alert fatigue and downtime. Reduces MTTR from hours to under 3 minutes with verified zero-regression safety. |
-| **Creativity & Originality** | Instead of a passive chat assistant, Amaze on Work is an autonomous closed-loop agent that operates in the background, only interrupting humans for critical risk escalations. |
-| **Presentation** | Fully documented with an end-to-end demo video, live cloud deployment at `http://98.90.18.42:8000/`, sample test incidents, and clear step-by-step reproduction instructions. |
-
----
-
-## 12. Quick Start & Local Setup
+## 11. Quick Start & Local Setup
 
 ### Prerequisites
 * Python 3.10+
@@ -244,7 +231,7 @@ Visit the dashboard at `http://localhost:8000` or the graph at `http://localhost
 
 ---
 
-## 13. Verification & Automated Test Suite
+## 12. Verification & Automated Test Suite
 
 The project includes an extensive automated test suite covering all agents, graph queries, sandboxes, and MCP tools:
 
@@ -259,7 +246,7 @@ pytest tests/ -v
 
 ---
 
-## 14. Tech Stack
+## 13. Tech Stack
 
 * **Agent Orchestration**: **Strands Agents SDK** (`strands-agents`) & LangGraph DAGs
 * **Cloud Architecture**: **Amazon Bedrock AgentCore** Runtime, Gateways, and Memory
@@ -272,7 +259,7 @@ pytest tests/ -v
 
 ---
 
-## 15. Repository Structure
+## 14. Repository Structure
 
 ```text
 AWS-AFH/
@@ -310,6 +297,6 @@ AWS-AFH/
 
 ---
 
-## 16. License
+## 15. License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
