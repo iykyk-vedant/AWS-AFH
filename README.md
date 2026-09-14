@@ -19,16 +19,6 @@
 
 ---
 
-## 📸 System Architecture Diagram
-
-<p align="center">
-  <img src="docs/architecture_diagram.png" alt="Amaze on Work — Autonomous Incident-to-Fix Engineering Agent Architecture" width="100%" />
-</p>
-
-*End-to-end multi-tier architecture: Ingestion Layer (GitHub, Slack, Jira) ➔ Amazon Bedrock AgentCore Runtime & AWS Strands Agents SDK GraphBuilder ➔ 9-Agent Pipeline ➔ GraphRAG & Ephemeral Docker Container Sandboxes ➔ Delivery Layer (Verified GitHub PRs, Slack notifications, Jira updates).*
-
----
-
 ## 📑 Table of Contents
 
 1. [The Pitch (Problem, Audience, Impact)](#1-the-pitch)
@@ -89,6 +79,12 @@ This manual troubleshooting lifecycle costs engineering organizations hundreds o
 ---
 
 ## 3. System Architecture & Data Flow
+
+<p align="center">
+  <img src="docs/architecture_diagram.png" alt="Amaze on Work System Architecture & Data Flow" width="100%" />
+</p>
+
+*Amazon Bedrock AgentCore Runtime (Strands Agents SDK GraphBuilder) coordinates specialized DAG agent nodes with Model Context Protocol (MCP) integrations, Neo4j GraphRAG memory, Docker sandbox testing, and policy-driven delivery.*
 
 ```mermaid
 flowchart TD
