@@ -86,57 +86,6 @@ This manual troubleshooting lifecycle costs engineering organizations hundreds o
 
 *Amazon Bedrock AgentCore Runtime (Strands Agents SDK GraphBuilder) coordinates specialized DAG agent nodes with Model Context Protocol (MCP) integrations, Neo4j GraphRAG memory, Docker sandbox testing, and policy-driven delivery.*
 
-```mermaid
-flowchart TD
-    subgraph Ingestion ["1. Ingestion Layer"]
-        GH["GitHub Issue / Webhook"]
-        Slack["Slack Alert / Channel"]
-        Jira["Jira Ticket Webhook"]
-    end
-
-    subgraph Runtime ["2. Bedrock AgentCore & Strands SDK Runtime"]
-        Coordinator["Strands Agents GraphBuilder Orchestrator\n(strands_agent.py / strands_orchestrator.py)"]
-        Parser["1. Incident Parser"]
-        Retriever["2. Knowledge Retriever"]
-        Analyst["3. Codebase Analyst"]
-        Critic["4. Adversarial Critic"]
-        FixWriter["5. Fix Writer"]
-        TestWriter["6. Test Writer"]
-        SecurityGate["7. Security Gate"]
-        Validator["8. Validation Agent"]
-        RiskScorer["9. Risk Scorer & Synthesis"]
-    end
-
-    subgraph Memory ["3. GraphRAG & Long-Term Memory"]
-        Neo4j["Neo4j Code Property Graph\n(AST, Call Graphs, Dependencies)"]
-        HistDB["Historical Resolution DB"]
-    end
-
-    subgraph Sandbox ["4. Isolated Execution Sandbox"]
-        DockerPy["Ephemeral Docker Sandbox\n(pytest -v before/after)"]
-    end
-
-    subgraph Delivery ["5. Automated Delivery & Handoff"]
-        PR["Verified GitHub Pull Request\n(Target: AFH-DEMO)"]
-        SlackPost["Interactive Slack Thread"]
-        JiraUpdate["Resolved Jira Ticket"]
-    end
-
-    GH --> Coordinator
-    Slack --> Coordinator
-    Jira --> Coordinator
-
-    Coordinator --> Parser --> Retriever --> Analyst --> Critic --> FixWriter --> SecurityGate --> Validator --> RiskScorer
-
-    Retriever <--> HistDB
-    Analyst <--> Neo4j
-    Validator <--> DockerPy
-
-    RiskScorer --> PR
-    RiskScorer --> SlackPost
-    RiskScorer --> JiraUpdate
-```
-
 ---
 
 ## 4. Strands Agents SDK Integration
