@@ -81,7 +81,7 @@ This manual troubleshooting lifecycle costs engineering organizations hundreds o
 ## 3. System Architecture & Data Flow
 
 <p align="center">
-  <img src="docs/architecture_diagram.png" alt="Amaze on Work System Architecture & Data Flow" width="100%" />
+  <img src="docs/architecture_diagram.svg" alt="Amaze on Work System Architecture & Data Flow" width="100%" />
 </p>
 
 *Amazon Bedrock AgentCore Runtime (Strands Agents SDK GraphBuilder) coordinates specialized DAG agent nodes with Model Context Protocol (MCP) integrations, Neo4j GraphRAG memory, Docker sandbox testing, and policy-driven delivery.*
@@ -281,7 +281,7 @@ AWS-AFH/
 ├── agentcore_app.py         # Bedrock AgentCore runtime entrypoint
 ├── docker/                  # Dockerfiles for ephemeral sandbox execution
 ├── docs/                    # Architecture diagrams and documentation assets
-│   └── architecture_diagram.png
+│   └── architecture_diagram.svg
 ├── incidents/               # Sample incident payloads (INC-001 to INC-011)
 ├── reports/                 # Auto-generated incident resolution reports
 ├── src/
