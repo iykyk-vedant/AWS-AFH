@@ -1063,14 +1063,6 @@
           <span class="pulse-dot"></span>
           <span id="engineStatusText">● Engine Live · 138ms</span>
         </div>
-        <button onclick="openAgentCoreModal()" class="btn-secondary" style="border-color: rgba(168, 85, 247, 0.5); color: #C084FC; cursor: pointer;">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-            <polyline points="2 17 12 22 22 17"/>
-            <polyline points="2 12 12 17 22 12"/>
-          </svg>
-          <span>Bedrock AgentCore</span>
-        </button>
         <a href="/graph" class="btn-secondary" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
           <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="18" cy="5" r="3"/>
@@ -1112,59 +1104,7 @@
         </div>
       </section>
 
-      <!-- Metrics Grid (§8) -->
-      <section class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-header">
-            <span>Catalog Scenarios</span>
-            <svg class="icon"><use href="#icon-shield"/></svg>
-          </div>
-          <div class="metric-value-row">
-            <span class="metric-value" id="metricCatalogCount">11</span>
-            <span class="metric-trend trend-up">+2 this week</span>
-          </div>
-          <div class="metric-desc">Production failure modes</div>
-        </div>
 
-        <div class="metric-card">
-          <div class="metric-header">
-            <span>Mean Time to Resolve</span>
-            <svg class="icon"><use href="#icon-clock"/></svg>
-          </div>
-          <div class="metric-value-row">
-            <span class="metric-value">2.1 min</span>
-            <span class="metric-trend trend-good">↓ 97.7% from baseline</span>
-          </div>
-          <div class="metric-desc">Automated patch cycle</div>
-        </div>
-
-        <div class="metric-card">
-          <div class="metric-header">
-            <span>Regressions Introduced</span>
-            <svg class="icon"><use href="#icon-check"/></svg>
-          </div>
-          <div class="metric-value-row">
-            <span class="metric-value" style="color: var(--success);">0</span>
-            <span class="metric-trend trend-good">100% test pass</span>
-          </div>
-          <div class="metric-desc">No regressions detected</div>
-        </div>
-
-        <div class="metric-card" onclick="openAgentCoreModal()" style="cursor: pointer; transition: transform 0.2s, border-color 0.2s;" title="Click to open Bedrock AgentCore Runtime Console">
-          <div class="metric-header">
-            <span>Orchestration</span>
-            <svg class="icon" style="color: #C084FC;"><use href="#icon-cpu"/></svg>
-          </div>
-          <div class="metric-value-row">
-            <span class="metric-value" style="font-size: 19px; color: #C084FC;">Strands + AgentCore</span>
-            <span class="status-pill-small" style="border-color: rgba(168, 85, 247, 0.4); color: #D8B4FE;">ACTIVE</span>
-          </div>
-          <div class="metric-desc" style="display: flex; align-items: center; justify-content: space-between;">
-            <span>AWS agent runtime & Bedrock</span>
-            <span style="font-size: 10px; color: #A855F7; text-decoration: underline;">Open Console ↗</span>
-          </div>
-        </div>
-      </section>
 
       <!-- 7-Stage Agent Pipeline Section (§9, §10, §11, §12) -->
       <section class="section-card">
@@ -1264,6 +1204,7 @@
               <button class="filter-pill" id="filterPillOpen" onclick="setFilter('open', this)">Open</button>
               <button class="filter-pill" id="filterPillTriaging" onclick="setFilter('triaging', this)">Triaging</button>
               <button class="filter-pill" id="filterPillResolved" onclick="setFilter('resolved', this)">Resolved</button>
+              <button class="filter-pill" id="filterPillPRs" onclick="setFilter('prs', this)">PRs</button>
             </div>
 
             <button class="btn-primary" onclick="openNewIssueModal()">
@@ -1287,7 +1228,7 @@
             <span class="term-dot dot-yellow"></span>
             <span class="term-dot dot-green"></span>
           </div>
-          <span class="term-title">live_orchestrator.log — AWS EC2 Graviton (3.231.94.193)</span>
+          <span class="term-title">live_orchestrator.log — AWS EC2 (98.90.18.42)</span>
           <button onclick="loadIncidents()" class="btn-secondary" style="height: 24px; padding: 0 8px; font-size: 11px;">
             <svg class="icon icon-sm"><use href="#icon-refresh"/></svg>
             <span>Sync</span>
@@ -1295,7 +1236,7 @@
         </div>
         <div class="terminal-body" id="termBody">
           <div class="term-row"><span class="term-time">[20:45:10]</span> <span class="term-info">SYSTEM:</span> Amaze on Work FastAPI Webhook Receiver listening on 0.0.0.0:8000</div>
-          <div class="term-row"><span class="term-time">[20:45:10]</span> <span class="term-info">BEDROCK:</span> Strands AgentCore initialized with Groq Compound model provider</div>
+          <div class="term-row"><span class="term-time">[20:45:10]</span> <span class="term-info">ORCHESTRATOR:</span> Strands Autonomous Pipeline initialized with Groq Compound model provider</div>
           <div class="term-row"><span class="term-time">[20:45:12]</span> <span class="term-success">ACTIVE:</span> Real-time GitHub monitoring live on iykyk-vedant/AFH-DEMO</div>
         </div>
       </section>
@@ -1423,99 +1364,7 @@
     </div>
   </div>
 
-  <!-- Bedrock AgentCore Runtime Modal -->
-  <div class="modal-backdrop" id="agentCoreModal">
-    <div class="modal-card" style="width: 740px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column;">
-      <div class="modal-header" style="background: linear-gradient(90deg, rgba(168, 85, 247, 0.12) 0%, rgba(59, 130, 246, 0.08) 100%); border-bottom: 1px solid rgba(168, 85, 247, 0.3);">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <svg class="icon" style="color: #C084FC;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-            <polyline points="2 17 12 22 22 17"/>
-            <polyline points="2 12 12 17 22 12"/>
-          </svg>
-          <div>
-            <h3 style="font-size: 15px; font-weight: 700; color: #F3E8FF; display: flex; align-items: center; gap: 8px;">
-              Amazon Bedrock AgentCore Runtime
-              <span class="badge" style="background: rgba(168, 85, 247, 0.2); color: #D8B4FE; border: 1px solid rgba(168, 85, 247, 0.4); font-size: 11px; padding: 2px 8px;">SDK v1.23.0</span>
-            </h3>
-            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
-              Serverless Multi-Agent Loop Runtime · Strands Agents SDK v1.55.1
-            </div>
-          </div>
-        </div>
-        <button class="btn-secondary" style="height: 30px; width: 30px; padding: 0; justify-content: center;" onclick="closeAgentCoreModal()">
-          <svg class="icon icon-sm"><use href="#icon-close"/></svg>
-        </button>
-      </div>
 
-      <div class="modal-body" style="overflow-y: auto; flex: 1; padding: 20px 24px;">
-        <!-- AgentCore Spec Grid -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px;">
-          <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px; padding: 12px;">
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Manifest Spec</div>
-            <div style="font-size: 13px; font-weight: 600; color: #38BDF8; margin-top: 4px; font-family: var(--font-mono);">agentcore.json</div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">schema: agentcore.schema.json</div>
-          </div>
-          <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px; padding: 12px;">
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Runtime Entrypoint</div>
-            <div style="font-size: 13px; font-weight: 600; color: #C084FC; margin-top: 4px; font-family: var(--font-mono);">@app.entrypoint</div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">agentcore_app.py:agent_invocation</div>
-          </div>
-          <div style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 6px; padding: 12px;">
-            <div style="font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Cloud Tool Gateway</div>
-            <div style="font-size: 13px; font-weight: 600; color: #34D399; margin-top: 4px; font-family: var(--font-mono);">FastMCP Gateways</div>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">GitHub · Slack · Jira IAM Bridges</div>
-          </div>
-        </div>
-
-        <!-- Invocation Config Form -->
-        <div style="background: rgba(168, 85, 247, 0.04); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 8px; padding: 16px;">
-          <div style="font-size: 13px; font-weight: 600; color: #F3E8FF; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-            <span>Runtime Invocation Envelope</span>
-            <span style="font-size: 11px; color: #A855F7; font-family: var(--font-mono);">POST /api/agentcore/invoke</span>
-          </div>
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: end;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label" style="font-size: 11px;">Target Incident ID</label>
-              <select id="agentCoreIncidentSelect" class="form-select">
-                <option value="INC-001">INC-001 · ZeroDivisionError in checkout calculation</option>
-                <option value="INC-002" selected>INC-002 · IndexError in batch payment processing</option>
-                <option value="INC-003">INC-003 · KeyError in shipping status lookup</option>
-                <option value="INC-004">INC-004 · TypeError in cart discount calculation</option>
-                <option value="INC-005">INC-005 · AttributeError in user profile update</option>
-                <option value="INC-006">INC-006 · FileNotFoundError in invoice generation</option>
-              </select>
-            </div>
-            <button class="btn-primary" id="btnInvokeAgentCore" onclick="runAgentCoreInvocation()" style="background: linear-gradient(135deg, #9333EA 0%, #3B82F6 100%); border: none; height: 38px; justify-content: center; font-weight: 600;">
-              <span id="agentCoreBtnText">Invoke AgentCore</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Live Invocation Stream & Response -->
-        <div class="form-group" style="margin-top: 4px;">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <label class="form-label" style="font-size: 11px;">AgentCore Invocation Result Envelope</label>
-            <span id="agentCoreDuration" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);"></span>
-          </div>
-          <pre id="agentCoreOutput" style="background: #0B0F19; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: var(--font-mono); font-size: 12px; color: #E2E8F0; max-height: 230px; overflow-y: auto; margin: 0; line-height: 1.5;">{
-  "status": "READY",
-  "runtime": "Amazon Bedrock AgentCore Serverless Runtime",
-  "framework": "strands-agents 1.55.1",
-  "message": "Select an incident above and click 'Invoke AgentCore' to test the serverless runtime entrypoint."
-}</pre>
-        </div>
-      </div>
-
-      <div class="modal-footer" style="display: flex; align-items: center; justify-content: space-between;">
-        <div style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
-          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #34D399;"></span>
-          <span>AgentCore Gateway Active</span>
-        </div>
-        <button class="btn-secondary" onclick="closeAgentCoreModal()">Close</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast Notification Container (§31) -->
   <div class="toast-container" id="toastContainer"></div>
@@ -1559,18 +1408,20 @@
           const total = incidentsData.length;
           const openCount = incidentsData.filter(i => (i.state || 'open') === 'open' && !i.pr_url).length;
           const resolvedCount = incidentsData.filter(i => (i.state || '') === 'closed' || !!i.pr_url).length;
+          const prCount = incidentsData.filter(i => !!i.pr_url).length;
           
           const pillAll = document.getElementById('filterPillAll');
           const pillOpen = document.getElementById('filterPillOpen');
           const pillTri = document.getElementById('filterPillTriaging');
           const pillRes = document.getElementById('filterPillResolved');
+          const pillPRs = document.getElementById('filterPillPRs');
           if (pillAll) pillAll.textContent = `All (${total})`;
           if (pillOpen) pillOpen.textContent = `Open (${openCount})`;
           if (pillTri) pillTri.textContent = `Triaging (${openCount})`;
           if (pillRes) pillRes.textContent = `Resolved (${resolvedCount})`;
+          if (pillPRs) pillPRs.textContent = `PRs (${prCount})`;
 
-          const metricCat = document.getElementById('metricCatalogCount');
-          if (metricCat && total > 0) metricCat.textContent = total;
+
 
           renderGrid(applyFilter(incidentsData));
         } else {
@@ -1600,9 +1451,10 @@
       return data.filter(inc => {
         const state = (inc.state || 'open').toLowerCase();
         let matchesFilter = true;
-        if (currentFilter === 'open') matchesFilter = state === 'open';
+        if (currentFilter === 'open') matchesFilter = state === 'open' && !inc.pr_url;
         else if (currentFilter === 'resolved') matchesFilter = state === 'closed' || !!inc.pr_url;
         else if (currentFilter === 'triaging') matchesFilter = state === 'open' && !inc.pr_url;
+        else if (currentFilter === 'prs') matchesFilter = !!inc.pr_url;
 
         const matchesQuery = !q ||
           (inc.id || '').toLowerCase().includes(q) ||
@@ -1924,68 +1776,6 @@
       }
     }
 
-    // ── Bedrock AgentCore Runtime Functions ──
-    function openAgentCoreModal() {
-      const modal = document.getElementById('agentCoreModal');
-      if (modal) modal.classList.add('open');
-    }
-
-    function closeAgentCoreModal() {
-      const modal = document.getElementById('agentCoreModal');
-      if (modal) modal.classList.remove('open');
-    }
-
-    async function runAgentCoreInvocation() {
-      const incSelect = document.getElementById('agentCoreIncidentSelect');
-      const incidentId = incSelect ? incSelect.value : 'INC-002';
-      const btn = document.getElementById('btnInvokeAgentCore');
-      const btnText = document.getElementById('agentCoreBtnText');
-      const output = document.getElementById('agentCoreOutput');
-      const duration = document.getElementById('agentCoreDuration');
-
-      btn.disabled = true;
-      btnText.textContent = 'Invoking Runtime...';
-      duration.textContent = 'Executing multi-agent loop...';
-      output.textContent = JSON.stringify({
-        "status": "INVOKING",
-        "runtime": "Amazon Bedrock AgentCore Serverless Runtime",
-        "target_incident": incidentId,
-        "entrypoint": "agentcore_app.py:agent_invocation",
-        "stage": "Executing Strands agents & FastMCP gateways..."
-      }, null, 2);
-
-      const startTime = Date.now();
-
-      try {
-        const res = await fetch('/api/agentcore/invoke', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ incident_id: incidentId })
-        });
-
-        const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
-        duration.textContent = `Completed in ${elapsed}s`;
-
-        if (res.ok) {
-          const data = await res.json();
-          output.textContent = JSON.stringify(data, null, 2);
-          showToast(`✓ AgentCore Invocation Successful for ${incidentId}`, 'success');
-          loadIncidents();
-        } else {
-          const err = await res.text();
-          output.textContent = JSON.stringify({ error: err, status: "FAILED" }, null, 2);
-          showToast(`AgentCore Invocation Error: ${res.statusText}`, 'error');
-        }
-      } catch (e) {
-        duration.textContent = 'Error';
-        output.textContent = JSON.stringify({ error: e.message, status: "NETWORK_ERROR" }, null, 2);
-        showToast(`Invocation Error: ${e.message}`, 'error');
-      } finally {
-        btn.disabled = false;
-        btnText.textContent = 'Invoke AgentCore';
-      }
-    }
-
     // ── Keyboard Shortcuts (§22) ──
     window.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -1996,7 +1786,6 @@
       if (e.key === 'Escape') {
         closeDrawer();
         closeNewIssueModal();
-        closeAgentCoreModal();
       }
     });
 
